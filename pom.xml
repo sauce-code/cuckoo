@@ -11,7 +11,7 @@
 		<module>cuckoo-uci</module>
 		<module>cuckoo-tui</module>
 		<module>cuckoo-gui</module>
-		<module>cuckoo-apk</module>
+		
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
