@@ -1,3 +1,4 @@
+package org.petero.cuckoo.app;
 /*
     CuckooChess - A java chess program.
     Copyright (C) 2011  Peter Österlund, peterosterlund2@gmail.com
@@ -16,14 +17,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.petero.cuckoo.tui;
-
 import java.io.IOException;
 
-import org.petero.cuckoo.engine.chess.ComputerPlayer;
-import org.petero.cuckoo.engine.chess.HumanPlayer;
-import org.petero.cuckoo.engine.chess.Player;
 import org.petero.cuckoo.engine.chess.TreeLogger;
+import org.petero.cuckoo.gui.AppletGUI;
+import org.petero.cuckoo.tui.TUIGame;
 import org.petero.cuckoo.uci.UCIProtocol;
 
 /**
@@ -32,20 +30,20 @@ import org.petero.cuckoo.uci.UCIProtocol;
  */
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws IOException {
-    	if ((args.length == 0)) {
-            Player whitePlayer = new HumanPlayer();
-            ComputerPlayer blackPlayer = new ComputerPlayer();
-            blackPlayer.setTTLogSize(21);
-            TUIGame game = new TUIGame(whitePlayer, blackPlayer);
-            game.play();
-        } else if ((args.length == 1) && args[0].equals("tree")) {
-            TreeLogger.main(new String[]{args[1]});
-        } else {
-            UCIProtocol.main(false);
-        }
-    }
+	/**
+	 * @param args
+	 *            the command line arguments
+	 */
+	public static void main(String[] args) throws IOException {
+		if ((args.length == 1) && args[0].equals("gui")) {
+			AppletGUI.main(args);
+		} else if ((args.length == 1) && (args[0].equals("txt") || args[0].equals("tui"))) {
+			TUIGame.main(args);
+		} else if ((args.length == 2) && args[0].equals("tree")) {
+			TreeLogger.main(new String[] { args[1] });
+		} else {
+			UCIProtocol.main(new String[] { Boolean.toString(false) });
+		}
+	}
+
 }

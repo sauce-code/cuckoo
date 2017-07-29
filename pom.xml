@@ -11,7 +11,7 @@
 		<module>cuckoo-uci</module>
 		<module>cuckoo-tui</module>
 		<module>cuckoo-gui</module>
-		
+		<module>cuckoo-app</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,12 +26,6 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	<licenses>
-		<license>
-			<name>GNU GENERAL PUBLIC LICENSE</name>
-			<url>LICENSE.txt</url>
-		</license>
-	</licenses>
 	<reporting>
 		<plugins>
 			<plugin>
@@ -41,4 +35,18 @@
 			</plugin>
 		</plugins>
 	</reporting>
+	<url>https://www.github.com/sauce-code/cuckoo</url>
+	<licenses>
+		<license>
+			<name>GNU GENERAL PUBLIC LICENSE</name>
+			<url>LICENSE.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Peter Österlund</name>
+			<url>http://hem.bredband.net/petero2b/javachess/index.html</url>
+			<email>peterosterlund2@gmail.com</email>
+		</developer>
+	</developers>
 </project>

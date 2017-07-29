@@ -28,6 +28,7 @@ import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Evaluate;
 import org.petero.cuckoo.engine.chess.Game;
+import org.petero.cuckoo.engine.chess.HumanPlayer;
 import org.petero.cuckoo.engine.chess.Move;
 import org.petero.cuckoo.engine.chess.Player;
 import org.petero.cuckoo.engine.chess.Position;
@@ -50,7 +51,7 @@ public class TUIGame extends Game {
         } else if (moveStr.equals("uci")) {
             whitePlayer = null;
             blackPlayer = null;
-            UCIProtocol.main(true);
+            UCIProtocol.main(new String[] { Boolean.toString(true) });
             System.exit(0);
             return false;
         } else if (moveStr.equals("help")) {
@@ -214,4 +215,13 @@ public class TUIGame extends Game {
             }
         }
     }
+    
+    public static void main(String[] args) throws IOException {
+        Player whitePlayer = new HumanPlayer();
+        ComputerPlayer blackPlayer = new ComputerPlayer();
+        blackPlayer.setTTLogSize(21);
+        TUIGame game = new TUIGame(whitePlayer, blackPlayer);
+        game.play();
+	}
+    
 }

@@ -7,12 +7,27 @@
 		<artifactId>cuckoo</artifactId>
 		<version>1.12</version>
 	</parent>
-	<groupId>org.petero.cuckoo.uci</groupId>
-	<artifactId>cuckoo-uci</artifactId>
+	<groupId>org.petero.cuckoo.app</groupId>
+	<artifactId>cuckoo-app</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>org.petero.cuckoo.engine</groupId>
 			<artifactId>cuckoo-engine</artifactId>
+			<version>1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.petero.cuckoo.gui</groupId>
+			<artifactId>cuckoo-gui</artifactId>
+			<version>1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.petero.cuckoo.tui</groupId>
+			<artifactId>cuckoo-tui</artifactId>
+			<version>1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.petero.cuckoo.uci</groupId>
+			<artifactId>cuckoo-uci</artifactId>
 			<version>1.12</version>
 		</dependency>
 	</dependencies>
@@ -24,7 +39,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.petero.cuckoo.uci.UCIProtocol</mainClass>
+							<mainClass>org.petero.cuckoo.app.Main</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>

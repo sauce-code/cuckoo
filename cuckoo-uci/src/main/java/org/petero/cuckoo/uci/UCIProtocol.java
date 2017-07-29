@@ -46,9 +46,10 @@ public class UCIProtocol {
     boolean quit;
 
 
-    public static void main(boolean autoStart) {
+    public static void main(String[] args) {
+    	boolean autostart = Boolean.parseBoolean(args[0]);
         UCIProtocol uciProt = new UCIProtocol();
-        uciProt.mainLoop(System.in, System.out, autoStart);
+        uciProt.mainLoop(System.in, System.out, autostart);
     }
 
     public UCIProtocol() {
