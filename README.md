@@ -2,7 +2,7 @@
 
 This is an adaptation of Peter Österlund's CuckooChess 1.12, see [official page](http://hem.bredband.net/petero2b/javachess/index.html)
 
-The source code provided is a java maven eclipse project.
+The source code provided is a java maven eclipse project in utf-8.
 
 The program, except for the chess font, is copyrighted by Peter Österlund, and is available as [open source](http://www.opensource.org/) under the [GNU GPL v3 license](http://www.gnu.org/licenses/gpl.html).
 
