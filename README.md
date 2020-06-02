@@ -6,9 +6,9 @@
 
 # ChuckooChess 1.12
 
-This is an adaptation of Peter Österlund's CuckooChess 1.12, see [official page](http://hem.bredband.net/petero2b/javachess/index.html)
+This is an adaptation of Peter Österlund's CuckooChess 1.12, see [official page](http://hem.bredband.net/petero2b/javachess/index.html).
 
-The source code provided is a java maven eclipse project in utf-8.
+The source code provided is a Java Maven project in UTF-8.
 
 The program, except for the chess font, is copyrighted by Peter Österlund, and is available as [open source](http://www.opensource.org/) under the [GNU GPL v3 license](http://www.gnu.org/licenses/gpl.html).
 
@@ -20,7 +20,7 @@ The program implements many of the standard methods for computer chess programs,
 
 The program is rather slow compared to state of the art chess programs. However, it is still quite good at tactics and scores [299](http://hem.bredband.net/petero2b/javachess/wac_10s.txt) of 300 on the [win at chess](http://chessprogramming.wikispaces.com/Test-Positions) tactical test suite, at 10 seconds thinking time per position, using an Intel Core i7 870 CPU. The only position not solved is the extremely complicated position 230, which according to [current analysis](http://rybkaforum.net/cgi-bin/rybkaforum/topic_show.pl?tid=18403), seems like a draw and therefore an invalid test position.
 
-Note that the author does not consider Java the best language for implementing a chess engine. He wrote this program mostly to get some hands-on experience with java and [eclipse](http://www.eclipse.org/).
+Note that the author does not consider Java the best language for implementing a chess engine. He wrote this program mostly to get some hands-on experience with Java and [Eclipse](http://www.eclipse.org/).
 
 The program uses the [Chess Cases](http://www.chessvariants.org/d.font/) chess font, created by Matthieu Leschemelle.
 
@@ -32,13 +32,13 @@ You can also run the applet as a standalone program. Download the [cuckoo-app-1.
 
     java -jar cuckoo-app-1.12-jar-with-dependencies.jar gui
 
-![GUI Preview](/doc/img/gui-preview.png)
+![GUI Preview](doc/img/gui-preview.png)
     
 or like this (text mode):
 
     java -jar cuckoo-app-1.12-jar-with-dependencies.jar txt
 
-![GUI Preview](/doc/img/tui-preview.png)
+![GUI Preview](doc/img/tui-preview.png)
 
 More commands are available in text mode than in graphical mode. Try the `help` command for a list of available commands.
 
@@ -75,8 +75,8 @@ To use the program with the [Arena](http://www.playwitharena.com/) GUI, create a
 
 Note that you must set the maximum heap size using `-Xmx` to a value larger than the hash size you set in the Arena program. (I don't know exactly how much larger.)
 
-If you are using windows, you may also be interested in a compiled version available from Jim Ablett's [chess projects page](http://jim-ablett.co.de/).
+If you are using Windows, you may also be interested in a compiled version available from Jim Ablett's [chess projects page](http://jim-ablett.co.de/).
 
 ## Change Log
 
-You can find the changelog [here](http://hem.bredband.net/petero2b/javachess/ChangeLog.txt).
+You can find the changelog [here](CHANGELOG.md).
