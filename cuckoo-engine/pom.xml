@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.petero.cuckoo</groupId>
 		<artifactId>cuckoo</artifactId>
-		<version>1.12</version>
+		<version>1.12.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.petero.cuckoo.engine</groupId>
 	<artifactId>cuckoo-engine</artifactId>

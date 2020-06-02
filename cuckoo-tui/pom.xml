@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.petero.cuckoo</groupId>
 		<artifactId>cuckoo</artifactId>
-		<version>1.12</version>
+		<version>1.12.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.petero.cuckoo.tui</groupId>
 	<artifactId>cuckoo-tui</artifactId>
@@ -13,12 +13,12 @@
 		<dependency>
 			<groupId>org.petero.cuckoo.engine</groupId>
 			<artifactId>cuckoo-engine</artifactId>
-			<version>1.12</version>
+			<version>1.12.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.petero.cuckoo.uci</groupId>
 			<artifactId>cuckoo-uci</artifactId>
-			<version>1.12</version>
+			<version>1.12.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
