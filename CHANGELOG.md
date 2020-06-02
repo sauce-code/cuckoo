@@ -1,6 +1,11 @@
 # Changelog
 
-2011-10-24: Version 1.12 (ELO: m=61 s=1.6)
+## 2017-07-30: Version 1.12 (Maven Port)
+- Reuploaded the project on GitHub as an Eclipse Maven Project
+- applied Cleanup
+- set required Java Version to 1.8
+
+## 2011-10-24: Version 1.12 (ELO: m=61 s=1.6)
 - Don't use aspiration window when mate score has been found.
 - Optimized the legal move generator. This has minimal effect on playing strength, but improves perft speed a lot.
 - Added bishop back rank penalty.
@@ -19,7 +24,7 @@
 - Optimized bishop pair bonus using CLOP.
 - Optimized futility margins using CLOP.
 
-2011-06-12: Version 1.11 (ELO: m=47 s=4.8)
+## 2011-06-12: Version 1.11 (ELO: m=47 s=4.8)
 - Do extended futility pruning also on depth 4.
 - Implemented razoring.
 - Added support for fractional ply extensions.
@@ -31,13 +36,13 @@
 - Increase beta in two steps when a root move fails high.
 - More accurate evaluation of end games with insufficient mating material.
 
-2011-04-23: Version 1.10 (ELO: m=13 s=2.9)
+## 2011-04-23: Version 1.10 (ELO: m=13 s=2.9)
 - More aggressive futility pruning.
 - Increased passed pawn bonus a little.
 - Added small penalty for non-developed bishops.
 - Implemented adjustable playing strength.
 
-2011-03-16: Version 1.09
+## 2011-03-16: Version 1.09
 - Speeded up the SEE function by using bitboard techniques.
 - Use a lookup table to speed up castle bonus calculations.
 - Implemented specialized move generator function for check evasions.
@@ -55,7 +60,7 @@
 - Adjusted the knight piece square tables.
 - Added code to dump the search tree to a binary file, and code to browse and search the dump file.
 
-2011-01-30: Version 1.08
+## 2011-01-30: Version 1.08
 - Modified the bishop piece square table.
 - Added penalty for bishop trapped behind pawn on a2/a7/h2/h7.
 - Added isolated pawn penalty.
@@ -63,7 +68,7 @@
 - Added backward pawn penalty.
 - Modified the history heuristic calculations.
 
-2011-01-18: Version 1.07
+## 2011-01-18: Version 1.07
 - Speed optimizations.
 - Only apply the "drawish factor" for opposite colored bishops if the non-pawn material is balanced.
 - Added evaluation of KQKP end games.
@@ -85,7 +90,7 @@
 - Ponder even if there is only one valid move.
 - Allow LMR also at the root.
 
-2010-12-31: Version 1.06
+## 2010-12-31: Version 1.06
 - Speed optimizations.
 - Implemented non-linear mobility scores.
 - Fixed bad interaction of futility pruning/hashing/fail soft.
@@ -114,7 +119,7 @@
 - Created specialized move generator functions to generate checks.
 - Correctly handle pseudo-legal but not legal en passant squares.
 
-2010-07-04: Version 1.05
+## 2010-07-04: Version 1.05
 - Speed optimizations.
 - Avoid dynamic memory allocations during search.
 - Don't do mate threat extensions too deep down in the search tree. Fixes search tree explosion in WAC 21.
@@ -125,4 +130,4 @@
 - Store static evaluation scores in the transposition table.
 - If there is only one legal move at the root, make that move immediately.
 
-2010-06-12: Version 1.04
+## 2010-06-12: Version 1.04
