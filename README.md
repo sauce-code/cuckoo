@@ -31,10 +31,14 @@ The author picked the name CuckooChess because the transposition table is based 
 You can also run the applet as a standalone program. Download the [cuckoo-app-1.12-jar-with-dependencies.jar](https://github.com/sauce-code/cuckoo/releases/download/1.12/cuckoo-app-1.12-jar-with-dependencies.jar) file and run it like this (graphical mode):
 
     java -jar cuckoo-app-1.12-jar-with-dependencies.jar gui
+
+![GUI Preview](/doc/img/gui-preview.png)
     
 or like this (text mode):
 
     java -jar cuckoo-app-1.12-jar-with-dependencies.jar txt
+
+![GUI Preview](/doc/img/tui-preview.png)
 
 More commands are available in text mode than in graphical mode. Try the `help` command for a list of available commands.
 
