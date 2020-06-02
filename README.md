@@ -1,3 +1,6 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+![Java Source 1.8](https://img.shields.io/badge/Java%20Source-1.8-blue.svg)
+![Java Compiler 1.8](https://img.shields.io/badge/Java%20Compiler-1.8-blue.svg)
 ![Java CI with Maven](https://github.com/sauce-code/cuckoo/workflows/Java%20CI%20with%20Maven/badge.svg)
 
 # ChuckooChess 1.12
