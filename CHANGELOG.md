@@ -2,8 +2,8 @@
 
 ## 2017-07-30: Version 1.12 (Maven Port)
 - Reuploaded the project on GitHub as an Eclipse Maven Project
-- applied Cleanup
-- set required Java Version to 1.8
+- Applied Cleanup
+- Set required Java Version to 1.8
 
 ## 2011-10-24: Version 1.12 (ELO: m=61 s=1.6)
 - Don't use aspiration window when mate score has been found.
