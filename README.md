@@ -44,22 +44,22 @@ More commands are available in text mode than in graphical mode. Try the `help` 
 
 ## Build instructions
 
-Compile the project in root directory using
+Compile the project using:
 
     mvn install
 
 You can find the compiled standalone jar here:
 
-    cuckoo-app\target\cuckoo-app-1.12-jar-with-dependencies.jar
+    cuckoo-app/target/cuckoo-app-1.12-jar-with-dependencies.jar
 
 To run it, see description above.
 
 
-You can also find gui only, tui only and uci only versions here 
+You can also find gui only, tui only and uci only versions here:
 
-    cuckoo-gui\target\cuckoo-gui-1.12-jar-with-dependencies.jar
-    cuckoo-tui\target\cuckoo-tui-1.12-jar-with-dependencies.jar
-    cuckoo-uci\target\cuckoo-uci-1.12-jar-with-dependencies.jar
+    cuckoo-gui/target/cuckoo-gui-1.12-jar-with-dependencies.jar
+    cuckoo-tui/target/cuckoo-tui-1.12-jar-with-dependencies.jar
+    cuckoo-uci/target/cuckoo-uci-1.12-jar-with-dependencies.jar
 
 For those, you don't need to add any parameters to run them.
 
@@ -67,16 +67,27 @@ For those, you don't need to add any parameters to run them.
 
 It is also possible to use the program as a [UCI engine](http://en.wikipedia.org/wiki/Universal_Chess_Interface), which means that you can use it with many graphical chess programs. For example, to use it with XBoard/WinBoard + polyglot, set EngineCommand like this in the polyglot ini file:
 
-    EngineCommand = java -jar /path/to/jar/cuckoo-app-1.12-jar-with-dependencies.jar uci
+    EngineCommand = java -jar path/to/jar/cuckoo-app-1.12-jar-with-dependencies.jar uci
 
 To use the program with the [Arena](http://www.playwitharena.com/) GUI, create a one-line bat-file containing:
 
     javaw -Xmx256m -jar cuckoo-app-1.12-jar-with-dependencies.jar uci
 
-Note that you must set the maximum heap size using `-Xmx` to a value larger than the hash size you set in the Arena program. (I don't know exactly how much larger.)
+Note that you must set the maximum heap size using `-Xmx` to a value larger than the hash size you set in the Arena program (the author doesn't know exactly how much larger).
 
 If you are using Windows, you may also be interested in a compiled version available from Jim Ablett's [chess projects page](http://jim-ablett.co.de/).
 
-## Change Log
+## Speed
+
+The program runs fastest when run in a 64-bit OS using a 64-bit Java implementation (JVM). Here is a speed comparison using CuckooChess 1.11 in 64-bit Windows 7 on an Intel core i7 870, when analyzing from the initial position to depth 17:
+
+| Version               | Speed (N/s) |
+| --------------------- | ----------- |
+| 64-bit JVM (1.6.0_29) | 1130275     |
+| 32-bit JVM (1.6.0_29) | 584194      |
+
+On this computer, the 64-bit version is more than 90% faster. 
+
+## Changelog
 
 You can find the changelog [here](CHANGELOG.md).
