@@ -34,7 +34,7 @@ You can also run the applet as a standalone program. Download the [cuckoo-app-1.
 
 ![GUI Preview](doc/img/gui-preview.png)
     
-or like this (text mode):
+Or like this (text mode):
 
     java -jar cuckoo-app-1.12-jar-with-dependencies.jar txt
 
@@ -48,14 +48,14 @@ Compile the project using:
 
     mvn install
 
-You can find the compiled standalone jar here:
+You can find the compiled standalone JAR here:
 
     cuckoo-app/target/cuckoo-app-1.12-jar-with-dependencies.jar
 
 To run it, see description above.
 
 
-You can also find gui only, tui only and uci only versions here:
+You can also find GUI only, TUI only and UCI only versions here:
 
     cuckoo-gui/target/cuckoo-gui-1.12-jar-with-dependencies.jar
     cuckoo-tui/target/cuckoo-tui-1.12-jar-with-dependencies.jar
@@ -83,8 +83,8 @@ The program runs fastest when run in a 64-bit OS using a 64-bit Java implementat
 
 | Version               | Speed (N/s) |
 | --------------------- | ----------: |
-| 64-bit JVM (1.6.0_29) |   1.130.275 |
-| 32-bit JVM (1.6.0_29) |     584.194 |
+| 64-bit JVM (1.6.0_29) |   1,130,275 |
+| 32-bit JVM (1.6.0_29) |     584,194 |
 
 On this computer, the 64-bit version is more than 90% faster. 
 
