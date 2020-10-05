@@ -52,7 +52,7 @@
 	<licenses>
 		<license>
 			<name>GNU GENERAL PUBLIC LICENSE</name>
-			<url>LICENSE.txt</url>
+			<url>LICENSE</url>
 		</license>
 	</licenses>
 	<developers>
@@ -62,4 +62,11 @@
 			<email>peterosterlund2@gmail.com</email>
 		</developer>
 	</developers>
+	  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/sauce-code/cuckoo</url>
+    </repository>
+  </distributionManagement>
 </project>
