@@ -1,10 +1,10 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
-![Java Version 1.8](https://img.shields.io/badge/Java%20Version-1.8-blue.svg)
+![Java Version 21](https://img.shields.io/badge/Java%20Version-21-blue.svg)
 ![Source Encoding](https://img.shields.io/badge/Source%20Encoding-UTF--8-blue)
 
 ![Java CI with Maven](https://github.com/sauce-code/cuckoo/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-# ChuckooChess 1.12
+# Cuckoo Chess
 
 This is an adaptation of Peter Österlund's CuckooChess 1.12, see [official page](http://hem.bredband.net/petero2b/javachess/index.html).
 
