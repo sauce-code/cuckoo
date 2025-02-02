@@ -57,13 +57,13 @@ public class Book {
         if (numBookMoves >= 0)
             return;
         long t0 = System.currentTimeMillis();
-        bookMap = new HashMap<Long, List<BookEntry>>();
+        bookMap = new HashMap<>();
         rndGen = new SecureRandom();
         rndGen.setSeed(System.currentTimeMillis());
         numBookMoves = 0;
         try {
             InputStream inStream = getClass().getResourceAsStream("/book.bin");
-            List<Byte> buf = new ArrayList<Byte>(8192);
+            List<Byte> buf = new ArrayList<>(8192);
             byte[] tmpBuf = new byte[1024];
             while (true) {
                 int len = inStream.read(tmpBuf);
@@ -107,13 +107,8 @@ public class Book {
 
     /** Add a move to a position in the opening book. */
     private void addToBook(Position pos, Move moveToAdd) {
-        List<BookEntry> ent = bookMap.get(pos.zobristHash());
-        if (ent == null) {
-            ent = new ArrayList<BookEntry>();
-            bookMap.put(pos.zobristHash(), ent);
-        }
-        for (int i = 0; i < ent.size(); i++) {
-            BookEntry be = ent.get(i);
+        List<BookEntry> ent = bookMap.computeIfAbsent(pos.zobristHash(), k -> new ArrayList<>());
+        for (BookEntry be : ent) {
             if (be.move.equals(moveToAdd)) {
                 be.count++;
                 return;
@@ -135,29 +130,28 @@ public class Book {
         MoveGen.MoveList legalMoves = new MoveGen().pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, legalMoves);
         int sum = 0;
-        for (int i = 0; i < bookMoves.size(); i++) {
-            BookEntry be = bookMoves.get(i);
+        for (BookEntry be : bookMoves) {
             boolean contains = false;
             for (int mi = 0; mi < legalMoves.size; mi++)
                 if (legalMoves.m[mi].equals(be.move)) {
                     contains = true;
                     break;
                 }
-            if  (!contains) {
+            if (!contains) {
                 // If an illegal move was found, it means there was a hash collision.
                 return null;
             }
-            sum += getWeight(bookMoves.get(i).count);
+            sum += getWeight(be.count);
         }
         if (sum <= 0) {
             return null;
         }
         int rnd = rndGen.nextInt(sum);
         sum = 0;
-        for (int i = 0; i < bookMoves.size(); i++) {
-            sum += getWeight(bookMoves.get(i).count);
+        for (BookEntry bookMove : bookMoves) {
+            sum += getWeight(bookMove.count);
             if (rnd < sum) {
-                return bookMoves.get(i).move;
+                return bookMove.move;
             }
         }
         // Should never get here
@@ -199,7 +193,7 @@ public class Book {
     }
     
     public static List<Byte> createBinBook() {
-        List<Byte> binBook = new ArrayList<Byte>(0);
+        List<Byte> binBook = new ArrayList<>(0);
         try {
             InputStream inStream = new Object().getClass().getResourceAsStream("/book.txt");
             InputStreamReader inFile = new InputStreamReader(inStream);
@@ -254,27 +248,22 @@ public class Book {
     }
 
     private static int pieceToProm(int p) {
-        switch (p) {
-        case Piece.WQUEEN: case Piece.BQUEEN:
-            return 1;
-        case Piece.WROOK: case Piece.BROOK:
-            return 2;
-        case Piece.WBISHOP: case Piece.BBISHOP:
-            return 3;
-        case Piece.WKNIGHT: case Piece.BKNIGHT:
-            return 4;
-        default:
-            return 0;
-        }
+        return switch (p) {
+            case Piece.WQUEEN, Piece.BQUEEN -> 1;
+            case Piece.WROOK, Piece.BROOK -> 2;
+            case Piece.WBISHOP, Piece.BBISHOP -> 3;
+            case Piece.WKNIGHT, Piece.BKNIGHT -> 4;
+            default -> 0;
+        };
     }
     
     private static int promToPiece(int prom, boolean whiteMove) {
-        switch (prom) {
-        case 1: return whiteMove ? Piece.WQUEEN : Piece.BQUEEN;
-        case 2: return whiteMove ? Piece.WROOK  : Piece.BROOK;
-        case 3: return whiteMove ? Piece.WBISHOP : Piece.BBISHOP;
-        case 4: return whiteMove ? Piece.WKNIGHT : Piece.BKNIGHT;
-        default: return Piece.EMPTY;
-        }
+        return switch (prom) {
+            case 1 -> whiteMove ? Piece.WQUEEN : Piece.BQUEEN;
+            case 2 -> whiteMove ? Piece.WROOK : Piece.BROOK;
+            case 3 -> whiteMove ? Piece.WBISHOP : Piece.BBISHOP;
+            case 4 -> whiteMove ? Piece.WKNIGHT : Piece.BKNIGHT;
+            default -> Piece.EMPTY;
+        };
     }
 }

@@ -170,14 +170,14 @@ public class ChessController {
     
     public final void setPosHistory(List<String> posHistStr) {
         try {
-            String fen = posHistStr.get(0);
+            String fen = posHistStr.getFirst();
             Position pos = TextIO.readFEN(fen);
             game.processString("new");
             game.pos = pos;
             String[] strArr = posHistStr.get(1).split(" ");
             final int arrLen = strArr.length;
-            for (int i = 0; i < arrLen; i++) {
-                game.processString(strArr[i]);
+            for (String s : strArr) {
+                game.processString(s);
             }
             int numUndo = Integer.parseInt(posHistStr.get(2));
             for (int i = 0; i < numUndo; i++) {
@@ -200,7 +200,7 @@ public class ChessController {
     public String getPGN() {
         StringBuilder pgn = new StringBuilder();
         List<String> posHist = getPosHistory();
-        String fen = posHist.get(0);
+        String fen = posHist.getFirst();
         String moves = game.getMoveListString(true);
         if (game.getGameState() == GameState.ALIVE)
             moves += " *";
@@ -228,8 +228,8 @@ public class ChessController {
         String[] strArr = moves.split(" ");
         int currLineLength = 0;
         final int arrLen = strArr.length;
-        for (int i = 0; i < arrLen; i++) {
-            String move = strArr[i].trim();
+        for (String s : strArr) {
+            String move = s.trim();
             int moveLen = move.length();
             if (moveLen > 0) {
                 if (currLineLength + 1 + moveLen >= 80) {
@@ -413,21 +413,12 @@ public class ChessController {
     Move promoteMove;
     public final void reportPromotePiece(int choice) {
         final boolean white = game.pos.whiteMove;
-        int promoteTo;
-        switch (choice) {
-            case 1:
-                promoteTo = white ? Piece.WROOK : Piece.BROOK;
-                break;
-            case 2:
-                promoteTo = white ? Piece.WBISHOP : Piece.BBISHOP;
-                break;
-            case 3:
-                promoteTo = white ? Piece.WKNIGHT : Piece.BKNIGHT;
-                break;
-            default:
-                promoteTo = white ? Piece.WQUEEN : Piece.BQUEEN;
-                break;
-        }
+        int promoteTo = switch (choice) {
+            case 1 -> white ? Piece.WROOK : Piece.BROOK;
+            case 2 -> white ? Piece.WBISHOP : Piece.BBISHOP;
+            case 3 -> white ? Piece.WKNIGHT : Piece.BKNIGHT;
+            default -> white ? Piece.WQUEEN : Piece.BQUEEN;
+        };
         promoteMove.promoteTo = promoteTo;
         Move m = promoteMove;
         promoteMove = null;
@@ -458,7 +449,6 @@ public class ChessController {
                 }
             }
         }
-        gui.reportInvalidMove(move);
         return false;
     }
 

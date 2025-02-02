@@ -377,9 +377,9 @@ public class PositionTest {
             "b5", "Nc3", "Nf6", "Nb1", "Ng8", "Nc3", "Nf6", "Nb1", "Ng8", "Nc3", "d5",
             "cxd6", "Qxd6", "h4", "Be6", "h5", "Nc6", "h6", "o-o-o", "hxg7", "Nf6", "gxh8Q", "Be7"
         };
-        List<UndoInfo> uiList = new ArrayList<UndoInfo>();
-        List<Long> hashList = new ArrayList<Long>();
-        List<Move> moveList = new ArrayList<Move>();
+        List<UndoInfo> uiList = new ArrayList<>();
+        List<Long> hashList = new ArrayList<>();
+        List<Move> moveList = new ArrayList<>();
         for (int i = 0; i < moves.length; i++) {
             uiList.add(new UndoInfo());
             Move m = TextIO.stringToMove(pos, moves[i]);
@@ -389,7 +389,7 @@ public class PositionTest {
             assertEquals(h, pos.computeZobristHash());
             hashList.add(h);
         }
-        assertFalse(hashList.get(0).equals(hashList.get(4)));
+        assertNotEquals(hashList.get(0), hashList.get(4));
         assertEquals(hashList.get(4), hashList.get(8));
         for (int i = moves.length - 1; i >= 0; i--) {
             pos.unMakeMove(moveList.get(i), uiList.get(i));

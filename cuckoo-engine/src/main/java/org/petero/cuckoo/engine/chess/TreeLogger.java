@@ -141,7 +141,7 @@ public final class TreeLogger {
 
     /** 
      * Log information when entering a search node.
-     * @param parentId     Index of parent node.
+     * @param parentIndex  Index of parent node.
      * @param m            Move made to go from parent node to this node
      * @param alpha        Search parameter
      * @param beta         Search parameter
@@ -321,7 +321,7 @@ public final class TreeLogger {
                 ArrayList<Integer> children = findChildren(currIndex);
                 StartEntry se = new StartEntry();
                 EndEntry ee = new EndEntry();
-                ArrayList<Integer> found = new ArrayList<Integer>();
+                ArrayList<Integer> found = new ArrayList<>();
                 for (Integer c : children) {
                     readEntries(c, se, ee);
                     if (TextIO.moveToUCIString(se.move).equals(cmdStr))
@@ -336,7 +336,7 @@ public final class TreeLogger {
                         printNodeInfo(rootPos, c);
                     doPrint = false;
                 } else {
-                    currIndex = found.get(0);
+                    currIndex = found.getFirst();
                 }
             } else if (cmdStr.startsWith("u")) {
                 int n = getArg(cmdStr, 1);

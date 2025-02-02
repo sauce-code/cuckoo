@@ -81,14 +81,9 @@ public class EngineControl {
 	/**
 	 * This class is responsible for sending "info" strings during search.
 	 */
-	private static class SearchListener implements Search.Listener {
-		final PrintStream os;
+	private record SearchListener(PrintStream os) implements Search.Listener {
 
-		SearchListener(PrintStream os) {
-			this.os = os;
-		}
-
-		@Override
+	@Override
 		public void notifyDepth(int depth) {
 			os.printf("info depth %d%n", depth);
 		}

@@ -99,8 +99,8 @@ public class TranspositionTable {
 
         /** Set depth. */
         public void setDepth(int d) {
-            depthSlot &= 0x8000;
-            depthSlot |= ((short)d) & 0x7fff;
+            depthSlot &= (short) 0x8000;
+            depthSlot |= (short) (((short)d) & 0x7fff);
         }
 
         int getHashSlot() {
@@ -109,7 +109,7 @@ public class TranspositionTable {
 
         public void setHashSlot(int s) {
             depthSlot &= 0x7fff;
-            depthSlot |= (s << 15);
+            depthSlot |= (short) (s << 15);
         }
     }
     final TTEntry[] table;
@@ -223,9 +223,9 @@ public class TranspositionTable {
     public final ArrayList<Move> extractPVMoves(Position rootPos, Move m) {
         Position pos = new Position(rootPos);
         m = new Move(m);
-        ArrayList<Move> ret = new ArrayList<Move>();
+        ArrayList<Move> ret = new ArrayList<>();
         UndoInfo ui = new UndoInfo();
-        List<Long> hashHistory = new ArrayList<Long>();
+        List<Long> hashHistory = new ArrayList<>();
         MoveGen moveGen = new MoveGen();
         while (true) {
             ret.add(m);
@@ -261,7 +261,7 @@ public class TranspositionTable {
         boolean first = true;
         TTEntry ent = probe(pos.historyHash());
         UndoInfo ui = new UndoInfo();
-        ArrayList<Long> hashHistory = new ArrayList<Long>();
+        ArrayList<Long> hashHistory = new ArrayList<>();
         boolean repetition = false;
         MoveGen moveGen = MoveGen.instance;
         while (ent.type != TTEntry.T_EMPTY) {
@@ -304,20 +304,14 @@ public class TranspositionTable {
 
     /** Print hash table statistics. */
     public final void printStats() {
-        int unused = 0;
-        int thisGen = 0;
-        List<Integer> depHist = new ArrayList<Integer>();
+        List<Integer> depHist = new ArrayList<>();
         final int maxDepth = 20;
         for (int i = 0; i < maxDepth; i++) {
             depHist.add(0);
         }
         for (TTEntry ent : table) {
             if (ent.type == TTEntry.T_EMPTY) {
-                unused++;
             } else {
-                if (ent.generation == generation) {
-                    thisGen++;
-                }
                 if (ent.getDepth() < maxDepth) {
                     depHist.set(ent.getDepth(), depHist.get(ent.getDepth()) + 1);
                 }

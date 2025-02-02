@@ -30,6 +30,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import javax.swing.JLabel;
 import org.petero.cuckoo.engine.chess.Move;
 import org.petero.cuckoo.engine.chess.Piece;
@@ -40,10 +41,13 @@ import org.petero.cuckoo.engine.chess.Position;
  * @author petero
  */
 public class ChessBoardPainter extends JLabel {
+    @Serial
     private static final long serialVersionUID = -1319250011487017825L;
     private Position pos;
     private int selectedSquare;
-    private int x0, y0, sqSize;
+    private int x0;
+    private int y0;
+    private int sqSize;
     private boolean flipped;
     private Font chessFont;
 
@@ -62,20 +66,16 @@ public class ChessBoardPainter extends JLabel {
         activeSquare = -1;
     }
 
-    /**
-     * Set the board to a given state.
-     * @param pos
-     */
-    final public void setPosition(Position pos) {
+    /** Set the board to a given state. */
+    public final void setPosition(Position pos) {
         this.pos = pos;
         repaint();
     }
 
     /**
      * Set/clear the board flipped status.
-     * @param flipped
      */
-    final public void setFlipped(boolean flipped) {
+    public final void setFlipped(boolean flipped) {
         this.flipped = flipped;
         repaint();
     }
@@ -84,7 +84,7 @@ public class ChessBoardPainter extends JLabel {
      * Set/clear the selected square.
      * @param square The square to select, or -1 to clear selection.
      */
-    final public void setSelection(int square) {
+    public final void setSelection(int square) {
         if (square != this.selectedSquare) {
             this.selectedSquare = square;
             repaint();
@@ -132,63 +132,32 @@ public class ChessBoardPainter extends JLabel {
 
     private void drawPiece(Graphics2D g, int xCrd, int yCrd, int p) {
         g.setColor(Piece.isWhite(p) ? Color.WHITE : Color.BLACK);
-        String ps;
-        switch (p) {
-            case Piece.EMPTY:
-                ps = "";
-                break;
-            case Piece.WKING:
-                ps = "k";
-                break;
-            case Piece.WQUEEN:
-                ps = "q";
-                break;
-            case Piece.WROOK:
-                ps = "r";
-                break;
-            case Piece.WBISHOP:
-                ps = "b";
-                break;
-            case Piece.WKNIGHT:
-                ps = "n";
-                break;
-            case Piece.WPAWN:
-                ps = "p";
-                break;
-            case Piece.BKING:
-                ps = "l";
-                break;
-            case Piece.BQUEEN:
-                ps = "w";
-                break;
-            case Piece.BROOK:
-                ps = "t";
-                break;
-            case Piece.BBISHOP:
-                ps = "v";
-                break;
-            case Piece.BKNIGHT:
-                ps = "m";
-                break;
-            case Piece.BPAWN:
-                ps = "o";
-                break;
-            default:
-                ps = "?";
-                break;
-        }
-        if (ps.length() > 0) {
+        String ps = switch (p) {
+            case Piece.EMPTY -> "";
+            case Piece.WKING -> "k";
+            case Piece.WQUEEN -> "q";
+            case Piece.WROOK -> "r";
+            case Piece.WBISHOP -> "b";
+            case Piece.WKNIGHT -> "n";
+            case Piece.WPAWN -> "p";
+            case Piece.BKING -> "l";
+            case Piece.BQUEEN -> "w";
+            case Piece.BROOK -> "t";
+            case Piece.BBISHOP -> "v";
+            case Piece.BKNIGHT -> "m";
+            case Piece.BPAWN -> "o";
+            default -> "?";
+        };
+        if (!ps.isEmpty()) {
             FontRenderContext frc = g.getFontRenderContext();
             if ((chessFont == null) || (chessFont.getSize() != sqSize)) {
                 InputStream inStream = getClass().getResourceAsStream("/casefont.ttf");
                 try {
                     Font font = Font.createFont(Font.TRUETYPE_FONT, inStream);
                     chessFont = font.deriveFont((float)sqSize);
-                } catch (FontFormatException ex) {
+                } catch (FontFormatException | IOException ex) {
                     throw new RuntimeException();
-                } catch (IOException ex) {
-                    throw new RuntimeException();
-                }
+                } 
             }
             g.setFont(chessFont);
             Rectangle2D textRect = g.getFont().getStringBounds(ps, frc);

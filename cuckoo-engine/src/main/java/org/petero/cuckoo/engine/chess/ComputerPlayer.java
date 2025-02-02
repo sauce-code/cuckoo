@@ -194,10 +194,8 @@ public class ComputerPlayer implements Player {
         PV += tt.extractPV(pos);
         pos.unMakeMove(bestM, ui);
 
-//        tt.printStats();
-
         // Return best move and PV
-        return new TwoReturnValues<Move, String>(bestM, PV);
+        return new TwoReturnValues<>(bestM, PV);
     }
 
     private Move findSemiRandomMove(Search sc, MoveGen.MoveList moves) {

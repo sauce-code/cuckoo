@@ -349,19 +349,19 @@ public class MoveGenTest {
         pos.setWhiteMove(true);
         List<String> strMoves = getMoveList(pos, false);
         assertEquals(1, strMoves.size());
-        assertEquals("e1e7", strMoves.get(0));
+        assertEquals("e1e7", strMoves.getFirst());
 
         pos.setPiece(Position.getSquare(0, 2), Piece.WBISHOP);
         pos.setPiece(Position.getSquare(4, 1), Piece.WPAWN);
         strMoves = getMoveList(pos, false);
         assertEquals(1, strMoves.size());
-        assertEquals("a3e7", strMoves.get(0));
+        assertEquals("a3e7", strMoves.getFirst());
 
         pos.setPiece(Position.getSquare(1, 3), Piece.WPAWN);
         pos.setPiece(Position.getSquare(5, 5), Piece.WPAWN);
         strMoves = getMoveList(pos, false);
         assertEquals(1, strMoves.size());
-        assertEquals("f6e7", strMoves.get(0));
+        assertEquals("f6e7", strMoves.getFirst());
     }
 
     /** Test that captureList and captureAndcheckList are generated correctly. */
@@ -427,7 +427,7 @@ public class MoveGenTest {
         MoveGen.MoveList moves = moveGen.pseudoLegalMoves(pos);
         if (onlyLegal)
             MoveGen.removeIllegal(pos, moves);
-        ArrayList<String> strMoves = new ArrayList<String>();
+        ArrayList<String> strMoves = new ArrayList<>();
         for (int mi = 0; mi < moves.size; mi++) {
             Move m = moves.m[mi];
             String mStr = TextIO.moveToUCIString(m);
@@ -505,7 +505,7 @@ public class MoveGenTest {
         }
         if (onlyLegal)
             MoveGen.removeIllegal(pos, moves);
-        ArrayList<String> strMoves = new ArrayList<String>();
+        ArrayList<String> strMoves = new ArrayList<>();
         for (int mi = 0; mi < moves.size; mi++) {
             Move m = moves.m[mi];
             String mStr = TextIO.moveToUCIString(m);
@@ -520,7 +520,7 @@ public class MoveGenTest {
         MoveGen.MoveList moves = new MoveGen().checkEvasions(pos);
         if (onlyLegal)
             MoveGen.removeIllegal(pos, moves);
-        ArrayList<String> strMoves = new ArrayList<String>();
+        ArrayList<String> strMoves = new ArrayList<>();
         for (int mi = 0; mi < moves.size; mi++) {
             Move m = moves.m[mi];
             String mStr = TextIO.moveToUCIString(m);

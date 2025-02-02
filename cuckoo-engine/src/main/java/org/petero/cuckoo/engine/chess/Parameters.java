@@ -85,7 +85,7 @@ public class Parameters {
         return inst;
     }
     public final String[] getParamNames() {
-        ArrayList<String> parNames = new ArrayList<String>();
+        ArrayList<String> parNames = new ArrayList<>();
         for (Map.Entry<String, ParamBase> e : params.entrySet())
             if (e.getValue().visible)
                 parNames.add(e.getKey());
@@ -97,7 +97,7 @@ public class Parameters {
     }
 
     private static final Parameters inst = new Parameters();
-    private final Map<String, ParamBase> params = new TreeMap<String, ParamBase>();
+    private final Map<String, ParamBase> params = new TreeMap<>();
 
     private Parameters() {
         addPar(new SpinParam("qV", false, -200, 200, 0));

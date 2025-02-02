@@ -232,8 +232,8 @@ public class Position {
                 bKingSq = to;
         }
 
-        psScore1[piece] += Evaluate.psTab1[piece][to] - Evaluate.psTab1[piece][from];
-        psScore2[piece] += Evaluate.psTab2[piece][to] - Evaluate.psTab2[piece][from];
+        psScore1[piece] += (short) (Evaluate.psTab1[piece][to] - Evaluate.psTab1[piece][from]);
+        psScore2[piece] += (short) (Evaluate.psTab2[piece][to] - Evaluate.psTab2[piece][from]);
     }
 
     /** Set a square to a piece value. */
@@ -293,10 +293,10 @@ public class Position {
         }
 
         // Update piece/square table scores
-        psScore1[removedPiece] -= Evaluate.psTab1[removedPiece][square];
-        psScore2[removedPiece] -= Evaluate.psTab2[removedPiece][square];
-        psScore1[piece]        += Evaluate.psTab1[piece][square];
-        psScore2[piece]        += Evaluate.psTab2[piece][square];
+        psScore1[removedPiece] -= (short) Evaluate.psTab1[removedPiece][square];
+        psScore2[removedPiece] -= (short) Evaluate.psTab2[removedPiece][square];
+        psScore1[piece]        += (short) Evaluate.psTab1[piece][square];
+        psScore2[piece]        += (short) Evaluate.psTab2[piece][square];
     }
 
     /**
@@ -586,7 +586,7 @@ public class Position {
         }
     }
 
-    private final void removeCastleRights(int square) {
+    private void removeCastleRights(int square) {
         if (square == Position.getSquare(0, 0)) {
             setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
         } else if (square == Position.getSquare(7, 0)) {

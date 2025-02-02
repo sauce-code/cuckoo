@@ -1078,9 +1078,6 @@ public class Evaluate {
             }
         }
         return score;
-
-        // FIXME! Add evaluation of KRPKR   : eg 8/8/8/5pk1/1r6/R7/8/4K3 w - - 0 74
-        // FIXME! KRBKR is very hard to draw
     }
 
     private static int evalKQKP(int wKing, int wQueen, int bKing, int bPawn) {
@@ -1090,23 +1087,17 @@ public class Evaluate {
         } else if (Math.abs(Position.getX(bPawn) - Position.getX(bKing)) > 2) {
             canWin = true; // King doesn't support pawn
         } else {
-            switch (bPawn) {
-            case 8:  // a2
-                canWin = ((1L << wKing) & 0x0F1F1F1F1FL) != 0;
-                break;
-            case 10: // c2
-                canWin = ((1L << wKing) & 0x071F1F1FL) != 0;
-                break;
-            case 13: // f2
-                canWin = ((1L << wKing) & 0xE0F8F8F8L) != 0;
-                break;
-            case 15: // h2
-                canWin = ((1L << wKing) & 0xF0F8F8F8F8L) != 0;
-                break;
-            default:
-                canWin = true;
-                break;
-            }
+            canWin = switch (bPawn) {
+                case 8 ->  // a2
+                        ((1L << wKing) & 0x0F1F1F1F1FL) != 0;
+                case 10 -> // c2
+                        ((1L << wKing) & 0x071F1F1FL) != 0;
+                case 13 -> // f2
+                        ((1L << wKing) & 0xE0F8F8F8L) != 0;
+                case 15 -> // h2
+                        ((1L << wKing) & 0xF0F8F8F8F8L) != 0;
+                default -> true;
+            };
         }
 
         final int dist = Math.max(Math.abs(Position.getX(wKing)-Position.getX(bPawn)),

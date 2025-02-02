@@ -52,7 +52,4 @@ public interface GUIInterface {
 
     /** Run code on the GUI thread. */
     void runOnUIThread(Runnable runnable);
-
-    /** Report that user attempted to make an invalid move. */
-    void reportInvalidMove(Move m);
 }

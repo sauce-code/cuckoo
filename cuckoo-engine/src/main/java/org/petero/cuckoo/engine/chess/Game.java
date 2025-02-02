@@ -185,9 +185,9 @@ public class Game {
      */
     protected boolean handleCommand(String moveStr) {
         if (moveStr.equals("new")) {
-            moveList = new ArrayList<Move>();
-            uiInfoList = new ArrayList<UndoInfo>();
-            drawOfferList = new ArrayList<Boolean>();
+            moveList = new ArrayList<>();
+            uiInfoList = new ArrayList<>();
+            drawOfferList = new ArrayList<>();
             currentMove = 0;
             pendingDrawOffer = false;
             drawState = GameState.ALIVE;
@@ -308,7 +308,7 @@ public class Game {
     }
 
     public List<String> getPosHistory() {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         
         Position pos = new Position(this.pos);
         for (int i = currentMove; i > 0; i--) {
@@ -317,8 +317,7 @@ public class Game {
         ret.add(TextIO.toFEN(pos)); // Store initial FEN
 
         StringBuilder moves = new StringBuilder();
-        for (int i = 0; i < moveList.size(); i++) {
-            Move move = moveList.get(i);
+        for (Move move : moveList) {
             String strMove = TextIO.moveToString(pos, move, false);
             moves.append(String.format(" %s", strMove));
             UndoInfo ui = new UndoInfo();
@@ -338,7 +337,7 @@ public class Game {
         System.out.printf("%s", movesStr);
     }
 
-    final public String getMoveListString(boolean compressed) {
+    public final String getMoveListString(boolean compressed) {
         StringBuilder ret = new StringBuilder();
 
         // Undo all moves in move history.
@@ -426,7 +425,7 @@ public class Game {
 
     /** Return a list of previous positions in this game, back to the last "zeroing" move. */
     public ArrayList<Position> getHistory() {
-        ArrayList<Position> posList = new ArrayList<Position>();
+        ArrayList<Position> posList = new ArrayList<>();
         Position pos = new Position(this.pos);
         for (int i = currentMove; i > 0; i--) {
             if (pos.halfMoveClock == 0)
@@ -449,7 +448,7 @@ public class Game {
             boolean valid;
             if (rep) {
                 valid = false;
-                List<Position> oldPositions = new ArrayList<Position>();
+                List<Position> oldPositions = new ArrayList<>();
                 if (m != null) {
                     UndoInfo ui = new UndoInfo();
                     Position tmpPos = new Position(pos);
@@ -464,7 +463,7 @@ public class Game {
                     oldPositions.add(tmpPos);
                 }
                 int repetitions = 0;
-                Position firstPos = oldPositions.get(0);
+                Position firstPos = oldPositions.getFirst();
                 for (Position p : oldPositions) {
                     if (p.drawRuleEquals(firstPos))
                         repetitions++;

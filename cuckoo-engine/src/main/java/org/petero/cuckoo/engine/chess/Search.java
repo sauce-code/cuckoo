@@ -197,8 +197,8 @@ public class Search {
         if ((maxDepth < 0) || (maxDepth > 100)) {
             maxDepth = 100;
         }
-        for (int i = 0; i < searchTreeInfo.length; i++) {
-            searchTreeInfo[i].allowNullMove = true;
+        for (SearchTreeInfo treeInfo : searchTreeInfo) {
+            treeInfo.allowNullMove = true;
         }
         try {
         int depth;
