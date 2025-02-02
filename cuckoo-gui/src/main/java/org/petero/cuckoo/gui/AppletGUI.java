@@ -20,7 +20,6 @@ package org.petero.cuckoo.gui;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Move;
 import org.petero.cuckoo.engine.chess.Position;
@@ -35,7 +34,7 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
     private static final long serialVersionUID = 7357610346389734323L;
     ChessBoardPainter cbp;
     ChessController ctrl;
-    final static int ttLogSize = 19; // Use 2^19 hash entries.
+    static final int TT_LOG_SIZE = 19; // Use 2^19 hash entries.
     String moveListStr = "";
     String thinkingStr = "";
 
@@ -46,8 +45,8 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
         try {
             java.awt.EventQueue.invokeAndWait(() -> {
 			    initComponents();
-			    cbp = (ChessBoardPainter)ChessBoard;
-			    ctrl.newGame(PlayerWhite.isSelected(), ttLogSize, true);
+			    cbp = (ChessBoardPainter) chessBoard;
+			    ctrl.newGame(playerWhite.isSelected(), TT_LOG_SIZE, true);
 			    ctrl.startGame();
 			});
         } catch (Exception ex) {
@@ -75,29 +74,29 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
      */
     private void initComponents() {
 
-        PlayerColor = new javax.swing.ButtonGroup();
-        MainPanel = new javax.swing.JPanel();
-        ChessBoardPanel = new javax.swing.JPanel();
-        ChessBoard = new ChessBoardPainter();
+        playerColor = new javax.swing.ButtonGroup();
+        mainPanel = new javax.swing.JPanel();
+        chessBoardPanel = new javax.swing.JPanel();
+        chessBoard = new ChessBoardPainter();
         jPanel1 = new javax.swing.JPanel();
-        NewGame = new javax.swing.JButton();
-        SettingsPanel = new javax.swing.JPanel();
-        PlayerWhite = new javax.swing.JRadioButton();
-        PlayerBlack = new javax.swing.JRadioButton();
-        TimeLabel = new javax.swing.JLabel();
-        TimeSlider = new javax.swing.JSlider();
-        ShowThinking = new javax.swing.JCheckBox();
-        FlipBoard = new javax.swing.JCheckBox();
+        newGame = new javax.swing.JButton();
+        settingsPanel = new javax.swing.JPanel();
+        playerWhite = new javax.swing.JRadioButton();
+        playerBlack = new javax.swing.JRadioButton();
+        timeLabel = new javax.swing.JLabel();
+        timeSlider = new javax.swing.JSlider();
+        showThinking = new javax.swing.JCheckBox();
+        flipBoard = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
-        LogTextArea = new javax.swing.JTextPane();
-        StatusLine = new javax.swing.JTextField();
-        Forward = new javax.swing.JButton();
-        Backward = new javax.swing.JButton();
+        logTextArea = new javax.swing.JTextPane();
+        statusLine = new javax.swing.JTextField();
+        forward = new javax.swing.JButton();
+        backward = new javax.swing.JButton();
 
-        ChessBoardPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        ChessBoardPanel.setPreferredSize(new java.awt.Dimension(500, 500));
+        chessBoardPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        chessBoardPanel.setPreferredSize(new java.awt.Dimension(500, 500));
 
-        ChessBoard.addMouseListener(new java.awt.event.MouseAdapter() {
+        chessBoard.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
 			public void mousePressed(java.awt.event.MouseEvent evt) {
                 ChessBoardMousePressed(evt);
@@ -107,112 +106,112 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
                 ChessBoardMouseReleased(evt);
             }
         });
-        ChessBoard.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        chessBoard.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
 			public void mouseDragged(java.awt.event.MouseEvent evt) {
                 ChessBoardMouseDragged(evt);
             }
         });
 
-        javax.swing.GroupLayout ChessBoardPanelLayout = new javax.swing.GroupLayout(ChessBoardPanel);
-        ChessBoardPanel.setLayout(ChessBoardPanelLayout);
+        javax.swing.GroupLayout ChessBoardPanelLayout = new javax.swing.GroupLayout(chessBoardPanel);
+        chessBoardPanel.setLayout(ChessBoardPanelLayout);
         ChessBoardPanelLayout.setHorizontalGroup(
             ChessBoardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(ChessBoard, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+            .addComponent(chessBoard, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
         );
         ChessBoardPanelLayout.setVerticalGroup(
             ChessBoardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(ChessBoard, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+            .addComponent(chessBoard, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
         );
 
         jPanel1.setFocusable(false);
 
-        NewGame.setText("New Game");
-        NewGame.setFocusable(false);
-        NewGame.addActionListener(evt -> NewGameActionPerformed(evt));
+        newGame.setText("New Game");
+        newGame.setFocusable(false);
+        newGame.addActionListener(evt -> NewGameActionPerformed(evt));
 
-        SettingsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Settings"));
-        SettingsPanel.setFocusable(false);
+        settingsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Settings"));
+        settingsPanel.setFocusable(false);
 
-        PlayerColor.add(PlayerWhite);
-        PlayerWhite.setSelected(true);
-        PlayerWhite.setText("Play White");
-        PlayerWhite.setFocusable(false);
+        playerColor.add(playerWhite);
+        playerWhite.setSelected(true);
+        playerWhite.setText("Play White");
+        playerWhite.setFocusable(false);
 
-        PlayerColor.add(PlayerBlack);
-        PlayerBlack.setText("Play Black");
-        PlayerBlack.setFocusable(false);
+        playerColor.add(playerBlack);
+        playerBlack.setText("Play Black");
+        playerBlack.setFocusable(false);
 
-        TimeLabel.setText("Thinking Time");
+        timeLabel.setText("Thinking Time");
 
-        TimeSlider.setMajorTickSpacing(15);
-        TimeSlider.setMaximum(60);
-        TimeSlider.setMinorTickSpacing(5);
-        TimeSlider.setPaintLabels(true);
-        TimeSlider.setPaintTicks(true);
-        TimeSlider.setValue(5);
-        TimeSlider.setFocusable(false);
-        TimeSlider.addChangeListener(evt -> TimeSliderStateChanged(evt));
+        timeSlider.setMajorTickSpacing(15);
+        timeSlider.setMaximum(60);
+        timeSlider.setMinorTickSpacing(5);
+        timeSlider.setPaintLabels(true);
+        timeSlider.setPaintTicks(true);
+        timeSlider.setValue(5);
+        timeSlider.setFocusable(false);
+        timeSlider.addChangeListener(evt -> TimeSliderStateChanged(evt));
 
-        ShowThinking.setText("Show Thinking");
-        ShowThinking.setFocusable(false);
-        ShowThinking.addChangeListener(evt -> ShowThinkingStateChanged(evt));
+        showThinking.setText("Show Thinking");
+        showThinking.setFocusable(false);
+        showThinking.addChangeListener(evt -> ShowThinkingStateChanged(evt));
 
-        FlipBoard.setText("Flip Board");
-        FlipBoard.setFocusable(false);
-        FlipBoard.addChangeListener(evt -> FlipBoardStateChanged(evt));
+        flipBoard.setText("Flip Board");
+        flipBoard.setFocusable(false);
+        flipBoard.addChangeListener(evt -> FlipBoardStateChanged(evt));
 
-        javax.swing.GroupLayout SettingsPanelLayout = new javax.swing.GroupLayout(SettingsPanel);
-        SettingsPanel.setLayout(SettingsPanelLayout);
+        javax.swing.GroupLayout SettingsPanelLayout = new javax.swing.GroupLayout(settingsPanel);
+        settingsPanel.setLayout(SettingsPanelLayout);
         SettingsPanelLayout.setHorizontalGroup(
             SettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(ShowThinking, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(showThinking, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGroup(SettingsPanelLayout.createSequentialGroup()
-                .addComponent(PlayerWhite)
+                .addComponent(playerWhite)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 104, Short.MAX_VALUE)
-                .addComponent(FlipBoard)
+                .addComponent(flipBoard)
                 .addContainerGap())
             .addGroup(SettingsPanelLayout.createSequentialGroup()
-                .addComponent(TimeLabel)
+                .addComponent(timeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(TimeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(PlayerBlack)
+                .addComponent(timeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(playerBlack)
         );
         SettingsPanelLayout.setVerticalGroup(
             SettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(SettingsPanelLayout.createSequentialGroup()
                 .addGroup(SettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(PlayerWhite)
-                    .addComponent(FlipBoard))
+                    .addComponent(playerWhite)
+                    .addComponent(flipBoard))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(PlayerBlack)
+                .addComponent(playerBlack)
                 .addGap(18, 18, 18)
                 .addGroup(SettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(TimeLabel)
-                    .addComponent(TimeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(timeLabel)
+                    .addComponent(timeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ShowThinking)
+                .addComponent(showThinking)
                 .addContainerGap())
         );
 
-        LogTextArea.setEditable(false);
-        LogTextArea.setVerifyInputWhenFocusTarget(false);
-        jScrollPane1.setViewportView(LogTextArea);
+        logTextArea.setEditable(false);
+        logTextArea.setVerifyInputWhenFocusTarget(false);
+        jScrollPane1.setViewportView(logTextArea);
 
-        StatusLine.setEditable(false);
-        StatusLine.setFocusable(false);
+        statusLine.setEditable(false);
+        statusLine.setFocusable(false);
 
-        Forward.setText("->");
-        Forward.setDefaultCapable(false);
-        Forward.setFocusPainted(false);
-        Forward.setFocusable(false);
-        Forward.addActionListener(evt -> ForwardActionPerformed(evt));
+        forward.setText("->");
+        forward.setDefaultCapable(false);
+        forward.setFocusPainted(false);
+        forward.setFocusable(false);
+        forward.addActionListener(evt -> ForwardActionPerformed(evt));
 
-        Backward.setText("<-");
-        Backward.setDefaultCapable(false);
-        Backward.setFocusPainted(false);
-        Backward.setFocusable(false);
-        Backward.addActionListener(evt -> BackwardActionPerformed(evt));
+        backward.setText("<-");
+        backward.setDefaultCapable(false);
+        backward.setFocusPainted(false);
+        backward.setFocusable(false);
+        backward.addActionListener(evt -> BackwardActionPerformed(evt));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -221,39 +220,39 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-                    .addComponent(StatusLine, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                    .addComponent(statusLine, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(NewGame)
+                            .addComponent(newGame)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(Backward)
+                            .addComponent(backward)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(Forward))
-                        .addComponent(SettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(forward))
+                        .addComponent(settingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(SettingsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(settingsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(NewGame)
-                    .addComponent(Forward)
-                    .addComponent(Backward))
+                    .addComponent(newGame)
+                    .addComponent(forward)
+                    .addComponent(backward))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(StatusLine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(statusLine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
-        MainPanel.setLayout(MainPanelLayout);
+        javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(mainPanel);
+        mainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
             MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ChessBoardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
+                .addComponent(chessBoardPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -264,7 +263,7 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
                 .addContainerGap()
                 .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(ChessBoardPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE))
+                    .addComponent(chessBoardPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -272,11 +271,11 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(MainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(MainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -291,11 +290,11 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
     }//GEN-LAST:event_ChessBoardMousePressed
 
     private void FlipBoardStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_FlipBoardStateChanged
-        cbp.setFlipped(FlipBoard.isSelected());
+        cbp.setFlipped(flipBoard.isSelected());
     }//GEN-LAST:event_FlipBoardStateChanged
 
     private void NewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NewGameActionPerformed
-        ctrl.newGame(PlayerWhite.isSelected(), ttLogSize, true);
+        ctrl.newGame(playerWhite.isSelected(), TT_LOG_SIZE, true);
         ctrl.startGame();
     }//GEN-LAST:event_NewGameActionPerformed
 
@@ -332,22 +331,22 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
     }//GEN-LAST:event_ChessBoardMouseReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Backward;
-    private javax.swing.JLabel ChessBoard;
-    private javax.swing.JPanel ChessBoardPanel;
-    private javax.swing.JCheckBox FlipBoard;
-    private javax.swing.JButton Forward;
-    private javax.swing.JTextPane LogTextArea;
-    private javax.swing.JPanel MainPanel;
-    private javax.swing.JButton NewGame;
-    private javax.swing.JRadioButton PlayerBlack;
-    private javax.swing.ButtonGroup PlayerColor;
-    private javax.swing.JRadioButton PlayerWhite;
-    private javax.swing.JPanel SettingsPanel;
-    private javax.swing.JCheckBox ShowThinking;
-    private javax.swing.JTextField StatusLine;
-    private javax.swing.JLabel TimeLabel;
-    private javax.swing.JSlider TimeSlider;
+    private javax.swing.JButton backward;
+    private javax.swing.JLabel chessBoard;
+    private javax.swing.JPanel chessBoardPanel;
+    private javax.swing.JCheckBox flipBoard;
+    private javax.swing.JButton forward;
+    private javax.swing.JTextPane logTextArea;
+    private javax.swing.JPanel mainPanel;
+    private javax.swing.JButton newGame;
+    private javax.swing.JRadioButton playerBlack;
+    private javax.swing.ButtonGroup playerColor;
+    private javax.swing.JRadioButton playerWhite;
+    private javax.swing.JPanel settingsPanel;
+    private javax.swing.JCheckBox showThinking;
+    private javax.swing.JTextField statusLine;
+    private javax.swing.JLabel timeLabel;
+    private javax.swing.JSlider timeSlider;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
@@ -364,15 +363,15 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
 
     @Override
 	public void setStatusString(String str) {
-        StatusLine.setText(str);
+        statusLine.setText(str);
     }
 
     @Override
 	public void setMoveListString(String str) {
         moveListStr = str;
         str = moveListStr + "\n" + thinkingStr;
-        if (!str.equals(LogTextArea.getText())) {
-            LogTextArea.setText(str);
+        if (!str.equals(logTextArea.getText())) {
+            logTextArea.setText(str);
         }
     }
     
@@ -380,20 +379,20 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
 	public void setThinkingString(String str) {
         thinkingStr = str;
         str = moveListStr + "\n" + thinkingStr;
-        if (!str.equals(LogTextArea.getText())) {
-            LogTextArea.setText(str);
+        if (!str.equals(logTextArea.getText())) {
+            logTextArea.setText(str);
         }
     }
     
 
     @Override
 	public final int timeLimit() {
-        return Math.max(25, TimeSlider.getValue() * 1000);
+        return Math.max(25, timeSlider.getValue() * 1000);
     }
 
     @Override
 	public final boolean showThinking() {
-        return ShowThinking.isSelected();
+        return showThinking.isSelected();
     }
 
     @Override
@@ -402,7 +401,7 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
 		    Object[] options = { "Queen", "Rook", "Bishop", "Knight" };
 		    int choice = JOptionPane.showOptionDialog(
 		            cbp, "Promote pawn to?", "Pawn Promotion",
-		            0, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		    ctrl.reportPromotePiece(choice);
 		});
     }

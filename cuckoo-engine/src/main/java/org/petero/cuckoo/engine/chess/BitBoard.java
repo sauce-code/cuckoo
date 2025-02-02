@@ -170,7 +170,7 @@ public class BitBoard {
         0x9080000412220a00L, 0x0000002020010a42L, 0xfc087e8e4bb2f736L, 0x43ff9e4ef4ca2c89L,
     };
 
-    private static final long createPattern(int i, long mask) {
+    private static long createPattern(int i, long mask) {
         long ret = 0L;
         for (int j = 0; ; j++) {
             long nextMask = mask & (mask - 1);
@@ -184,7 +184,7 @@ public class BitBoard {
         return ret;
     }
     
-    private static final long addRookRays(int x, int y, long occupied, boolean inner) {
+    private static long addRookRays(int x, int y, long occupied, boolean inner) {
         long mask = 0;
         mask = addRay(mask, x, y,  1,  0, occupied, inner);
         mask = addRay(mask, x, y, -1,  0, occupied, inner);
@@ -192,7 +192,7 @@ public class BitBoard {
         mask = addRay(mask, x, y,  0, -1, occupied, inner);
         return mask;
     }
-    private static final long addBishopRays(int x, int y, long occupied, boolean inner) {
+    private static long addBishopRays(int x, int y, long occupied, boolean inner) {
         long mask = 0;
         mask = addRay(mask, x, y,  1,  1, occupied, inner);
         mask = addRay(mask, x, y, -1, -1, occupied, inner);
@@ -201,8 +201,8 @@ public class BitBoard {
         return mask;
     }
 
-    private static final long addRay(long mask, int x, int y, int dx, int dy, 
-                                     long occupied, boolean inner) {
+    private static long addRay(long mask, int x, int y, int dx, int dy,
+                               long occupied, boolean inner) {
         int lo = inner ? 1 : 0;
         int hi = inner ? 6 : 7;
         while (true) {
@@ -270,15 +270,16 @@ public class BitBoard {
         }
     }
 
-    public static final long bishopAttacks(int sq, long occupied) {
+    public static long bishopAttacks(int sq, long occupied) {
         return bTables[sq][(int)(((occupied & bMasks[sq]) * bMagics[sq]) >>> (64 - bBits[sq]))];
     }
 
-    public static final long rookAttacks(int sq, long occupied) {
+    public static long rookAttacks(int sq, long occupied) {
         return rTables[sq][(int)(((occupied & rMasks[sq]) * rMagics[sq]) >>> (64 - rBits[sq]))];
     }
-    
-    static public final long[][] squaresBetween;
+
+  public static final long[][] squaresBetween;
+
     static {
         squaresBetween = new long[64][];
         for (int sq1 = 0; sq1 < 64; sq1++) {
@@ -305,7 +306,7 @@ public class BitBoard {
         }
     }
 
-    private static final byte dirTable[] = {
+    private static final byte[] dirTable = {
             -9,   0,   0,   0,   0,   0,   0,  -8,   0,   0,   0,   0,   0,   0,  -7,
         0,   0,  -9,   0,   0,   0,   0,   0,  -8,   0,   0,   0,   0,   0,  -7,   0,
         0,   0,   0,  -9,   0,   0,   0,   0,  -8,   0,   0,   0,   0,  -7,   0,   0,
@@ -323,37 +324,37 @@ public class BitBoard {
         0,   7,   0,   0,   0,   0,   0,   0,   8,   0,   0,   0,   0,   0,   0,   9
     };
 
-    static public final int getDirection(int from, int to) {
+  public static int getDirection(int from, int to) {
         int offs = to + (to|7) - from - (from|7) + 0x77;
         return dirTable[offs];
     }
 
-    public static final long southFill(long mask) {
+    public static long southFill(long mask) {
         mask |= (mask >>> 8);
         mask |= (mask >>> 16);
         mask |= (mask >>> 32);
         return mask;
     }
     
-    public static final long northFill(long mask) {
+    public static long northFill(long mask) {
         mask |= (mask << 8);
         mask |= (mask << 16);
         mask |= (mask << 32);
         return mask;
     }
 
-    private static final int trailingZ[] = {
-        63,  0, 58,  1, 59, 47, 53,  2,
-        60, 39, 48, 27, 54, 33, 42,  3,
-        61, 51, 37, 40, 49, 18, 28, 20,
-        55, 30, 34, 11, 43, 14, 22,  4,
-        62, 57, 46, 52, 38, 26, 32, 41,
-        50, 36, 17, 19, 29, 10, 13, 21,
-        56, 45, 25, 31, 35, 16,  9, 12,
-        44, 24, 15,  8, 23,  7,  6,  5
-    };
+  private static final int[] trailingZ = {
+    63, 0, 58, 1, 59, 47, 53, 2,
+    60, 39, 48, 27, 54, 33, 42, 3,
+    61, 51, 37, 40, 49, 18, 28, 20,
+    55, 30, 34, 11, 43, 14, 22, 4,
+    62, 57, 46, 52, 38, 26, 32, 41,
+    50, 36, 17, 19, 29, 10, 13, 21,
+    56, 45, 25, 31, 35, 16, 9, 12,
+    44, 24, 15, 8, 23, 7, 6, 5
+  };
 
-    static public final int numberOfTrailingZeros(long mask) {
+  public static int numberOfTrailingZeros(long mask) {
         return trailingZ[(int)(((mask & -mask) * 0x07EDD5E59A4E28C2L) >>> 58)];
     }
 }

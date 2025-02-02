@@ -18,28 +18,28 @@
 
 package org.petero.cuckoo.uci;
 
-import org.petero.cuckoo.engine.chess.Book;
-import org.petero.cuckoo.engine.chess.ComputerPlayer;
-import org.petero.cuckoo.engine.chess.Move;
-import org.petero.cuckoo.engine.chess.MoveGen;
-import org.petero.cuckoo.engine.chess.Parameters;
-import org.petero.cuckoo.engine.chess.Piece;
-import org.petero.cuckoo.engine.chess.Position;
-import org.petero.cuckoo.engine.chess.Search;
-import org.petero.cuckoo.engine.chess.TextIO;
-import org.petero.cuckoo.engine.chess.TranspositionTable;
-import org.petero.cuckoo.engine.chess.Parameters.CheckParam;
-import org.petero.cuckoo.engine.chess.Parameters.ComboParam;
-import org.petero.cuckoo.engine.chess.Parameters.ParamBase;
-import org.petero.cuckoo.engine.chess.Parameters.SpinParam;
-import org.petero.cuckoo.engine.chess.Parameters.StringParam;
-import org.petero.cuckoo.engine.chess.TranspositionTable.TTEntry;
-import org.petero.cuckoo.engine.chess.UndoInfo;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import org.petero.cuckoo.engine.chess.Book;
+import org.petero.cuckoo.engine.chess.ComputerPlayer;
+import org.petero.cuckoo.engine.chess.Move;
+import org.petero.cuckoo.engine.chess.MoveGen;
+import org.petero.cuckoo.engine.chess.Parameters;
+import org.petero.cuckoo.engine.chess.Parameters.CheckParam;
+import org.petero.cuckoo.engine.chess.Parameters.ComboParam;
+import org.petero.cuckoo.engine.chess.Parameters.ParamBase;
+import org.petero.cuckoo.engine.chess.Parameters.SpinParam;
+import org.petero.cuckoo.engine.chess.Parameters.StringParam;
+import org.petero.cuckoo.engine.chess.Piece;
+import org.petero.cuckoo.engine.chess.Position;
+import org.petero.cuckoo.engine.chess.Search;
+import org.petero.cuckoo.engine.chess.TextIO;
+import org.petero.cuckoo.engine.chess.TranspositionTable;
+import org.petero.cuckoo.engine.chess.TranspositionTable.TTEntry;
+import org.petero.cuckoo.engine.chess.UndoInfo;
 
 /**
  * Control the search thread.
@@ -47,13 +47,13 @@ import java.util.Random;
  * @author petero
  */
 public class EngineControl {
-	PrintStream os;
+	final PrintStream os;
 
 	Thread engineThread;
 	private final Object threadMutex;
 	Search sc;
 	TranspositionTable tt;
-	MoveGen moveGen;
+	final MoveGen moveGen;
 
 	Position pos;
 	long[] posHashList;
@@ -82,7 +82,7 @@ public class EngineControl {
 	 * This class is responsible for sending "info" strings during search.
 	 */
 	private static class SearchListener implements Search.Listener {
-		PrintStream os;
+		final PrintStream os;
 
 		SearchListener(PrintStream os) {
 			this.os = os;
@@ -113,7 +113,7 @@ public class EngineControl {
 				bound = " lowerbound";
 			}
 			os.printf("info depth %d score %s %d%s time %d nodes %d nps %d pv%s%n", depth, isMate ? "mate" : "cp",
-					score, bound, time, nodes, nps, pvBuf.toString());
+					score, bound, time, nodes, nps, pvBuf);
 		}
 
 		@Override
@@ -213,22 +213,18 @@ public class EngineControl {
 			maxTimeLimit = (int) (minTimeLimit * (Math.max(2.5, Math.min(4.0, moves / 2))));
 
 			// Leave at least 1s on the clock, but can't use negative time
-			minTimeLimit = clamp(minTimeLimit, 1, time - margin);
-			maxTimeLimit = clamp(maxTimeLimit, 1, time - margin);
+			minTimeLimit = clamp(minTimeLimit, time - margin);
+			maxTimeLimit = clamp(maxTimeLimit, time - margin);
 		}
 	}
 
-	private static final int clamp(int val, int min, int max) {
-		if (val < min) {
-			return min;
-		} else if (val > max) {
-			return max;
-		} else {
-			return val;
-		}
+	private static int clamp(int val, int max) {
+		if (val < 1) {
+			return 1;
+		} else return Math.min(val, max);
 	}
 
-	final private void startThread(final int minTimeLimit, final int maxTimeLimit, int maxDepth, final int maxNodes) {
+	private void startThread(final int minTimeLimit, final int maxTimeLimit, int maxDepth, final int maxNodes) {
 		synchronized (threadMutex) {
 		} // Must not start new search until old search is finished
 		sc = new Search(pos, posHashList, posHashListSize, tt);
@@ -284,7 +280,7 @@ public class EngineControl {
 		engineThread.start();
 	}
 
-	private final void stopThread() {
+	private void stopThread() {
 		Thread myThread;
 		Search mySearch;
 		synchronized (threadMutex) {
@@ -303,13 +299,13 @@ public class EngineControl {
 		}
 	}
 
-	private final void setupTT() {
+	private void setupTT() {
 		int nEntries = hashSizeMB > 0 ? hashSizeMB * (1 << 20) / 24 : 1024;
 		int logSize = (int) Math.floor(Math.log(nEntries) / Math.log(2));
 		tt = new TranspositionTable(logSize);
 	}
 
-	private final void setupPosition(Position pos, List<Move> moves) {
+	private void setupPosition(Position pos, List<Move> moves) {
 		UndoInfo ui = new UndoInfo();
 		posHashList = new long[200 + moves.size()];
 		posHashListSize = 0;
@@ -323,7 +319,7 @@ public class EngineControl {
 	/**
 	 * Try to find a move to ponder from the transposition table.
 	 */
-	private final Move getPonderMove(Position pos, Move m) {
+	private Move getPonderMove(Position pos, Move m) {
 		if (m == null)
 			return null;
 		Move ret = null;
@@ -348,7 +344,7 @@ public class EngineControl {
 		return ret;
 	}
 
-	private static final String moveToString(Move m) {
+	private static String moveToString(Move m) {
 		if (m == null)
 			return "0000";
 		String ret = TextIO.squareToString(m.from);
@@ -382,9 +378,9 @@ public class EngineControl {
 		os.printf("option name Ponder type check default true%n");
 		os.printf("option name UCI_AnalyseMode type check default false%n");
 		os.printf(
-				"option name UCI_EngineAbout type string default %s by Peter Osterlund, see http://web.comhem.se/petero2home/javachess/index.html%n",
+				"option name UCI_EngineAbout type string default %s by Peter Osterlund, see https://web.comhem.se/petero2home/javachess/index.html%n",
 				ComputerPlayer.engineName);
-		os.printf("option name Strength type spin default 1000 min 0 max 1000\n");
+		os.print("option name Strength type spin default 1000 min 0 max 1000\n");
 
 		for (String pName : Parameters.instance().getParamNames()) {
 			ParamBase p = Parameters.instance().getParam(pName);
@@ -405,7 +401,7 @@ public class EngineControl {
 				os.printf("option name %s type combo default %s ", cp.name, cp.defaultValue);
 				for (String s : cp.allowedValues)
 					os.printf(" var %s", s);
-				os.printf("\n");
+				os.print("\n");
 				break;
 			}
 			case BUTTON:
@@ -436,7 +432,7 @@ public class EngineControl {
 			} else {
 				Parameters.instance().set(optionName, optionValue);
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException ignored) {
 		}
 	}
 }

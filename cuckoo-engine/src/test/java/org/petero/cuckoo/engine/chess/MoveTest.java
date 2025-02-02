@@ -18,37 +18,15 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  *
  * @author petero
  */
 public class MoveTest {
-
-    public MoveTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
     
     /**
      * Test of move constructor, of class Move.
@@ -76,9 +54,9 @@ public class MoveTest {
         Move m3 = new Move(Position.getSquare(1, 6), Position.getSquare(1, 7), Piece.WROOK);
         Move m4 = new Move(Position.getSquare(0, 6), Position.getSquare(1, 7), Piece.WKNIGHT);
         Move m5 = new Move(Position.getSquare(0, 6), Position.getSquare(1, 7), Piece.WROOK);
-        assertTrue(!m1.equals(m2));
-        assertTrue(!m1.equals(m3));
-        assertTrue(!m1.equals(m4));
-        assertTrue(m1.equals(m5));
+        assertFalse(m1.equals(m2));
+        assertFalse(m1.equals(m3));
+        assertFalse(m1.equals(m4));
+        assertEquals(m1, m5);
     }
 }

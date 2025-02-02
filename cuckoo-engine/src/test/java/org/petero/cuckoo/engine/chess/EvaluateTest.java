@@ -18,27 +18,15 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  *
  * @author petero
  */
 public class EvaluateTest {
-
-    public EvaluateTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     /**
      * Test of evalPos method, of class Evaluate.
@@ -61,10 +49,10 @@ public class EvaluateTest {
         assertTrue(moveScore(pos, "Rf1") < 0);
 
         pos = TextIO.readFEN("8/8/8/1r3k2/4pP2/4P3/8/4K2R w K - 0 1");
-        assertEquals(true, pos.h1Castle());
+        assertTrue(pos.h1Castle());
         int cs1 = evalWhite(pos);
         pos.setCastleMask(pos.getCastleMask() & ~(1 << Position.H1_CASTLE));
-        assertEquals(false, pos.h1Castle());
+        assertFalse(pos.h1Castle());
         int cs2 = evalWhite(pos);
         assertTrue(cs2 >= cs1);    // No bonus for useless castle right
 
@@ -322,14 +310,6 @@ public class EvaluateTest {
         pos.setPiece(TextIO.getSquare("d4"), Piece.WKING);
         int score2 = evalWhite(pos);
         assertTrue(score2 > score); // King closer to passed pawn promotion square
-
-        // Connected passed pawn test. Disabled because it didn't help in tests
-//        pos = TextIO.readFEN("4k3/8/8/4P3/3P1K2/8/8/8 w - - 0 1");
-//        score = evalWhite(pos);
-//        pos.setPiece(TextIO.getSquare("d4"), Piece.EMPTY);
-//        pos.setPiece(TextIO.getSquare("d5"), Piece.WPAWN);
-//        score2 = evalWhite(pos);
-//        assertTrue(score2 > score); // Advancing passed pawn is good
     }
 
     /**
@@ -436,8 +416,8 @@ public class EvaluateTest {
         assertTrue(score2 > score1);
     }
 
-    /** Return static evaluation score for white, regardless of whose turn it is to move. */
-    final static int evalWhite(Position pos) {
+  /** Return static evaluation score for white, regardless of whose turn it is to move. */
+  static int evalWhite(Position pos) {
         Evaluate eval = new Evaluate();
         int ret = eval.evalPos(pos);
         Position symPos = swapColors(pos);
@@ -449,7 +429,7 @@ public class EvaluateTest {
         return ret;
     }
 
-    final static Position swapColors(Position pos) {
+  static Position swapColors(Position pos) {
         Position sym = new Position();
         sym.whiteMove = !pos.whiteMove;
         for (int x = 0; x < 8; x++) {
@@ -480,13 +460,12 @@ public class EvaluateTest {
     }
 
     /** Compute change in eval score for white after making "moveStr" in position "pos". */
-    private final int moveScore(Position pos, String moveStr) {
+    private int moveScore(Position pos, String moveStr) {
         int score1 = evalWhite(pos);
         Position tmpPos = new Position(pos);
         UndoInfo ui = new UndoInfo();
         tmpPos.makeMove(TextIO.stringToMove(tmpPos, moveStr), ui);
         int score2 = evalWhite(tmpPos);
-//        System.out.printf("move:%s s1:%d s2:%d\n", moveStr, score1, score2);
         return score2 - score1;
     }
 }

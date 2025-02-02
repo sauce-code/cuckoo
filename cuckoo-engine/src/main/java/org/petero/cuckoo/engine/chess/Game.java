@@ -540,15 +540,14 @@ public class Game {
         if (wn + bn == 0) {
             // Only bishops. If they are all on the same color, the position is a draw.
             long bMask = pos.pieceTypeBB[Piece.WBISHOP] | pos.pieceTypeBB[Piece.BBISHOP];
-            if (((bMask & BitBoard.maskDarkSq) == 0) ||
-                ((bMask & BitBoard.maskLightSq) == 0))
-                return true;
+            return ((bMask & BitBoard.maskDarkSq) == 0) ||
+                    ((bMask & BitBoard.maskLightSq) == 0);
         }
 
         return false;
     }
 
-    final static long perfT(MoveGen moveGen, Position pos, int depth) {
+    static long perfT(MoveGen moveGen, Position pos, int depth) {
         if (depth == 0)
             return 1;
         long nodes = 0;

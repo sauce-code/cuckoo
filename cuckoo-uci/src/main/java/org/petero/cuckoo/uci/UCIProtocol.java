@@ -18,17 +18,17 @@
 
 package org.petero.cuckoo.uci;
 
-import org.petero.cuckoo.engine.chess.ChessParseError;
-import org.petero.cuckoo.engine.chess.ComputerPlayer;
-import org.petero.cuckoo.engine.chess.Move;
-import org.petero.cuckoo.engine.chess.Position;
-import org.petero.cuckoo.engine.chess.TextIO;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import org.petero.cuckoo.engine.chess.ChessParseError;
+import org.petero.cuckoo.engine.chess.ComputerPlayer;
+import org.petero.cuckoo.engine.chess.Move;
+import org.petero.cuckoo.engine.chess.Position;
+import org.petero.cuckoo.engine.chess.TextIO;
 
 /**
  * Handle the UCI protocol mode.
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 public class UCIProtocol {
     // Data set by the "position" command.
     Position pos;
-    ArrayList<Move> moves;
+    final ArrayList<Move> moves;
 
     // Engine data
     EngineControl engine;
@@ -203,13 +203,11 @@ public class UCIProtocol {
                 }
                 quit = true;
             }
-        } catch (ChessParseError ex) {
-        } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (NumberFormatException nfe) {
+        } catch (ChessParseError | ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
         }
     }
 
-    final private void initEngine(PrintStream os) {
+    private void initEngine(PrintStream os) {
         if (engine == null) {
             engine = new EngineControl(os);
         }

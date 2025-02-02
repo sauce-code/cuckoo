@@ -18,12 +18,10 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.petero.cuckoo.engine.chess.Search.StopSearch;
-
-import static org.junit.Assert.*;
 
 /**
  *
@@ -31,18 +29,7 @@ import static org.junit.Assert.*;
  */
 public class SearchTest {
     static final long[] nullHist = new long[200];
-    static TranspositionTable tt = new TranspositionTable(19);
-    
-    public SearchTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
+    static final TranspositionTable tt = new TranspositionTable(19);
 
     /**
      * Test of negaScout method, of class Search.
@@ -89,7 +76,7 @@ public class SearchTest {
         pos = TextIO.readFEN("8/8/2K5/3QP3/P6P/1q6/8/k7 w - - 31 51");
         sc = new Search(pos, nullHist, 0, tt);
         Move bestM = idSearch(sc, 2);
-        assertTrue(!TextIO.moveToString(pos, bestM, false).equals("Qxb3"));
+        assertFalse(TextIO.moveToString(pos, bestM, false).equals("Qxb3"));
     }
 
     /**
@@ -243,8 +230,7 @@ public class SearchTest {
         MoveGen.removeIllegal(sc.pos, moves);
         sc.scoreMoveList(moves, 0);
         sc.timeLimit(-1, -1);
-        Move bestM = sc.iterativeDeepening(moves, maxDepth, -1, false);
-        return bestM;
+        return sc.iterativeDeepening(moves, maxDepth, -1, false);
     }
 
     /** Compute SEE(m) and assure that signSEE and negSEE give matching results. */
@@ -307,7 +293,7 @@ public class SearchTest {
         assertEquals(0, getSEE(sc, TextIO.stringToMove(pos, "exd4")));
         // 1 3 1 1 3 1 3 3 5 5 5 9 9
         //-1 2 1 0 3 0 3 0 5 0 5 0 9
-        assertEquals(2 * pV - nV, getSEE(sc, TextIO.stringToMove(pos, "Nxd4")));
+        assertEquals(2L * pV - nV, getSEE(sc, TextIO.stringToMove(pos, "Nxd4")));
 
         pos.setPiece(TextIO.getSquare("b2"), Piece.EMPTY);  // Remove white queen
         sc = new Search(pos, nullHist, 0, tt);
@@ -455,7 +441,7 @@ public class SearchTest {
         Move m = TextIO.stringToMove(pos, "Ra6");
         moves = moveGen.pseudoLegalMoves(pos);
         boolean res = Search.selectHashMove(moves, m);
-        assertEquals(true, res);
+        assertTrue(res);
         assertEquals(m, moves.m[0]);
     }
 }

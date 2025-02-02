@@ -27,15 +27,15 @@ import java.util.Random;
  * @author petero
  */
 public class ComputerPlayer implements Player {
-    public static String engineName = "CuckooChess 1.12";
+    public static final String engineName = "CuckooChess 1.12";
 
     int minTimeMillis;
     int maxTimeMillis;
     int maxDepth;
-    int maxNodes;
+    final int maxNodes;
     public boolean verbose;
     TranspositionTable tt;
-    Book book;
+    final Book book;
     boolean bookEnabled;
     boolean randomMode;
     Search currentSearch;
@@ -224,7 +224,7 @@ public class ComputerPlayer implements Player {
         return null;
     }
 
-    private final static int moveProbWeight(int moveScore, int bestScore) {
+    private static int moveProbWeight(int moveScore, int bestScore) {
         double d = (bestScore - moveScore) / 100.0;
         double w = 100*Math.exp(-d*d/2);
         return (int)Math.ceil(w);

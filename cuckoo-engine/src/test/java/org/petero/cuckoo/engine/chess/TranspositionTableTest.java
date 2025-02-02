@@ -18,29 +18,16 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.petero.cuckoo.engine.chess.TranspositionTable.TTEntry;
-
-import static org.junit.Assert.*;
 
 /**
  *
  * @author petero
  */
 public class TranspositionTableTest {
-
-    public TranspositionTableTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     /**
      * Test of TTEntry nested class, of class TranspositionTable.
@@ -87,11 +74,11 @@ public class TranspositionTableTest {
         assertEquals(score + 2, ent2.getScore(ply - 2));
         
         // Compare ent1 and ent2
-        assertTrue(!ent1.betterThan(ent2, 0));  // More depth is good
+        assertFalse(ent1.betterThan(ent2, 0));  // More depth is good
         assertTrue(ent2.betterThan(ent1, 0));
 
         ent2.generation = 1;
-        assertTrue(!ent2.betterThan(ent1, 0));  // ent2 has wrong generation
+        assertFalse(ent2.betterThan(ent1, 0));  // ent2 has wrong generation
         assertTrue(ent2.betterThan(ent1, 1));  // ent1 has wrong generation
 
         ent2.generation = 0;
@@ -99,8 +86,8 @@ public class TranspositionTableTest {
         ent1.type = TranspositionTable.TTEntry.T_GE;
         assertTrue(ent2.betterThan(ent1, 0));
         ent2.type = TranspositionTable.TTEntry.T_LE;
-        assertTrue(!ent2.betterThan(ent1, 0));  // T_GE is equally good as T_LE
-        assertTrue(!ent1.betterThan(ent2, 0));
+        assertFalse(ent2.betterThan(ent1, 0));  // T_GE is equally good as T_LE
+        assertFalse(ent1.betterThan(ent2, 0));
         
         // Test negative mate score
         TTEntry ent3 = new TTEntry();

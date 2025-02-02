@@ -42,7 +42,7 @@ public class TranspositionTable {
         static public final int T_EMPTY = 3;   // Empty hash slot
         
         /** Return true if this object is more valuable than the other, false otherwise. */
-        public final boolean betterThan(TTEntry other, int currGen) {
+        public boolean betterThan(TTEntry other, int currGen) {
             if ((generation == currGen) != (other.generation == currGen)) {
                 return generation == currGen;   // Old entries are less valuable
             }
@@ -56,23 +56,23 @@ public class TranspositionTable {
         }
 
         /** Return true if entry is good enough to spend extra time trying to avoid overwriting it. */
-        public final boolean valuable(int currGen) {
+        public boolean valuable(int currGen) {
             if (generation != currGen)
                 return false;
             return (type == T_EXACT) || (getDepth() > 3 * Search.plyScale);
         }
 
-        public final void getMove(Move m) {
+        public void getMove(Move m) {
             m.from = move & 63;
             m.to = (move >> 6) & 63;
             m.promoteTo = (move >> 12) & 15;
         }
-        public final void setMove(Move move) {
+        public void setMove(Move move) {
             this.move = (short)(move.from + (move.to << 6) + (move.promoteTo << 12));
         }
         
         /** Get the score from the hash entry, and convert from "mate in x" to "mate at ply". */
-        public final int getScore(int ply) {
+        public int getScore(int ply) {
             int sc = score;
             if (sc > Search.MATE0 - 1000) {
                 sc -= ply;
@@ -83,7 +83,7 @@ public class TranspositionTable {
         }
         
         /** Convert score from "mate at ply" to "mate in x", and store in hash entry. */
-        public final void setScore(int score, int ply) {
+        public void setScore(int score, int ply) {
             if (score > Search.MATE0 - 1000) {
                 score += ply;
             } else if (score < -(Search.MATE0 - 1000)) {
@@ -93,27 +93,27 @@ public class TranspositionTable {
         }
 
         /** Get depth from the hash entry. */
-        public final int getDepth() {
+        public int getDepth() {
             return depthSlot & 0x7fff;
         }
 
         /** Set depth. */
-        public final void setDepth(int d) {
+        public void setDepth(int d) {
             depthSlot &= 0x8000;
             depthSlot |= ((short)d) & 0x7fff;
         }
 
-        final int getHashSlot() {
+        int getHashSlot() {
             return depthSlot >>> 15;
         }
 
-        public final void setHashSlot(int s) {
+        public void setHashSlot(int s) {
             depthSlot &= 0x7fff;
             depthSlot |= (s << 15);
         }
     }
-    TTEntry[] table;
-    TTEntry emptySlot;
+    final TTEntry[] table;
+    final TTEntry emptySlot;
     byte generation;
 
     /** Constructor. Creates an empty transposition table with numEntries slots. */
@@ -323,17 +323,13 @@ public class TranspositionTable {
                 }
             }
         }
-        System.out.printf("Hash stats: unused:%d thisGen:%d\n", unused, thisGen);
-        for (int i = 0; i < maxDepth; i++) {
-            System.out.printf("%2d %d\n", i, depHist.get(i));
-        }
     }
     
-    private final int h0(long key) {
+    private int h0(long key) {
         return (int)(key & (table.length - 1));
     }
     
-    private final int h1(long key) {
+    private int h1(long key) {
         return (int)((key >> 32) & (table.length - 1));
     }
 }

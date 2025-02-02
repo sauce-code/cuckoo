@@ -18,27 +18,15 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  *
  * @author petero
  */
 public class BookTest {
-
-    public BookTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     /**
      * Test of getBookMove method, of class Book.
@@ -71,7 +59,7 @@ public class BookTest {
 
     /** Check that move is a legal move in position pos. */
     private void checkValid(Position pos, Move move) {
-        assertTrue(move != null);
+        assertNotNull(move);
         MoveGen.MoveList moveList = new MoveGen().pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moveList);
         boolean contains = false;

@@ -82,9 +82,7 @@ public class Move {
             return false;
         if (to != other.to)
             return false;
-        if (promoteTo != other.promoteTo)
-            return false;
-        return true;
+        return promoteTo == other.promoteTo;
     }
     @Override
     public int hashCode() {

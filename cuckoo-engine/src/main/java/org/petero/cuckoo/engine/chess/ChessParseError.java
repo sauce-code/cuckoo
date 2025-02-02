@@ -18,11 +18,14 @@
 
 package org.petero.cuckoo.engine.chess;
 
+import java.io.Serial;
+
 /**
  * Exception class to represent parse errors in FEN or algebraic notation.
  * @author petero
  */
 public class ChessParseError extends Exception {
+    @Serial
     private static final long serialVersionUID = -6051856171275301175L;
     public ChessParseError() {
     }

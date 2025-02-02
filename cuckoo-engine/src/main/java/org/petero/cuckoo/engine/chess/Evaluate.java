@@ -298,12 +298,12 @@ public class Evaluate {
     }
 
     /** Compute white_material - black_material. */
-    static final int material(Position pos) {
+    static int material(Position pos) {
         return pos.wMtrl - pos.bMtrl;
     }
     
     /** Compute score based on piece square tables. Positive values are good for white. */
-    private final int pieceSquareEval(Position pos) {
+    private int pieceSquareEval(Position pos) {
         int score = 0;
         final int wMtrl = pos.wMtrl;
         final int bMtrl = pos.bMtrl;
@@ -348,7 +348,7 @@ public class Evaluate {
 
         // Knights
         {
-            final int t1 = qV + 2 * rV + 1 * bV + 1 * nV + 6 * pV;
+            final int t1 = qV + 2 * rV + bV + nV + 6 * pV;
             final int t2 = nV + 8 * pV;
             int n1 = pos.psScore1[Piece.WKNIGHT];
             int n2 = pos.psScore2[Piece.WKNIGHT];
@@ -413,7 +413,7 @@ public class Evaluate {
     }
 
     /** Implement the "when ahead trade pieces, when behind trade pawns" rule. */
-    private final int tradeBonus(Position pos) {
+    private int tradeBonus(Position pos) {
         final int wM = pos.wMtrl;
         final int bM = pos.bMtrl;
         final int wPawn = pos.wMtrlPawns;
@@ -444,15 +444,14 @@ public class Evaluate {
     }
 
     /** Score castling ability. */
-    private final int castleBonus(Position pos) {
+    private int castleBonus(Position pos) {
         if (pos.getCastleMask() == 0) return 0;
 
         final int k1 = kt1b[7*8+6] - kt1b[7*8+4];
         final int k2 = kt2b[7*8+6] - kt2b[7*8+4];
         final int t1 = qV + 2 * rV + 2 * bV;
-        final int t2 = rV;
         final int t = pos.bMtrl - pos.bMtrlPawns;
-        final int ks = interpolate(t, t2, k2, t1, k1);
+        final int ks = interpolate(t, rV, k2, t1, k1);
 
         final int castleValue = ks + rt1b[7*8+5] - rt1b[7*8+7];
         if (castleValue <= 0)
@@ -472,7 +471,7 @@ public class Evaluate {
         return wBonus - bBonus;
     }
 
-    private final int pawnBonus(Position pos) {
+    private int pawnBonus(Position pos) {
         long key = pos.pawnZobristHash();
         PawnHashData phd = pawnHash[(int)key & (pawnHash.length - 1)];
         if (phd.key != key)
@@ -525,7 +524,7 @@ public class Evaluate {
                     int y = Position.getY(sq);
                     int pawnDist = Math.min(5, y);
                     int kingDistX = Math.abs(kingX - x);
-                    int kingDistY = Math.abs(kingY - 0);
+                    int kingDistY = Math.abs(kingY);
                     int kingDist = Math.max(kingDistX, kingDistY);
                     int kScore = kingDist * 4;
                     if (kingDist > pawnDist) kScore += (kingDist - pawnDist) * (kingDist - pawnDist);
@@ -543,7 +542,7 @@ public class Evaluate {
     }
 
     /** Compute pawn hash data for pos. */
-    private final void computePawnHashData(Position pos, PawnHashData ph) {
+    private void computePawnHashData(Position pos, PawnHashData ph) {
         int score = 0;
 
         // Evaluate double pawns and pawn islands
@@ -616,12 +615,6 @@ public class Evaluate {
             }
         }
 
-        // Connected passed pawn bonus. Seems logical but doesn't help in tests
-//        if (passedPawnsW != 0)
-//            passedBonusW += 15 * Long.bitCount(passedPawnsW & ((passedPawnsW & BitBoard.maskBToHFiles) >>> 1));
-//        if (passedPawnsB != 0)
-//            passedBonusB += 15 * Long.bitCount(passedPawnsB & ((passedPawnsB & BitBoard.maskBToHFiles) >>> 1));
-
         ph.key = pos.pawnZobristHash();
         ph.score = score;
         ph.passedBonusW = (short)passedBonusW;
@@ -631,7 +624,7 @@ public class Evaluate {
     }
 
     /** Compute rook bonus. Rook on open/half-open file. */
-    private final int rookBonus(Position pos) {
+    private int rookBonus(Position pos) {
         int score = 0;
         final long wPawns = pos.pieceTypeBB[Piece.WPAWN];
         final long bPawns = pos.pieceTypeBB[Piece.BPAWN];
@@ -676,7 +669,7 @@ public class Evaluate {
     }
 
     /** Compute bishop evaluation. */
-    private final int bishopEval(Position pos, int oldScore) {
+    private int bishopEval(Position pos, int oldScore) {
         int score = 0;
         final long occupied = pos.whiteBB | pos.blackBB;
         long wBishops = pos.pieceTypeBB[Piece.WBISHOP];
@@ -803,7 +796,7 @@ public class Evaluate {
     }
 
     /** Compute king safety for both kings. */
-    private final int kingSafety(Position pos) {
+    private int kingSafety(Position pos) {
         final int minM = rV + bV;
         final int m = (pos.wMtrl - pos.wMtrlPawns + pos.bMtrl - pos.bMtrlPawns) / 2;
         if (m <= minM)
@@ -839,8 +832,7 @@ public class Evaluate {
             }
         }
         score += (bKingAttacks - wKingAttacks) * 4;
-        final int kSafety = interpolate(m, minM, 0, maxM, score);
-        return kSafety;
+        return interpolate(m, minM, 0, maxM, score);
     }
 
     private static final class KingSafetyHashData {
@@ -859,7 +851,7 @@ public class Evaluate {
         }
     }
 
-    private final int kingSafetyKPPart(Position pos) {
+    private int kingSafetyKPPart(Position pos) {
         final long key = pos.pawnZobristHash() ^ pos.kingZobristHash();
         KingSafetyHashData ksh = kingSafetyHash[(int)key & (kingSafetyHash.length - 1)];
         if (ksh.key != key) {
@@ -933,7 +925,7 @@ public class Evaluate {
     }
 
     /** Implements special knowledge for some endgame situations. */
-    private final int endGameEval(Position pos, int oldScore) {
+    private int endGameEval(Position pos, int oldScore) {
         int score = oldScore;
         if (pos.wMtrl + pos.bMtrl > 6 * rV)
             return score;
@@ -1091,7 +1083,7 @@ public class Evaluate {
         // FIXME! KRBKR is very hard to draw
     }
 
-    private static final int evalKQKP(int wKing, int wQueen, int bKing, int bPawn) {
+    private static int evalKQKP(int wKing, int wQueen, int bKing, int bPawn) {
         boolean canWin = false;
         if (((1L << bKing) & 0xFFFF) == 0) {
             canWin = true; // King doesn't support pawn
@@ -1125,7 +1117,7 @@ public class Evaluate {
         return score;
     }
 
-    private static final int kpkEval(int wKing, int bKing, int wPawn, boolean whiteMove) {
+    private static int kpkEval(int wKing, int bKing, int wPawn, boolean whiteMove) {
         if (Position.getX(wKing) >= 4) { // Mirror X
             wKing ^= 7;
             bKing ^= 7;
@@ -1144,7 +1136,7 @@ public class Evaluate {
         return qV - pV / 4 * (7-Position.getY(wPawn));
     }
 
-    private static final int krkpEval(int wKing, int bKing, int bPawn, boolean whiteMove) {
+    private static int krkpEval(int wKing, int bKing, int bPawn, boolean whiteMove) {
         if (Position.getX(bKing) >= 4) { // Mirror X
             wKing ^= 7;
             bKing ^= 7;
@@ -1169,7 +1161,7 @@ public class Evaluate {
      * Interpolate between (x1,y1) and (x2,y2).
      * If x < x1, return y1, if x > x2 return y2. Otherwise, use linear interpolation.
      */
-    static final int interpolate(int x, int x1, int y1, int x2, int y2) {
+    static int interpolate(int x, int x1, int y1, int x2, int y2) {
         if (x > x2) {
             return y2;
         } else if (x < x1) {

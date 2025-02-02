@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Parameters {
-    public static enum Type {
+    public enum Type {
         CHECK,
         SPIN,
         COMBO,
@@ -21,7 +21,7 @@ public class Parameters {
 
     public static final class CheckParam extends ParamBase {
         public boolean value;
-        public boolean defaultValue;
+        public final boolean defaultValue;
         CheckParam(String name, boolean visible, boolean def) {
             this.name = name;
             this.type = Type.CHECK;
@@ -32,10 +32,10 @@ public class Parameters {
     }
 
     public static final class SpinParam extends ParamBase {
-        public int minValue;
-        public int maxValue;
+        public final int minValue;
+        public final int maxValue;
         public int value;
-        public int defaultValue;
+        public final int defaultValue;
         SpinParam(String name, boolean visible, int minV, int maxV, int def) {
             this.name = name;
             this.type = Type.SPIN;
@@ -48,9 +48,9 @@ public class Parameters {
     }
 
     public static final class ComboParam extends ParamBase {
-        public String[] allowedValues;
+        public final String[] allowedValues;
         public String value;
-        public String defaultValue;
+        public final String defaultValue;
         ComboParam(String name, boolean visible, String[] allowed, String def) {
             this.name = name;
             this.type = Type.COMBO;
@@ -71,7 +71,7 @@ public class Parameters {
 
     public static final class StringParam extends ParamBase {
         public String value;
-        public String defaultValue;
+        public final String defaultValue;
         StringParam(String name, boolean visible, String def) {
             this.name = name;
             this.type = Type.STRING;
@@ -97,7 +97,7 @@ public class Parameters {
     }
 
     private static final Parameters inst = new Parameters();
-    private Map<String, ParamBase> params = new TreeMap<String, ParamBase>();
+    private final Map<String, ParamBase> params = new TreeMap<String, ParamBase>();
 
     private Parameters() {
         addPar(new SpinParam("qV", false, -200, 200, 0));
@@ -107,7 +107,7 @@ public class Parameters {
         addPar(new SpinParam("pV", false, -200, 200, 0));
     }
 
-    private final void addPar(ParamBase p) {
+    private void addPar(ParamBase p) {
         params.put(p.name.toLowerCase(), p);
     }
 
@@ -115,8 +115,7 @@ public class Parameters {
         return ((CheckParam)params.get(name.toLowerCase())).value;
     }
     final int getIntPar(String name) {
-        int ret = ((SpinParam)params.get(name.toLowerCase())).value;
-        return ret;
+        return ((SpinParam)params.get(name.toLowerCase())).value;
     }
     final String getStringPar(String name) {
         return ((StringParam)params.get(name.toLowerCase())).value;
@@ -129,9 +128,9 @@ public class Parameters {
         switch (p.type) {
         case CHECK: {
             CheckParam cp = (CheckParam)p;
-            if (value.toLowerCase().equals("true"))
+            if (value.equalsIgnoreCase("true"))
                 cp.value = true;
-            else if (value.toLowerCase().equals("false"))
+            else if (value.equalsIgnoreCase("false"))
                 cp.value = false;
             break;
         }
@@ -141,14 +140,14 @@ public class Parameters {
                 int val = Integer.parseInt(value);
                 if ((val >= sp.minValue) && (val <= sp.maxValue))
                     sp.value = val;
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException ignored) {
             }
             break;
         }
         case COMBO: {
             ComboParam cp = (ComboParam)p;
             for (String allowed : cp.allowedValues)
-                if (allowed.toLowerCase().equals(value.toLowerCase())) {
+                if (allowed.equalsIgnoreCase(value)) {
                     cp.value = allowed;
                     break;
                 }

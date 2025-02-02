@@ -92,8 +92,7 @@ public class Position {
 
     public Position(Position other) {
         squares = new int[64];
-        for (int i = 0; i < 64; i++)
-            squares[i] = other.squares[i];
+        System.arraycopy(other.squares, 0, squares, 0, 64);
         pieceTypeBB = new long[Piece.nPieceTypes];
         psScore1 = new short[Piece.nPieceTypes];
         psScore2 = new short[Piece.nPieceTypes];
@@ -132,9 +131,7 @@ public class Position {
             return false;
         if (hashKey != other.hashKey)
             return false;
-        if (pHashKey != other.pHashKey)
-            return false;
-        return true;
+        return pHashKey == other.pHashKey;
     }
     @Override
     public int hashCode() {
@@ -177,9 +174,7 @@ public class Position {
             return false;
         if (castleMask != other.castleMask)
             return false;
-        if (epSquare != other.epSquare)
-            return false;
-        return true;
+        return epSquare == other.epSquare;
     }
 
     public final void setWhiteMove(boolean whiteMove) {
@@ -189,19 +184,19 @@ public class Position {
         }
     }
     /** Return index in squares[] vector corresponding to (x,y). */
-    public final static int getSquare(int x, int y) {
+    public static int getSquare(int x, int y) {
         return y * 8 + x;
     }
     /** Return x position (file) corresponding to a square. */
-    public final static int getX(int square) {
+    public static int getX(int square) {
         return square & 7;
     }
     /** Return y position (rank) corresponding to a square. */
-    public final static int getY(int square) {
+    public static int getY(int square) {
         return square >> 3;
     }
     /** Return true if (x,y) is a dark square. */
-    public final static boolean darkSquare(int x, int y) {
+    public static boolean darkSquare(int x, int y) {
         return (x & 1) == (y & 1);
     }
 
@@ -211,7 +206,7 @@ public class Position {
     }
 
     /** Move a non-pawn piece to an empty square. */
-    private final void movePieceNotPawn(int from, int to) {
+    private void movePieceNotPawn(int from, int to) {
         final int piece = squares[from];
         hashKey ^= psHashKeys[piece][from];
         hashKey ^= psHashKeys[piece][to];
@@ -649,7 +644,7 @@ public class Position {
         return hash;
     }
 
-    private final static long getRandomHashVal(int rndNo) {
+    private static long getRandomHashVal(int rndNo) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
             byte[] input = new byte[4];

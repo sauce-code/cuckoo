@@ -18,37 +18,15 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  *
  * @author petero
  */
 public class TextIOTest {
-
-    public TextIOTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of readFEN method, of class TextIO.
@@ -62,11 +40,11 @@ public class TextIOTest {
         assertEquals(pos.getPiece(Position.getSquare(0, 3)), Piece.WQUEEN);
         assertEquals(pos.getPiece(Position.getSquare(4, 7)), Piece.BKING);
         assertEquals(pos.getPiece(Position.getSquare(4, 1)), Piece.WKING);
-        assertEquals(pos.whiteMove, false);
-        assertEquals(pos.a1Castle(), false);
-        assertEquals(pos.h1Castle(), false);
-        assertEquals(pos.a8Castle(), true);
-        assertEquals(pos.h8Castle(), true);
+        assertFalse(pos.whiteMove);
+        assertFalse(pos.a1Castle());
+        assertFalse(pos.h1Castle());
+        assertTrue(pos.a8Castle());
+        assertTrue(pos.h8Castle());
 
         fen = "8/3k4/8/5pP1/1P6/1NB5/2QP4/R3K2R w KQ f6 1 2";
         pos = TextIO.readFEN(fen);
@@ -76,11 +54,11 @@ public class TextIOTest {
 
         // Must have exactly one king
         boolean wasError = testFENParseError("8/8/8/8/8/8/8/kk1K4 w - - 0 1");
-        assertEquals(true, wasError);
+        assertTrue(wasError);
 
         // Must not be possible to capture the king
         wasError = testFENParseError("8/8/8/8/8/8/8/k1RK4 w - - 0 1");
-        assertEquals(true, wasError);
+        assertTrue(wasError);
         
         // Make sure bogus en passant square information is removed
         fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
@@ -89,30 +67,30 @@ public class TextIOTest {
         
         // Test for too many rows (slashes)
         wasError = testFENParseError("8/8/8/8/4k3/8/8/8/KBN5 w - - 0 1");
-        assertEquals(true, wasError);
+        assertTrue(wasError);
         
         // Test for too many columns
         wasError = testFENParseError("8K/8/8/8/4k3/8/8/8 w - - 0 1");
-        assertEquals(true, wasError);
+        assertTrue(wasError);
         
         // Pawns must not be on first/last rank
         wasError = testFENParseError("kp6/8/8/8/8/8/8/K7 w - - 0 1");
-        assertEquals(true, wasError);
+        assertTrue(wasError);
         
         wasError = testFENParseError("kr/pppp/8/8/8/8/8/KBR w");
-        assertEquals(false, wasError);  // OK not to specify castling flags and ep square
+        assertFalse(wasError);  // OK not to specify castling flags and ep square
         
         wasError = testFENParseError("k/8/8/8/8/8/8/K");
-        assertEquals(true, wasError);   // Error side to move not specified
+        assertTrue(wasError);   // Error side to move not specified
         
         wasError = testFENParseError("");
-        assertEquals(true, wasError);
+        assertTrue(wasError);
 
         wasError = testFENParseError("    |");
-        assertEquals(true, wasError);
+        assertTrue(wasError);
 
         wasError = testFENParseError("1B1B4/6k1/7r/7P/6q1/r7/q7/7K b - - acn 6; acs 0;");
-        assertEquals(false, wasError);  // Extra stuff after FEN string is allowed
+        assertFalse(wasError);  // Extra stuff after FEN string is allowed
     }
 
     /** Tests if trying to parse a FEN string causes an error. */
@@ -258,7 +236,7 @@ public class TextIOTest {
         m = TextIO.stringToMove(pos, "ne");
         assertEquals(mNe5, m);
         m = TextIO.stringToMove(pos, "N");
-        assertEquals(null, m);
+        assertNull(m);
         
         Move mQc6e4 = new Move(Position.getSquare(2, 5), Position.getSquare(4, 3), Piece.EMPTY);
         m = TextIO.stringToMove(pos, "Qc6-e4");
@@ -266,9 +244,9 @@ public class TextIOTest {
         m = TextIO.stringToMove(pos, "Qc6e4");
         assertEquals(mQc6e4, m);
         m = TextIO.stringToMove(pos, "Qce4");
-        assertEquals(null, m);
+        assertNull(m);
         m = TextIO.stringToMove(pos, "Q6e4");
-        assertEquals(null, m);
+        assertNull(m);
 
         Move maxb1Q = new Move(Position.getSquare(0, 1), Position.getSquare(1, 0), Piece.BQUEEN);
         m = TextIO.stringToMove(pos, "axb1Q");
@@ -276,7 +254,7 @@ public class TextIOTest {
         m = TextIO.stringToMove(pos, "axb1Q#");
         assertEquals(maxb1Q, m);
         m = TextIO.stringToMove(pos, "axb1Q+");
-        assertEquals(null, m);
+        assertNull(m);
         
         Move mh5= new Move(Position.getSquare(7, 6), Position.getSquare(7, 4), Piece.EMPTY);
         m = TextIO.stringToMove(pos, "h5");
@@ -284,7 +262,7 @@ public class TextIOTest {
         m = TextIO.stringToMove(pos, "h7-h5");
         assertEquals(mh5, m);
         m = TextIO.stringToMove(pos, "h");
-        assertEquals(null, m);
+        assertNull(m);
 
         pos = TextIO.readFEN("r1b1k2r/1pqpppbp/p5pn/3BP3/8/2pP4/PPPBQPPP/R3K2R w KQkq - 0 12");
         m = TextIO.stringToMove(pos, "bxc3");
@@ -301,7 +279,7 @@ public class TextIOTest {
         Move kCastle = new Move(Position.getSquare(4,0), Position.getSquare(6,0), Piece.EMPTY);
         Move qCastle = new Move(Position.getSquare(4,0), Position.getSquare(2,0), Piece.EMPTY);
         m = TextIO.stringToMove(pos, "o");
-        assertEquals(null, m);
+        assertNull(m);
         m = TextIO.stringToMove(pos, "o-o");
         assertEquals(kCastle, m);
         m = TextIO.stringToMove(pos, "O-O");
@@ -313,7 +291,7 @@ public class TextIOTest {
         pos.setPiece(Position.getSquare(5,1), Piece.EMPTY);
         pos.setPiece(Position.getSquare(5,5), Piece.EMPTY);
         m = TextIO.stringToMove(pos, "o");
-        assertEquals(null, m);
+        assertNull(m);
         m = TextIO.stringToMove(pos, "o-o");
         assertEquals(kCastle, m);
         m = TextIO.stringToMove(pos, "o-o-o");
@@ -332,7 +310,7 @@ public class TextIOTest {
      * Test of getSquare method, of class TextIO.
      */
     @Test
-    public void testGetSquare() throws ChessParseError {
+    public void testGetSquare() {
         System.out.println("getSquare");
         assertEquals(Position.getSquare(0, 0), TextIO.getSquare("a1"));
         assertEquals(Position.getSquare(1, 7), TextIO.getSquare("b8"));
@@ -380,7 +358,7 @@ public class TextIOTest {
         assertEquals(new Move(12, 12+8*3, Piece.EMPTY), m);
 
         m = TextIO.uciStringToMove("e2e5q");
-        assertEquals(null, m);
+        assertNull(m);
 
         m = TextIO.uciStringToMove("e7e8q");
         assertEquals(Piece.WQUEEN, m.promoteTo);
@@ -391,8 +369,8 @@ public class TextIOTest {
         m = TextIO.uciStringToMove("e2e1n");
         assertEquals(Piece.BKNIGHT, m.promoteTo);
         m = TextIO.uciStringToMove("e7e8x");
-        assertEquals(null, m);  // Invalid promotion piece
+        assertNull(m);  // Invalid promotion piece
         m = TextIO.uciStringToMove("i1i3");
-        assertEquals(null, m);  // Outside board
+        assertNull(m);  // Outside board
     }
 }

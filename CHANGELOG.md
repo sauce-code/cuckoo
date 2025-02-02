@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2017-07-30: Version 1.12 (Maven Port)
-- Reuploaded the project on GitHub as an Eclipse Maven Project.
+- Re-uploaded the project on GitHub as an Eclipse Maven Project.
 - Applied cleanup.
 - Set required Java version to 1.8.
 

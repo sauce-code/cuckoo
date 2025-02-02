@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
-
 import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Game;
@@ -45,7 +44,7 @@ public class ChessController {
     Player humanPlayer;
     ComputerPlayer computerPlayer;
     Game game;
-    GUIInterface gui;
+    final GUIInterface gui;
     boolean humanIsWhite;
     Thread computerThread;
     int threadStack;       // Thread stack size, or zero to use OS default
@@ -136,7 +135,7 @@ public class ChessController {
             setSearchInfo();
         }
     }
-    SearchListener listener;
+    final SearchListener listener;
     
     public ChessController(GUIInterface gui) {
         this.gui = gui;
@@ -439,7 +438,7 @@ public class ChessController {
      * Move a piece from one square to another.
      * @return True if the move was legal, false otherwise.
      */
-    final private boolean doMove(Move move) {
+    private boolean doMove(Move move) {
         Position pos = game.pos;
         MoveGen.MoveList moves = new MoveGen().pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moves);
@@ -464,14 +463,14 @@ public class ChessController {
     }
 
 
-    final private void updateGUI() {
+    private void updateGUI() {
         setStatusString();
         setMoveList();
         setThinkingPV();
         gui.setPosition(game.pos);
     }
 
-    final private void setStatusString() {
+    private void setStatusString() {
         String str = game.pos.whiteMove ? "White's move" : "Black's move";
         if (computerThread != null) str += " (thinking)";
         if (game.getGameState() != Game.GameState.ALIVE) {
@@ -493,7 +492,7 @@ public class ChessController {
         gui.setThinkingString(str);
     }
 
-    final private void setSelection() {
+    private void setSelection() {
         Move m = game.getLastMove();
         int sq = (m != null) ? m.to : -1;
         gui.setSelection(sq);
@@ -501,8 +500,7 @@ public class ChessController {
 
     
     private void startComputerThinking() {
-        if (game.pos.whiteMove != humanIsWhite) {
-            if (computerThread == null) {
+    if (game.pos.whiteMove != humanIsWhite && computerThread == null) {
                 Runnable run = () -> {
 				    computerPlayer.timeLimit(gui.timeLimit(), gui.timeLimit(), gui.randomMode());
 				    final String cmd = computerPlayer.getCommand(new Position(game.pos),
@@ -525,7 +523,7 @@ public class ChessController {
                 updateGUI();
                 computerThread.start();
             }
-        }
+
     }
 
     public synchronized void stopComputerThinking() {

@@ -18,16 +18,16 @@
 
 package org.petero.cuckoo.uci;
 
-import org.petero.cuckoo.engine.chess.Move;
 import java.util.ArrayList;
 import java.util.List;
+import org.petero.cuckoo.engine.chess.Move;
 
 /**
- * Store search parameters (times, increments, max depth, etc).
+ * Store search parameters (times, increments, max depth, etc.).
  * @author petero
  */
 public class SearchParams {
-    List<Move> searchMoves;  // If non-empty, search only these moves
+    final List<Move> searchMoves;  // If non-empty, search only these moves
     int wTime;               // White remaining time, ms
     int bTime;               // Black remaining time, ms
     int wInc;                // White increment per move, ms

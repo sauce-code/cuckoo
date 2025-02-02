@@ -18,28 +18,16 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import java.util.ArrayList;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import org.junit.Test;
 
 /**
  *
  * @author petero
  */
 public class ComputerPlayerTest {
-
-    public ComputerPlayerTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     /**
      * Test of getCommand method, of class ComputerPlayer.
@@ -79,7 +67,7 @@ public class ComputerPlayerTest {
      * Test of draw by repetition, of class ComputerPlayer.
      */
     @Test
-    public void testDrawRep() throws ChessParseError {
+    public void testDrawRep() {
         System.out.println("drawRep");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         ComputerPlayer cp = new ComputerPlayer();
@@ -109,6 +97,6 @@ public class ComputerPlayerTest {
         game.processString("Ra8");
         game.processString("Kh7");
         result = cp.getCommand(new Position(game.pos), false, game.getHistory());
-        assertTrue(!result.equals("Ra7+")); // Ra7 now leads to a draw by repetition
+        assertFalse(result.equals("Ra7+")); // Ra7 now leads to a draw by repetition
     }
 }

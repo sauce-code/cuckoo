@@ -22,8 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-
-import org.petero.cuckoo.uci.UCIProtocol;
 import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Evaluate;
@@ -34,6 +32,7 @@ import org.petero.cuckoo.engine.chess.Player;
 import org.petero.cuckoo.engine.chess.Position;
 import org.petero.cuckoo.engine.chess.TextIO;
 import org.petero.cuckoo.engine.chess.TwoReturnValues;
+import org.petero.cuckoo.uci.UCIProtocol;
 
 public class TUIGame extends Game {
 
@@ -91,14 +90,14 @@ public class TUIGame extends Game {
         try {
             int idx = cmd.indexOf(" ");
             String filename = cmd.substring(0, idx);
-            String timeStr = cmd.substring(idx + 1, cmd.length());
+            String timeStr = cmd.substring(idx + 1);
             int timeLimit = Integer.parseInt(timeStr);
             //            System.out.printf("file:%s time:%s (%d)\n", filename, timeStr, timeLimit);
             fr = new LineNumberReader(new FileReader(filename));
             String line;
             Player pl = whitePlayer.isHumanPlayer() ? blackPlayer : whitePlayer;
             if (pl.isHumanPlayer()) {
-                System.out.printf("No computer player available");
+                System.out.print("No computer player available");
                 return false;
             }
             ComputerPlayer cp = (ComputerPlayer)pl;

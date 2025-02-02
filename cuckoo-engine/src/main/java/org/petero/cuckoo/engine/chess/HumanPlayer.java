@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class HumanPlayer implements Player {
     private String lastCmd = "";
-    private BufferedReader in;
+    private final BufferedReader in;
 
     public HumanPlayer() {
         in = new BufferedReader(new InputStreamReader(System.in));
@@ -39,7 +39,7 @@ public class HumanPlayer implements Player {
     public String getCommand(Position pos, boolean drawOffer, List<Position> history) {
         try {
             String color = pos.whiteMove ? "white" : "black";
-            System.out.print(String.format("Enter move (%s):", color));
+            System.out.printf("Enter move (%s):", color);
             String moveStr = in.readLine();
             if (moveStr == null)
                 return "quit";

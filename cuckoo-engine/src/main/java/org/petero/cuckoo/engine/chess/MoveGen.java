@@ -41,7 +41,7 @@ public final class MoveGen {
      * Generate and return a list of pseudo-legal moves.
      * Pseudo-legal means that the moves doesn't necessarily defend from check threats.
      */
-    public final MoveList pseudoLegalMoves(Position pos) {
+    public MoveList pseudoLegalMoves(Position pos) {
         MoveList moveList = getMoveListObj();
         final long occupied = pos.whiteBB | pos.blackBB;
         if (pos.whiteMove) {
@@ -206,7 +206,7 @@ public final class MoveGen {
      * Generate and return a list of pseudo-legal check evasion moves.
      * Pseudo-legal means that the moves doesn't necessarily defend from check threats.
      */
-    public final MoveList checkEvasions(Position pos) {
+    public MoveList checkEvasions(Position pos) {
         MoveList moveList = getMoveListObj();
         final long occupied = pos.whiteBB | pos.blackBB;
         if (pos.whiteMove) {
@@ -374,7 +374,7 @@ public final class MoveGen {
     }
 
     /** Generate captures, checks, and possibly some other moves that are too hard to filter out. */
-    public final MoveList pseudoLegalCapturesAndChecks(Position pos) {
+    public MoveList pseudoLegalCapturesAndChecks(Position pos) {
         MoveList moveList = getMoveListObj();
         long occupied = pos.whiteBB | pos.blackBB;
         if (pos.whiteMove) {
@@ -594,7 +594,7 @@ public final class MoveGen {
         return moveList;
     }
 
-    public final MoveList pseudoLegalCaptures(Position pos) {
+    public MoveList pseudoLegalCaptures(Position pos) {
         MoveList moveList = getMoveListObj();
         long occupied = pos.whiteBB | pos.blackBB;
         if (pos.whiteMove) {
@@ -712,7 +712,7 @@ public final class MoveGen {
     /**
      * Return true if the side to move is in check.
      */
-    public static final boolean inCheck(Position pos) {
+    public static boolean inCheck(Position pos) {
         int kingSq = pos.getKingSq(pos.whiteMove);
         return sqAttacked(pos, kingSq);
     }
@@ -720,7 +720,7 @@ public final class MoveGen {
     /**
      * Return the next piece in a given direction, starting from sq.
      */
-    private static final int nextPiece(Position pos, int sq, int delta) {
+    private static int nextPiece(Position pos, int sq, int delta) {
         while (true) {
             sq += delta;
             int p = pos.getPiece(sq);
@@ -730,8 +730,9 @@ public final class MoveGen {
     }
 
     /** Like nextPiece(), but handles board edges. */
-    private static final int nextPieceSafe(Position pos, int sq, int delta) {
-        int dx = 0, dy = 0;
+    private static int nextPieceSafe(Position pos, int sq, int delta) {
+        int dx = 0;
+        int dy = 0;
         switch (delta) {
         case 1: dx=1; dy=0; break;
         case 9: dx=1; dy=1; break;
@@ -759,7 +760,7 @@ public final class MoveGen {
     /**
      * Return true if making a move delivers check to the opponent
      */
-    public static final boolean givesCheck(Position pos, Move m) {
+    public static boolean givesCheck(Position pos, Move m) {
         boolean wtm = pos.whiteMove;
         int oKingSq = pos.getKingSq(!wtm);
         int oKing = wtm ? Piece.BKING : Piece.WKING;
@@ -821,13 +822,11 @@ public final class MoveGen {
             if (m.to - m.from == 2) { // O-O
                 if (MoveGen.nextPieceSafe(pos, m.from, -1) == oKing)
                     return true;
-                if (MoveGen.nextPieceSafe(pos, m.from + 1, wtm ? 8 : -8) == oKing)
-                    return true;
+                return MoveGen.nextPieceSafe(pos, m.from + 1, wtm ? 8 : -8) == oKing;
             } else if (m.to - m.from == -2) { // O-O-O
                 if (MoveGen.nextPieceSafe(pos, m.from, 1) == oKing)
                     return true;
-                if (MoveGen.nextPieceSafe(pos, m.from - 1, wtm ? 8 : -8) == oKing)
-                    return true;
+                return MoveGen.nextPieceSafe(pos, m.from - 1, wtm ? 8 : -8) == oKing;
             }
         } else if (p == Piece.WPAWN) {
             if (pos.getPiece(m.to) == Piece.EMPTY) {
@@ -870,7 +869,7 @@ public final class MoveGen {
     /**
      * Return true if the side to move can take the opponents king.
      */
-    public static final boolean canTakeKing(Position pos) {
+    public static boolean canTakeKing(Position pos) {
         pos.setWhiteMove(!pos.whiteMove);
         boolean ret = inCheck(pos);
         pos.setWhiteMove(!pos.whiteMove);
@@ -880,7 +879,7 @@ public final class MoveGen {
     /**
      * Return true if a square is attacked by the opposite side.
      */
-    public static final boolean sqAttacked(Position pos, int sq) {
+    public static boolean sqAttacked(Position pos, int sq) {
         if (pos.whiteMove) {
             if ((BitBoard.knightAttacks[sq] & pos.pieceTypeBB[Piece.BKNIGHT]) != 0)
                 return true;
@@ -892,8 +891,7 @@ public final class MoveGen {
             long bbQueen = pos.pieceTypeBB[Piece.BQUEEN];
             if ((BitBoard.bishopAttacks(sq, occupied) & (pos.pieceTypeBB[Piece.BBISHOP] | bbQueen)) != 0)
                 return true;
-            if ((BitBoard.rookAttacks(sq, occupied) & (pos.pieceTypeBB[Piece.BROOK] | bbQueen)) != 0)
-                return true;
+            return (BitBoard.rookAttacks(sq, occupied) & (pos.pieceTypeBB[Piece.BROOK] | bbQueen)) != 0;
         } else {
             if ((BitBoard.knightAttacks[sq] & pos.pieceTypeBB[Piece.WKNIGHT]) != 0)
                 return true;
@@ -905,10 +903,8 @@ public final class MoveGen {
             long bbQueen = pos.pieceTypeBB[Piece.WQUEEN];
             if ((BitBoard.bishopAttacks(sq, occupied) & (pos.pieceTypeBB[Piece.WBISHOP] | bbQueen)) != 0)
                 return true;
-            if ((BitBoard.rookAttacks(sq, occupied) & (pos.pieceTypeBB[Piece.WROOK] | bbQueen)) != 0)
-                return true;
+            return (BitBoard.rookAttacks(sq, occupied) & (pos.pieceTypeBB[Piece.WROOK] | bbQueen)) != 0;
         }
-        return false;
     }
 
     /**
@@ -916,7 +912,7 @@ public final class MoveGen {
      * "moveList" is assumed to be a list of pseudo-legal moves.
      * This function removes the moves that don't defend from check threats.
      */
-    public static final void removeIllegal(Position pos, MoveList moveList) {
+    public static void removeIllegal(Position pos, MoveList moveList) {
         int length = 0;
         UndoInfo ui = new UndoInfo();
 
@@ -962,8 +958,8 @@ public final class MoveGen {
         moveList.size = length;
     }
 
-    private final static boolean addPawnMovesByMask(MoveList moveList, Position pos, long mask,
-                                                    int delta, boolean allPromotions) {
+    private static boolean addPawnMovesByMask(MoveList moveList, Position pos, long mask,
+                                              int delta, boolean allPromotions) {
         if (mask == 0)
             return false;
         long oKingMask = pos.pieceTypeBB[pos.whiteMove ? Piece.BKING : Piece.WKING];
@@ -1003,8 +999,8 @@ public final class MoveGen {
         return false;
     }
 
-    private final static void addPawnDoubleMovesByMask(MoveList moveList, Position pos,
-                                                       long mask, int delta) {
+    private static void addPawnDoubleMovesByMask(MoveList moveList, Position pos,
+                                                 long mask, int delta) {
         while (mask != 0) {
             int sq = BitBoard.numberOfTrailingZeros(mask);
             setMove(moveList, sq + delta, sq, Piece.EMPTY);
@@ -1012,7 +1008,7 @@ public final class MoveGen {
         }
     }
     
-    private final static boolean addMovesByMask(MoveList moveList, Position pos, int sq0, long mask) {
+    private static boolean addMovesByMask(MoveList moveList, Position pos, int sq0, long mask) {
         long oKingMask = pos.pieceTypeBB[pos.whiteMove ? Piece.BKING : Piece.WKING];
         if ((mask & oKingMask) != 0) {
             int sq = BitBoard.numberOfTrailingZeros(mask & oKingMask);
@@ -1028,7 +1024,7 @@ public final class MoveGen {
         return false;
     }
 
-    private final static void setMove(MoveList moveList, int from, int to, int promoteTo) {
+    private static void setMove(MoveList moveList, int from, int to, int promoteTo) {
         Move m = moveList.m[moveList.size++];
         m.from = from;
         m.to = to;
@@ -1037,12 +1033,12 @@ public final class MoveGen {
     }
 
     // Code to handle the Move cache.
-    private Object[] moveListCache = new Object[200];
+    private final Object[] moveListCache = new Object[200];
     private int moveListsInCache = 0;
     
     private static final int MAX_MOVES = 256;
 
-    private final MoveList getMoveListObj() {
+    private MoveList getMoveListObj() {
         MoveList ml;
         if (moveListsInCache > 0) {
             ml = (MoveList)moveListCache[--moveListsInCache];
@@ -1056,7 +1052,7 @@ public final class MoveGen {
     }
 
     /** Return all move objects in moveList to the move cache. */
-    public final void returnMoveList(MoveList moveList) {
+    public void returnMoveList(MoveList moveList) {
         if (moveListsInCache < moveListCache.length) {
             moveListCache[moveListsInCache++] = moveList;
         }
