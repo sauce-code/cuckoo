@@ -27,7 +27,6 @@ public class BitBoardTest {
     /** Test of kingAttacks, of class BitBoard. */
     @Test
     public void testKingAttacks() {
-        System.out.println("kingAttacks");
         assertEquals(5, Long.bitCount(BitBoard.kingAttacks[TextIO.getSquare("g1")]));
         assertEquals(3, Long.bitCount(BitBoard.kingAttacks[TextIO.getSquare("h1")]));
         assertEquals(3, Long.bitCount(BitBoard.kingAttacks[TextIO.getSquare("a1")]));
@@ -40,7 +39,6 @@ public class BitBoardTest {
     /** Test of knightAttacks, of class BitBoard. */
     @Test
     public void testKnightAttacks() {
-        System.out.println("knightAttacks");
         assertEquals(3, Long.bitCount(BitBoard.knightAttacks[TextIO.getSquare("g1")]));
         assertEquals(2, Long.bitCount(BitBoard.knightAttacks[TextIO.getSquare("a1")]));
         assertEquals(2, Long.bitCount(BitBoard.knightAttacks[TextIO.getSquare("h1")]));
@@ -56,7 +54,6 @@ public class BitBoardTest {
     /** Test of squaresBetween[][], of class BitBoard. */
     @Test
     public void testSquaresBetween() {
-        System.out.println("squaresBetween");
         // Tests that the set of nonzero elements is correct
         for (int sq1 = 0; sq1 < 64; sq1++) {
             for (int sq2 = 0; sq2 < 64; sq2++) {
@@ -105,7 +102,6 @@ public class BitBoardTest {
 
     @Test
     public void testGetDirection() {
-        System.out.println("getDirection");
         for (int from = 0; from < 64; from++) {
             for (int to = 0; to < 64; to++) {
                 assertEquals(computeDirection(from, to), BitBoard.getDirection(from, to));
@@ -115,7 +111,6 @@ public class BitBoardTest {
 
     @Test
     public void testTrailingZeros() {
-        System.out.println("trailingZeros");
         for (int i = 0; i < 64; i++) {
             long mask = 1L << i;
             assertEquals(i, BitBoard.numberOfTrailingZeros(mask));

@@ -35,14 +35,13 @@ public class PositionTest {
      */
     @Test
     public void testGetPiece() throws ChessParseError {
-        System.out.println("getPiece");
         Position pos = new Position();
         int result = pos.getPiece(0);
-        assertEquals(result, Piece.EMPTY);
+        assertEquals(Piece.EMPTY, result);
 
-        pos = TextIO.readFEN(TextIO.startPosFEN);
+        pos = TextIO.readFEN(TextIO.START_POS_FEN);
         result = pos.getPiece(0);
-        assertEquals(result, Piece.WROOK);
+        assertEquals(Piece.WROOK, result);
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 2; y++) {
                 int p1 = pos.getPiece(Position.getSquare(x, y));
@@ -58,7 +57,6 @@ public class PositionTest {
      */
     @Test
     public void testGetIndex() {
-        System.out.println("getIndex");
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 int sq = Position.getSquare(x, y);
@@ -75,7 +73,6 @@ public class PositionTest {
      */
     @Test
     public void testSetPiece() {
-        System.out.println("setPiece");
         Position instance = new Position();
         assertEquals(Piece.EMPTY, instance.getPiece(Position.getSquare(0, 0)));
         instance.setPiece(Position.getSquare(3, 4), Piece.WKING);
@@ -87,8 +84,7 @@ public class PositionTest {
      */
     @Test
     public void testMakeMove() throws ChessParseError {
-        System.out.println("makeMove");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Position origPos = new Position(pos);
         assertEquals(pos, origPos);
         Move move = new Move(Position.getSquare(4,1), Position.getSquare(4,3), Piece.EMPTY);
@@ -98,7 +94,7 @@ public class PositionTest {
         assertEquals(-1, pos.getEpSquare());
         assertEquals(Piece.EMPTY, pos.getPiece(Position.getSquare(4,1)));
         assertEquals(Piece.WPAWN, pos.getPiece(Position.getSquare(4,3)));
-        assertFalse(pos.equals(origPos));
+        assertNotEquals(pos, origPos);
         int castleMask = (1 << Position.A1_CASTLE) |
                          (1 << Position.H1_CASTLE) |
                          (1 << Position.A8_CASTLE) |
@@ -184,7 +180,6 @@ public class PositionTest {
 
     @Test
     public void testCastleMask() throws ChessParseError {
-        System.out.println("castleMask");
         Position pos = TextIO.readFEN("rnbqk1nr/pppp1ppp/8/4p3/4P3/2N2N2/PPPP1bPP/R1BQKB1R w KQkq - 0 1");
         UndoInfo ui = new UndoInfo();
         Move m = TextIO.stringToMove(pos, "Kxf2");
@@ -199,7 +194,6 @@ public class PositionTest {
      */
     @Test
     public void testPromotion() throws ChessParseError {
-        System.out.println("promotion");
         String fen = "r1bqk2r/1Pppbppp/p1n2n2/2P1p3/B3P3/5N2/Pp1P1PPP/R1BQK2R w KQkq - 0 1";
         Position pos = TextIO.readFEN(fen);
         assertEquals(fen, TextIO.toFEN(pos));
@@ -239,7 +233,6 @@ public class PositionTest {
      */
     @Test
     public void testMoveCounters() throws ChessParseError {
-        System.out.println("moveCounters");
         String fen = "r1bqk2r/2ppbppp/p1n2n2/1pP1p3/B3P3/5N2/PP1P1PPP/RNBQK2R w KQkq b6 0 7";
         Position pos = TextIO.readFEN(fen);
         
@@ -303,8 +296,7 @@ public class PositionTest {
      */
     @Test
     public void testDrawRuleEquals() throws ChessParseError {
-        System.out.println("drawRuleEquals");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Position origPos = new Position(pos);
         UndoInfo ui = new UndoInfo();
         pos.makeMove(TextIO.stringToMove(pos, "Nf3"), ui);
@@ -315,7 +307,7 @@ public class PositionTest {
         assertFalse(pos.drawRuleEquals(origPos));
         pos.makeMove(TextIO.stringToMove(pos, "Ng8"), ui);
         assertTrue(pos.drawRuleEquals(origPos));
-        assertFalse(pos.equals(origPos));       // Move counters have changed
+        assertNotEquals(pos, origPos);       // Move counters have changed
         
         String fen = "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1";
         pos = TextIO.readFEN(fen);
@@ -329,7 +321,7 @@ public class PositionTest {
         pos.makeMove(TextIO.stringToMove(pos, "Bf8"), ui);
         assertFalse(pos.drawRuleEquals(origPos));   // Not equal, castling rights lost
 
-        pos = TextIO.readFEN(TextIO.startPosFEN);
+        pos = TextIO.readFEN(TextIO.START_POS_FEN);
         pos.makeMove(TextIO.stringToMove(pos, "c4"), ui);
         pos.makeMove(TextIO.stringToMove(pos, "a6"), ui);
         pos.makeMove(TextIO.stringToMove(pos, "c5"), ui);
@@ -348,8 +340,7 @@ public class PositionTest {
      */
     @Test
     public void testHashCode() throws ChessParseError {
-        System.out.println("hashCode");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         long h1 = pos.zobristHash();
         assertEquals(h1, pos.computeZobristHash());
         UndoInfo ui = new UndoInfo();
@@ -404,8 +395,7 @@ public class PositionTest {
      */
     @Test
     public void testGetKingSq() throws ChessParseError {
-        System.out.println("getKingSq");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         assertEquals(TextIO.getSquare("e1"), pos.getKingSq(true));
         assertEquals(TextIO.getSquare("e8"), pos.getKingSq(false));
         pos = TextIO.readFEN("r1bq1bnr/ppppkppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQ - 0 4");

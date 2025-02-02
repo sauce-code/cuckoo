@@ -34,7 +34,6 @@ public class ComputerPlayerTest {
      */
     @Test
     public void testGetCommand() throws ChessParseError {
-        System.out.println("getCommand");
         ArrayList<Position> nullHist = new ArrayList<>();
 
         Position pos = TextIO.readFEN("7k/5Q2/p5K1/8/8/8/8/8 b - - 99 80");
@@ -68,7 +67,6 @@ public class ComputerPlayerTest {
      */
     @Test
     public void testDrawRep() {
-        System.out.println("drawRep");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         ComputerPlayer cp = new ComputerPlayer();
         cp.maxDepth = 3;
@@ -97,6 +95,6 @@ public class ComputerPlayerTest {
         game.processString("Ra8");
         game.processString("Kh7");
         result = cp.getCommand(new Position(game.pos), false, game.getHistory());
-        assertFalse(result.equals("Ra7+")); // Ra7 now leads to a draw by repetition
+        assertNotEquals("Ra7+", result); // Ra7 now leads to a draw by repetition
     }
 }

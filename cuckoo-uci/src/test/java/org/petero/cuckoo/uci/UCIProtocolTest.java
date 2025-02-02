@@ -33,7 +33,6 @@ public class UCIProtocolTest {
      */
     @Test
     public void testTokenize() {
-        System.out.println("tokenize");
         UCIProtocol uci = new UCIProtocol();
         String[] result = uci.tokenize("  a b   c de \t \t fgh");
         assertEquals(5, result.length);

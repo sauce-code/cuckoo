@@ -70,8 +70,6 @@ public final class TreeLogger {
             bos.write((byte)(fen.length));
             bos.write(fen);
             byte[] pad = new byte[128-1-fen.length];
-            for (int i = 0; i < pad.length; i++)
-                pad[i] = 0;
             bos.write(pad);
         } catch (IOException e) {
             throw new RuntimeException();
@@ -310,8 +308,7 @@ public final class TreeLogger {
             String cmdStr = in.readLine();
             if (cmdStr == null)
                 return;
-            if (cmdStr.length() == 0)
-                cmdStr = prevStr;
+            if (cmdStr.isEmpty()) cmdStr = prevStr;
             if (cmdStr.startsWith("q")) {
                 return;
             } else if (cmdStr.startsWith("?")) {
@@ -380,7 +377,7 @@ public final class TreeLogger {
                     int i = Integer.parseInt(cmdStr);
                     if ((i >= -1) && (i < numEntries))
                         currIndex = i;
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ignored) {
                 }
             }
             prevStr = cmdStr;
@@ -407,7 +404,7 @@ public final class TreeLogger {
     /** Return all nodes with a given hash key. */
     private ArrayList<Integer> getNodeForHashKey(long hashKey) {
         hashKey &= 0x0000ffffffffffffL;
-        ArrayList<Integer> ret = new ArrayList<Integer>();
+        ArrayList<Integer> ret = new ArrayList<>();
         StartEntry se = new StartEntry();
         EndEntry ee = new EndEntry();
         for (int index = 0; index < numEntries; index++) {
@@ -433,7 +430,7 @@ public final class TreeLogger {
                 s = s.substring(2);
             try {
                 key = Long.parseLong(s, 16);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
             }
         }
         return key;
@@ -446,14 +443,14 @@ public final class TreeLogger {
             if (idx > 0) {
                 return Integer.parseInt(s.substring(idx+1));
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
         }
         return defVal;
     }
 
     /** Get a list of integer parameters from an input string. */
     ArrayList<Integer> getArgs(String s, int defVal) {
-        ArrayList<Integer> ret = new ArrayList<Integer>();
+        ArrayList<Integer> ret = new ArrayList<>();
         String[] split = s.split(" ");
         try {
             for (int i = 1; i < split.length; i++)
@@ -461,8 +458,7 @@ public final class TreeLogger {
         } catch (NumberFormatException e) {
             ret.clear();
         }
-        if (ret.size() == 0)
-            ret.add(defVal);
+        if (ret.isEmpty()) ret.add(defVal);
         return ret;
     }
 
@@ -517,7 +513,7 @@ public final class TreeLogger {
 
     /** Find all children of a node. */
     private ArrayList<Integer> findChildren(int index) {
-        ArrayList<Integer> ret = new ArrayList<Integer>();
+        ArrayList<Integer> ret = new ArrayList<>();
         StartEntry se = new StartEntry();
         EndEntry ee = new EndEntry();
         int child = index + 1;
@@ -545,7 +541,7 @@ public final class TreeLogger {
 
     /** Get list of nodes from root position to a node. */
     private ArrayList<Integer> getNodeSequence(int index) {
-        ArrayList<Integer> nodes = new ArrayList<Integer>();
+        ArrayList<Integer> nodes = new ArrayList<>();
         nodes.add(index);
         while (index >= 0) {
             index = findParent(index);
@@ -557,7 +553,7 @@ public final class TreeLogger {
 
     /** Find list of moves from root node to a node. */
     private ArrayList<Move> getMoveSequence(int index) {
-        ArrayList<Move> moves = new ArrayList<Move>();
+        ArrayList<Move> moves = new ArrayList<>();
         StartEntry se = new StartEntry();
         EndEntry ee = new EndEntry();
         while (index >= 0) {

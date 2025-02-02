@@ -33,8 +33,7 @@ public class EvaluateTest {
      */
     @Test
     public void testEvalPos() throws ChessParseError {
-        System.out.println("evalPos");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         UndoInfo ui = new UndoInfo();
         pos.makeMove(TextIO.stringToMove(pos, "e4"), ui);
         pos.makeMove(TextIO.stringToMove(pos, "e5"), ui);
@@ -99,8 +98,7 @@ public class EvaluateTest {
      */
     @Test
     public void testPieceSquareEval() throws ChessParseError {
-        System.out.println("pieceSquareEval");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         int score = evalWhite(pos);
         assertEquals(0, score);    // Should be zero, by symmetry
         UndoInfo ui = new UndoInfo();
@@ -140,7 +138,6 @@ public class EvaluateTest {
      */
     @Test
     public void testTradeBonus() throws ChessParseError {
-        System.out.println("tradeBonus");
         String fen = "8/5k2/6r1/2p1p3/3p4/2P2N2/3PPP2/4K1R1 w - - 0 1";
         Position pos = TextIO.readFEN(fen);
         int score1 = evalWhite(pos);
@@ -169,8 +166,7 @@ public class EvaluateTest {
      */
     @Test
     public void testMaterial() throws ChessParseError {
-        System.out.println("material");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         assertEquals(0, Evaluate.material(pos));
         
         final int pV = Evaluate.pV;
@@ -201,7 +197,6 @@ public class EvaluateTest {
      */
     @Test
     public void testKingSafety() throws ChessParseError {
-        System.out.println("kingSafety");
         Position pos = TextIO.readFEN("r3kb1r/p1p1pppp/b2q1n2/4N3/3P4/2N1PQ2/P2B1PPP/R3R1K1 w kq - 0 1");
         int s1 = evalWhite(pos);
         pos.setPiece(TextIO.getSquare("g7"), Piece.EMPTY);
@@ -230,7 +225,6 @@ public class EvaluateTest {
      */
     @Test
     public void testEndGameEval() throws ChessParseError {
-        System.out.println("endGameEval");
         Position pos = new Position();
         pos.setPiece(Position.getSquare(4, 1), Piece.WKING);
         pos.setPiece(Position.getSquare(4, 6), Piece.BKING);
@@ -296,7 +290,6 @@ public class EvaluateTest {
      */
     @Test
     public void testPassedPawns() throws ChessParseError {
-        System.out.println("passedPawns");
         Position pos = TextIO.readFEN("8/8/8/P3k/8/8/p/K w");
         int score = evalWhite(pos);
         assertTrue(score > 300); // Unstoppable passed pawn
@@ -317,7 +310,6 @@ public class EvaluateTest {
      */
     @Test
     public void testBishAndRookPawns() throws ChessParseError {
-        System.out.println("bishAndRookPawns");
         final int pV = Evaluate.pV;
         final int bV = Evaluate.bV;
         final int winScore = pV + bV;
@@ -370,7 +362,6 @@ public class EvaluateTest {
      */
     @Test
     public void testKQKP() throws ChessParseError {
-        System.out.println("KQKP");
         final int pV = Evaluate.pV;
         final int qV = Evaluate.qV;
         final int winScore = qV - pV - 200;
@@ -393,7 +384,6 @@ public class EvaluateTest {
     
     @Test
     public void testKRKP() throws ChessParseError {
-        System.out.println("KRKP");
         final int pV = Evaluate.pV;
         final int rV = Evaluate.rV;
         final int winScore = rV - pV;

@@ -93,7 +93,7 @@ public class Game {
             case DRAW_REP:
             {
                 String ret = "Game over, draw by repetition!";
-                if ((drawStateMoveStr != null) && (drawStateMoveStr.length() > 0)) {
+                if ((drawStateMoveStr != null) && (!drawStateMoveStr.isEmpty())) {
                     ret = ret + " [" + drawStateMoveStr + "]";
                 }
                 return ret;
@@ -101,7 +101,7 @@ public class Game {
             case DRAW_50:
             {
                 String ret = "Game over, draw by 50 move rule!";
-                if ((drawStateMoveStr != null) && (drawStateMoveStr.length() > 0)) {
+                if ((drawStateMoveStr != null) && (!drawStateMoveStr.isEmpty())) {
                     ret = ret + " [" + drawStateMoveStr + "]";  
                 }
                 return ret;
@@ -193,7 +193,7 @@ public class Game {
             drawState = GameState.ALIVE;
             resignState = GameState.ALIVE;
             try {
-                pos = TextIO.readFEN(TextIO.startPosFEN);
+                pos = TextIO.readFEN(TextIO.START_POS_FEN);
             } catch (ChessParseError ex) {
                 throw new RuntimeException();
             }
@@ -359,7 +359,7 @@ public class Game {
                 whiteMove = strMove;
             } else {
                 blackMove = strMove;
-                if (whiteMove.length() == 0) {
+                if (whiteMove.isEmpty()) {
                     whiteMove = "...";
                 }
                 if (compressed) {
@@ -442,7 +442,7 @@ public class Game {
             boolean rep = drawCmd.startsWith("rep");
             Move m = null;
             String ms = drawCmd.substring(drawCmd.indexOf(" ") + 1);
-            if (ms.length() > 0) {
+            if (!ms.isEmpty()) {
                 m = TextIO.stringToMove(pos, ms);
             }
             boolean valid;
@@ -539,8 +539,8 @@ public class Game {
         if (wn + bn == 0) {
             // Only bishops. If they are all on the same color, the position is a draw.
             long bMask = pos.pieceTypeBB[Piece.WBISHOP] | pos.pieceTypeBB[Piece.BBISHOP];
-            return ((bMask & BitBoard.maskDarkSq) == 0) ||
-                    ((bMask & BitBoard.maskLightSq) == 0);
+            return ((bMask & BitBoard.MASK_DARK_SQ) == 0) ||
+                    ((bMask & BitBoard.MASK_LIGHT_SQ) == 0);
         }
 
         return false;

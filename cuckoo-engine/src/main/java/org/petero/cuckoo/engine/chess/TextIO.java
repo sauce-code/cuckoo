@@ -23,7 +23,11 @@ package org.petero.cuckoo.engine.chess;
  * @author petero
  */
 public class TextIO {
-  public static final String startPosFEN =
+
+    private TextIO() {
+    }
+
+    public static final String START_POS_FEN =
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     /** Parse a FEN string and return a chess Position object. */
@@ -64,7 +68,7 @@ public class TextIO {
                 default: throw new ChessParseError("Invalid piece");
             }
         }
-        if (words[1].length() == 0) {
+        if (words[1].isEmpty()) {
             throw new ChessParseError("Invalid side");
         }
         pos.setWhiteMove(words[1].charAt(0) == 'w');
@@ -298,7 +302,7 @@ public class TextIO {
                 ret.append("O-O-O");
             }
         }
-        if (ret.length() == 0) {
+        if (ret.isEmpty()) {
             int p = pos.getPiece(move.from);
             ret.append(pieceToChar(p));
             int x1 = Position.getX(move.from);
@@ -460,8 +464,7 @@ public class TextIO {
     public static Move stringToMove(Position pos, String strMove) {
         strMove = strMove.replaceAll("=", "");
         Move move = null;
-        if (strMove.length() == 0)
-            return move;
+        if (strMove.isEmpty()) return move;
         MoveGen.MoveList moves = MoveGen.instance.pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moves);
         {
@@ -570,8 +573,7 @@ public class TextIO {
                 } else {
                     ret.append(Piece.isWhite(p) ? ' ' : '*');
                     String pieceName = pieceToChar(p);
-                    if (pieceName.length() == 0)
-                        pieceName = "P";
+                    if (pieceName.isEmpty()) pieceName = "P";
                     ret.append(pieceName);
                     ret.append(" |");
                 }

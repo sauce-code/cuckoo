@@ -33,7 +33,6 @@ public class GameTest {
      */
     @Test
     public void testHaveDrawOffer() {
-        System.out.println("haveDrawOffer");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         assertFalse(game.haveDrawOffer());
 
@@ -103,7 +102,7 @@ public class GameTest {
         
         res = game.processString("draw offer e5");
         assertTrue(res);
-        assertEquals(TextIO.startPosFEN, TextIO.toFEN(game.pos));   // Move invalid, not executed
+        assertEquals(TextIO.START_POS_FEN, TextIO.toFEN(game.pos));   // Move invalid, not executed
         res = game.processString("e4");
         assertTrue(res);
         assertTrue(game.haveDrawOffer());   // Previous draw offer still valid
@@ -126,7 +125,6 @@ public class GameTest {
      */
     @Test
     public void testDraw50() {
-        System.out.println("draw50");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         assertFalse(game.haveDrawOffer());
         boolean res = game.processString("draw 50");
@@ -185,7 +183,6 @@ public class GameTest {
      */
     @Test
     public void testDrawRep() {
-        System.out.println("drawRep");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         assertFalse(game.haveDrawOffer());
         game.processString("Nc3");
@@ -259,7 +256,6 @@ public class GameTest {
      */
     @Test
     public void testResign() {
-        System.out.println("resign");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         assertEquals(Game.GameState.ALIVE, game.getGameState());
         game.processString("f3");
@@ -286,9 +282,8 @@ public class GameTest {
      */
     @Test
     public void testProcessString() throws ChessParseError {
-        System.out.println("processString");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
-        assertEquals(TextIO.startPosFEN, TextIO.toFEN(game.pos));
+        assertEquals(TextIO.START_POS_FEN, TextIO.toFEN(game.pos));
         boolean res = game.processString("Nf3");
         assertTrue(res);
         assertEquals(1, game.pos.halfMoveClock);
@@ -304,10 +299,10 @@ public class GameTest {
         assertEquals(1, game.pos.fullMoveCounter);
         res = game.processString("undo");
         assertTrue(res);
-        assertEquals(TextIO.startPosFEN, TextIO.toFEN(game.pos));
+        assertEquals(TextIO.START_POS_FEN, TextIO.toFEN(game.pos));
         res = game.processString("undo");
         assertTrue(res);
-        assertEquals(TextIO.startPosFEN, TextIO.toFEN(game.pos));
+        assertEquals(TextIO.START_POS_FEN, TextIO.toFEN(game.pos));
 
         res = game.processString("redo");
         assertTrue(res);
@@ -324,7 +319,7 @@ public class GameTest {
 
         res = game.processString("new");
         assertTrue(res);
-        assertEquals(TextIO.startPosFEN, TextIO.toFEN(game.pos));
+        assertEquals(TextIO.START_POS_FEN, TextIO.toFEN(game.pos));
         
         String fen = "8/8/8/4k3/8/8/2p5/5K2 b - - 47 68";
         Position pos = TextIO.readFEN(fen);
@@ -341,7 +336,6 @@ public class GameTest {
      */
     @Test
     public void testGetGameState() {
-        System.out.println("getGameState");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         assertEquals(Game.GameState.ALIVE, game.getGameState());
         game.processString("f3");
@@ -359,7 +353,6 @@ public class GameTest {
      */
     @Test
     public void testInsufficientMaterial() {
-        System.out.println("insufficientMaterial");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         assertEquals(Game.GameState.ALIVE, game.getGameState());
         game.processString("setpos 4k3/8/8/8/8/8/8/4K3 w - - 0 1");
@@ -404,7 +397,6 @@ public class GameTest {
      */
     @Test
     public void testPerfT() {
-        System.out.println("perfT");
         Game game = new Game(new HumanPlayer(), new HumanPlayer());
         game.processString("new");
         doTestPerfT(game.pos, 5, new long[]{20,400,8902,197281,4865609,119060324,3195901860L,84998978956L});
@@ -422,7 +414,6 @@ public class GameTest {
             long t0 = System.nanoTime();
             long nodes = Game.perfT(moveGen, pos, d);
             long t1 = System.nanoTime();
-            System.out.printf("perft(%d) = %d, t=%.6fs\n", d, nodes, (t1 - t0)*1e-9);
             assertEquals(expectedNodeCounts[d-1], nodes);
         }
     }

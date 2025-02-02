@@ -18,7 +18,6 @@
 
 package org.petero.cuckoo.engine.guibase;
 
-import org.petero.cuckoo.engine.chess.Move;
 import org.petero.cuckoo.engine.chess.Position;
 
 public interface GUIInterface {

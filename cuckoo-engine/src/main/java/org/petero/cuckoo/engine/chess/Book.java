@@ -72,7 +72,7 @@ public class Book {
                     buf.add(tmpBuf[i]);
             }
             inStream.close();
-            Position startPos = TextIO.readFEN(TextIO.startPosFEN);
+            Position startPos = TextIO.readFEN(TextIO.START_POS_FEN);
             Position pos = new Position(startPos);
             UndoInfo ui = new UndoInfo();
             int len = buf.size();
@@ -195,20 +195,19 @@ public class Book {
     public static List<Byte> createBinBook() {
         List<Byte> binBook = new ArrayList<>(0);
         try {
-            InputStream inStream = new Object().getClass().getResourceAsStream("/book.txt");
+            InputStream inStream = Object.class.getResourceAsStream("/book.txt");
             InputStreamReader inFile = new InputStreamReader(inStream);
             BufferedReader inBuf = new BufferedReader(inFile);
             LineNumberReader lnr = new LineNumberReader(inBuf);
             String line;
             while ((line = lnr.readLine()) != null) {
-                if (line.startsWith("#") || (line.length() == 0)) {
+            if (line.startsWith("#") || (line.isEmpty())) {
                     continue;
                 }
                 if (!addBookLine(line, binBook)) {
                     System.out.printf("Book parse error, line:%d\n", lnr.getLineNumber());
                     throw new RuntimeException();
                 }
-//              System.out.printf("no:%d line:%s%n", lnr.getLineNumber(), line);
             }
             lnr.close();
         } catch (ChessParseError ex) {
@@ -222,11 +221,10 @@ public class Book {
 
     /** Add a sequence of moves, starting from the initial position, to the binary opening book. */
     private static boolean addBookLine(String line, List<Byte> binBook) throws ChessParseError {
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         UndoInfo ui = new UndoInfo();
         String[] strMoves = line.split(" ");
         for (String strMove : strMoves) {
-//            System.out.printf("Adding move:%s\n", strMove);
             int bad = 0;
             if (strMove.endsWith("?")) {
                 strMove = strMove.substring(0, strMove.length() - 1);

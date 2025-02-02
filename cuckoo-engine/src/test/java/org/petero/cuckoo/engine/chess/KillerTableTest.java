@@ -33,7 +33,6 @@ public class KillerTableTest {
      */
     @Test
     public void testAddKiller() {
-        System.out.println("addKiller");
         KillerTable kt = new KillerTable();
         Move m = new Move(TextIO.getSquare("b1"), TextIO.getSquare("b5"), Piece.EMPTY);
         kt.addKiller(3, m);
@@ -47,7 +46,6 @@ public class KillerTableTest {
      */
     @Test
     public void testGetKillerScore() {
-        System.out.println("getKillerScore");
         KillerTable kt = new KillerTable();
         Move m1 = new Move(TextIO.getSquare("b1"), TextIO.getSquare("b5"), Piece.EMPTY);
         Move m2 = new Move(TextIO.getSquare("c1"), TextIO.getSquare("d2"), Piece.EMPTY);

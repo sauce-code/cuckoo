@@ -104,14 +104,13 @@ public class TUIGame extends Game {
             int numRight = 0;
             int numTotal = 0;
             while ((line = fr.readLine()) != null) {
-                if (line.startsWith("#") || (line.length() == 0)) {
+                if (line.startsWith("#") || (line.isEmpty())) {
                     continue;
                 }
                 int idx1 = line.indexOf(" bm ");
                 String fen = line.substring(0, idx1);
                 int idx2 = line.indexOf(";", idx1);
                 String bm = line.substring(idx1 + 4, idx2);
-                //                System.out.printf("Line %3d: fen:%s bm:%s\n", fr.getLineNumber(), fen, bm);
                 Position testPos = TextIO.readFEN(fen);
                 cp.clearTT();
                 TwoReturnValues<Move, String> ret = cp.searchPosition(testPos, timeLimit);
@@ -147,12 +146,9 @@ public class TUIGame extends Game {
             return false;
         } catch (IOException ex) {
             System.out.printf("IO error: %s\n", ex.getMessage());
-        } catch (ChessParseError cpe) {
+        } catch (ChessParseError | StringIndexOutOfBoundsException cpe) {
             int lineNo = (fr == null) ? -1 : fr.getLineNumber();
             System.out.printf("Parse error, line %d: %s\n", lineNo, cpe.getMessage());
-        } catch (StringIndexOutOfBoundsException e) {
-            int lineNo = (fr == null) ? -1 : fr.getLineNumber();
-            System.out.printf("Parse error, line %d: %s\n", lineNo, e.getMessage());
         } finally {
             if (fr != null) {
                 try {
@@ -194,7 +190,7 @@ public class TUIGame extends Game {
             // Check game state
             System.out.print(TextIO.asciiBoard(pos));
             String stateStr = getGameStateString();
-            if (stateStr.length() > 0) {
+            if (!stateStr.isEmpty()) {
                 System.out.printf("%s%n", stateStr);
             }
             if (getGameState() != GameState.ALIVE) {

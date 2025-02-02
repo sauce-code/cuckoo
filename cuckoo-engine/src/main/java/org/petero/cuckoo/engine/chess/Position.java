@@ -454,22 +454,22 @@ public class Position {
         }
         if (wtm) {
             // Update castling rights when rook moves
-            if ((BitBoard.maskCorners & fromMask) != 0) {
+            if ((BitBoard.MASK_CORNERS & fromMask) != 0) {
                 if (p == Piece.WROOK)
                     removeCastleRights(move.from);
             }
-            if ((BitBoard.maskCorners & (1L << move.to)) != 0) {
+            if ((BitBoard.MASK_CORNERS & (1L << move.to)) != 0) {
                 if (capP == Piece.BROOK)
                     removeCastleRights(move.to);
             }
         } else {
             fullMoveCounter++;
             // Update castling rights when rook moves
-            if ((BitBoard.maskCorners & fromMask) != 0) {
+            if ((BitBoard.MASK_CORNERS & fromMask) != 0) {
                 if (p == Piece.BROOK)
                     removeCastleRights(move.from);
             }
-            if ((BitBoard.maskCorners & (1L << move.to)) != 0) {
+            if ((BitBoard.MASK_CORNERS & (1L << move.to)) != 0) {
                 if (capP == Piece.WROOK)
                     removeCastleRights(move.to);
             }

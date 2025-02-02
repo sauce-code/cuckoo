@@ -220,7 +220,7 @@ public class ChessController {
         pgn.append(String.format("[White \"%s\"]%n", white));
         pgn.append(String.format("[Black \"%s\"]%n", black));
         pgn.append(String.format("[Result \"%s\"]%n", game.getPGNResultString()));
-        if (!fen.equals(TextIO.startPosFEN)) {
+        if (!fen.equals(TextIO.START_POS_FEN)) {
             pgn.append(String.format("[FEN \"%s\"]%n", fen));
             pgn.append("[SetUp \"1\"]\n");
         }
@@ -271,7 +271,7 @@ public class ChessController {
         }
 
         // Parse tag section
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Scanner sc = new Scanner(pgn);
         sc.useDelimiter("\\s+");
         while (sc.hasNext("\\[.*")) {
@@ -321,7 +321,7 @@ public class ChessController {
         while (sc.hasNext()) {
             String strMove = sc.next();
             strMove = strMove.replaceFirst("\\$?[0-9]*\\.*([^?!]*)[?!]*", "$1");
-            if (strMove.length() == 0) continue;
+            if (strMove.isEmpty()) continue;
             Move m = TextIO.stringToMove(game.pos, strMove);
             if (m == null)
                 break;
@@ -413,13 +413,12 @@ public class ChessController {
     Move promoteMove;
     public final void reportPromotePiece(int choice) {
         final boolean white = game.pos.whiteMove;
-        int promoteTo = switch (choice) {
+        promoteMove.promoteTo = switch (choice) {
             case 1 -> white ? Piece.WROOK : Piece.BROOK;
             case 2 -> white ? Piece.WBISHOP : Piece.BBISHOP;
             case 3 -> white ? Piece.WKNIGHT : Piece.BKNIGHT;
             default -> white ? Piece.WQUEEN : Piece.BQUEEN;
         };
-        promoteMove.promoteTo = promoteTo;
         Move m = promoteMove;
         promoteMove = null;
         humanMove(m);

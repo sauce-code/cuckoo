@@ -21,7 +21,6 @@ package org.petero.cuckoo.engine.chess;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.petero.cuckoo.engine.chess.Search.StopSearch;
 
 /**
  *
@@ -36,7 +35,6 @@ public class SearchTest {
      */
     @Test
     public void testNegaScout() throws ChessParseError, StopSearch {
-        System.out.println("negaScout");
         final int mate0 = Search.MATE0;
 
         Position pos = TextIO.readFEN("3k4/8/3K2R1/8/8/8/8/8 w - - 0 1");
@@ -76,7 +74,7 @@ public class SearchTest {
         pos = TextIO.readFEN("8/8/2K5/3QP3/P6P/1q6/8/k7 w - - 31 51");
         sc = new Search(pos, nullHist, 0, tt);
         Move bestM = idSearch(sc, 2);
-        assertFalse(TextIO.moveToString(pos, bestM, false).equals("Qxb3"));
+        assertNotEquals("Qxb3", TextIO.moveToString(pos, bestM, false));
     }
 
     /**
@@ -84,7 +82,6 @@ public class SearchTest {
      */
     @Test
     public void testDraw50() throws ChessParseError, StopSearch {
-        System.out.println("draw50");
         final int mate0 = Search.MATE0;
         final int mateInOne = mate0 - 2;
         final int matedInOne = -mate0 + 3;
@@ -146,7 +143,6 @@ public class SearchTest {
      */
     @Test
     public void testDrawRep() throws ChessParseError, StopSearch {
-        System.out.println("drawRep");
         final int mate0 = Search.MATE0;
         Position pos = TextIO.readFEN("7k/5RR1/8/8/8/8/q3q3/2K5 w - - 0 1");
         Search sc = new Search(pos, nullHist, 0, tt);
@@ -185,7 +181,6 @@ public class SearchTest {
      */
     @Test
     public void testHashing() throws ChessParseError {
-        System.out.println("hashing");
         Position pos = TextIO.readFEN("/k/3p/p2P1p/P2P1P///K/ w - -");  // Fine #70
         Search sc = new Search(pos, nullHist, 0, tt);
         Move bestM = idSearch(sc, 28);
@@ -194,7 +189,6 @@ public class SearchTest {
     
     @Test
     public void testCheckEvasion() throws ChessParseError {
-        System.out.println("check evasion");
         Position pos = TextIO.readFEN("6r1/R5PK/2p5/1k6/8/8/p7/8 b - - 0 62");
         Search sc = new Search(pos, nullHist, 0, tt);
         Move bestM = idSearch(sc, 3);
@@ -209,7 +203,6 @@ public class SearchTest {
 
     @Test
     public void testStalemateTrap() throws ChessParseError {
-        System.out.println("stalemate trap");
         Position pos = TextIO.readFEN("7k/1P3R1P/6r1/5K2/8/8/6R1/8 b - - 98 194");
         Search sc = new Search(pos, nullHist, 0, tt);
         Move bestM = idSearch(sc, 3);
@@ -218,7 +211,6 @@ public class SearchTest {
 
     @Test
     public void testKQKRNullMove() throws ChessParseError {
-        System.out.println("kqkrNullMove");
         Position pos = TextIO.readFEN("7K/6R1/5k2/3q4/8/8/8/8 b - - 0 1");
         Search sc = new Search(pos, nullHist, 0, tt);
         Move bestM = idSearch(sc, 9);
@@ -253,7 +245,6 @@ public class SearchTest {
      */
     @Test
     public void testSEE() throws ChessParseError {
-        System.out.println("SEE");
         final int pV = Evaluate.pV;
         final int nV = Evaluate.nV;
         final int bV = Evaluate.bV;
@@ -406,7 +397,6 @@ public class SearchTest {
      */
     @Test
     public void testScoreMoveList() throws ChessParseError {
-        System.out.println("SEEorder");
         Position pos = TextIO.readFEN("r2qk2r/ppp2ppp/1bnp1nb1/1N2p3/3PP3/1PP2N2/1P3PPP/R1BQRBK1 w kq - 0 1");
         Search sc = new Search(pos, nullHist, 0, tt);
         MoveGen moveGen = new MoveGen();

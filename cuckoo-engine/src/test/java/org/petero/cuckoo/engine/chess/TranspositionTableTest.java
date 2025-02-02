@@ -34,9 +34,8 @@ public class TranspositionTableTest {
      */
     @Test
     public void testTTEntry() throws ChessParseError {
-        System.out.println("TTEntry");
         final int mate0 = Search.MATE0;
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Move move = TextIO.stringToMove(pos, "e4");
 
         // Test "normal" (non-mate) score
@@ -112,9 +111,8 @@ public class TranspositionTableTest {
      */
     @Test
     public void testInsert() throws ChessParseError {
-        System.out.println("insert");
         TranspositionTable tt = new TranspositionTable(16);
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         String[] moves = {
             "e4", "e5", "Nf3", "Nc6", "Bb5", "a6", "Ba4", "b5", "Bb3", "Nf6", "O-O", "Be7", "Re1"
         };
@@ -130,7 +128,7 @@ public class TranspositionTableTest {
             tt.insert(pos.historyHash(), m, type, ply, depth, score * 2 + 3);
         }
 
-        pos = TextIO.readFEN(TextIO.startPosFEN);
+        pos = TextIO.readFEN(TextIO.START_POS_FEN);
         for (int i = 0; i < moves.length; i++) {
             Move m = TextIO.stringToMove(pos, moves[i]);
             pos.makeMove(m, ui);

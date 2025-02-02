@@ -43,7 +43,7 @@ public class HumanPlayer implements Player {
             String moveStr = in.readLine();
             if (moveStr == null)
                 return "quit";
-            if (moveStr.length() == 0) {
+            if (moveStr.isEmpty()) {
                 return lastCmd;
             } else {
                 lastCmd = moveStr;

@@ -33,8 +33,7 @@ public class HistoryTest {
      */
     @Test
     public void testGetHistScore() throws ChessParseError {
-        System.out.println("getHistScore");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         History hs = new History();
         Move m1 = TextIO.stringToMove(pos, "e4");
         Move m2 = TextIO.stringToMove(pos, "d4");

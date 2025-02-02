@@ -26,11 +26,14 @@ import org.petero.cuckoo.engine.chess.Position;
 import org.petero.cuckoo.engine.guibase.ChessController;
 import org.petero.cuckoo.engine.guibase.GUIInterface;
 
+import java.io.Serial;
+
 /**
  * The main class for the chess GUI.
  * @author petero
  */
 public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
+    @Serial
     private static final long serialVersionUID = 7357610346389734323L;
     ChessBoardPainter cbp;
     ChessController ctrl;
@@ -128,7 +131,7 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
 
         newGame.setText("New Game");
         newGame.setFocusable(false);
-        newGame.addActionListener(evt -> NewGameActionPerformed(evt));
+        newGame.addActionListener(this::NewGameActionPerformed);
 
         settingsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Settings"));
         settingsPanel.setFocusable(false);
@@ -151,15 +154,15 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
         timeSlider.setPaintTicks(true);
         timeSlider.setValue(5);
         timeSlider.setFocusable(false);
-        timeSlider.addChangeListener(evt -> TimeSliderStateChanged(evt));
+        timeSlider.addChangeListener(this::TimeSliderStateChanged);
 
         showThinking.setText("Show Thinking");
         showThinking.setFocusable(false);
-        showThinking.addChangeListener(evt -> ShowThinkingStateChanged(evt));
+        showThinking.addChangeListener(this::ShowThinkingStateChanged);
 
         flipBoard.setText("Flip Board");
         flipBoard.setFocusable(false);
-        flipBoard.addChangeListener(evt -> FlipBoardStateChanged(evt));
+        flipBoard.addChangeListener(this::FlipBoardStateChanged);
 
         javax.swing.GroupLayout SettingsPanelLayout = new javax.swing.GroupLayout(settingsPanel);
         settingsPanel.setLayout(SettingsPanelLayout);
@@ -205,13 +208,13 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
         forward.setDefaultCapable(false);
         forward.setFocusPainted(false);
         forward.setFocusable(false);
-        forward.addActionListener(evt -> ForwardActionPerformed(evt));
+        forward.addActionListener(this::ForwardActionPerformed);
 
         backward.setText("<-");
         backward.setDefaultCapable(false);
         backward.setFocusPainted(false);
         backward.setFocusable(false);
-        backward.addActionListener(evt -> BackwardActionPerformed(evt));
+        backward.addActionListener(this::BackwardActionPerformed);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);

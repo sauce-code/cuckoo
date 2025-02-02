@@ -271,11 +271,11 @@ public class Evaluate {
         wAttacksBB = bAttacksBB = 0L;
 
         long pawns = pos.pieceTypeBB[Piece.WPAWN];
-        wPawnAttacks = ((pawns & BitBoard.maskBToHFiles) << 7) |
-                       ((pawns & BitBoard.maskAToGFiles) << 9);
+        wPawnAttacks = ((pawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
+                       ((pawns & BitBoard.MASK_A_TO_G_FILES) << 9);
         pawns = pos.pieceTypeBB[Piece.BPAWN];
-        bPawnAttacks = ((pawns & BitBoard.maskBToHFiles) >>> 9) |
-                       ((pawns & BitBoard.maskAToGFiles) >>> 7);
+        bPawnAttacks = ((pawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
+                       ((pawns & BitBoard.MASK_A_TO_G_FILES) >>> 7);
 
         score += pieceSquareEval(pos);
         score += pawnBonus(pos);
@@ -566,19 +566,19 @@ public class Evaluate {
         // Evaluate backward pawns, defined as a pawn that guards a friendly pawn,
         // can't be guarded by friendly pawns, can advance, but can't advance without 
         // being captured by an enemy pawn.
-        long wPawnAttacks = (((wPawns & BitBoard.maskBToHFiles) << 7) |
-                             ((wPawns & BitBoard.maskAToGFiles) << 9));
-        long bPawnAttacks = (((bPawns & BitBoard.maskBToHFiles) >>> 9) |
-                             ((bPawns & BitBoard.maskAToGFiles) >>> 7));
+        long wPawnAttacks = (((wPawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
+                             ((wPawns & BitBoard.MASK_A_TO_G_FILES) << 9));
+        long bPawnAttacks = (((bPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
+                             ((bPawns & BitBoard.MASK_A_TO_G_FILES) >>> 7));
         long wBackward = wPawns & ~((wPawns | bPawns) >>> 8) & (bPawnAttacks >>> 8) &
                          ~BitBoard.northFill(wPawnAttacks);
-        wBackward &= (((wPawns & BitBoard.maskBToHFiles) >>> 9) |
-                      ((wPawns & BitBoard.maskAToGFiles) >>> 7));
+        wBackward &= (((wPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
+                      ((wPawns & BitBoard.MASK_A_TO_G_FILES) >>> 7));
         wBackward &= ~BitBoard.northFill(bPawnFiles);
         long bBackward = bPawns & ~((wPawns | bPawns) << 8) & (wPawnAttacks << 8) &
                          ~BitBoard.southFill(bPawnAttacks);
-        bBackward &= (((bPawns & BitBoard.maskBToHFiles) << 7) |
-                      ((bPawns & BitBoard.maskAToGFiles) << 9));
+        bBackward &= (((bPawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
+                      ((bPawns & BitBoard.MASK_A_TO_G_FILES) << 9));
         bBackward &= ~BitBoard.northFill(wPawnFiles);
         score -= (Long.bitCount(wBackward) - Long.bitCount(bBackward)) * 15;
 
@@ -587,8 +587,8 @@ public class Evaluate {
         final int[] ppBonus = {-1,24,26,30,36,47,64,-1};
         int passedBonusW = 0;
         if (passedPawnsW != 0) {
-            long guardedPassedW = passedPawnsW & (((wPawns & BitBoard.maskBToHFiles) << 7) |
-                                                  ((wPawns & BitBoard.maskAToGFiles) << 9));
+            long guardedPassedW = passedPawnsW & (((wPawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
+                                                  ((wPawns & BitBoard.MASK_A_TO_G_FILES) << 9));
             passedBonusW += 15 * Long.bitCount(guardedPassedW);
             long m = passedPawnsW;
             while (m != 0) {
@@ -603,8 +603,8 @@ public class Evaluate {
         long passedPawnsB = bPawns & ~BitBoard.northFill(wPawns | wPawnAttacks | (bPawns << 8));
         int passedBonusB = 0;
         if (passedPawnsB != 0) {
-            long guardedPassedB = passedPawnsB & (((bPawns & BitBoard.maskBToHFiles) >>> 9) |
-                                                  ((bPawns & BitBoard.maskAToGFiles) >>> 7));
+            long guardedPassedB = passedPawnsB & (((bPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
+                                                  ((bPawns & BitBoard.MASK_A_TO_G_FILES) >>> 7));
             passedBonusB += 15 * Long.bitCount(guardedPassedB);
             long m = passedPawnsB;
             while (m != 0) {
@@ -633,8 +633,8 @@ public class Evaluate {
         while (m != 0) {
             int sq = BitBoard.numberOfTrailingZeros(m);
             final int x = Position.getX(sq);
-            if ((wPawns & BitBoard.maskFile[x]) == 0) { // At least half-open file
-                score += (bPawns & BitBoard.maskFile[x]) == 0 ? 25 : 12;
+            if ((wPawns & BitBoard.MASK_FILE[x]) == 0) { // At least half-open file
+                score += (bPawns & BitBoard.MASK_FILE[x]) == 0 ? 25 : 12;
             }
             long atk = BitBoard.rookAttacks(sq, occupied);
             wAttacksBB |= atk;
@@ -651,8 +651,8 @@ public class Evaluate {
         while (m != 0) {
             int sq = BitBoard.numberOfTrailingZeros(m);
             final int x = Position.getX(sq);
-            if ((bPawns & BitBoard.maskFile[x]) == 0) {
-                score -= (wPawns & BitBoard.maskFile[x]) == 0 ? 25 : 12;
+            if ((bPawns & BitBoard.MASK_FILE[x]) == 0) {
+                score -= (wPawns & BitBoard.MASK_FILE[x]) == 0 ? 25 : 12;
             }
             long atk = BitBoard.rookAttacks(sq, occupied);
             bAttacksBB |= atk;
@@ -697,10 +697,10 @@ public class Evaluate {
             m &= m-1;
         }
 
-        boolean whiteDark  = (pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.maskDarkSq ) != 0;
-        boolean whiteLight = (pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.maskLightSq) != 0;
-        boolean blackDark  = (pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.maskDarkSq ) != 0;
-        boolean blackLight = (pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.maskLightSq) != 0;
+        boolean whiteDark  = (pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.MASK_DARK_SQ) != 0;
+        boolean whiteLight = (pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.MASK_LIGHT_SQ) != 0;
+        boolean blackDark  = (pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.MASK_DARK_SQ) != 0;
+        boolean blackLight = (pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.MASK_LIGHT_SQ) != 0;
         int numWhite = (whiteDark ? 1 : 0) + (whiteLight ? 1 : 0);
         int numBlack = (blackDark ? 1 : 0) + (blackLight ? 1 : 0);
 
@@ -806,28 +806,28 @@ public class Evaluate {
         if (Position.getY(pos.wKingSq) == 0) {
             if (((pos.pieceTypeBB[Piece.WKING] & 0x60L) != 0) && // King on f1 or g1
                 ((pos.pieceTypeBB[Piece.WROOK] & 0xC0L) != 0) && // Rook on g1 or h1
-                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.maskFile[6]) != 0) &&
-                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.maskFile[7]) != 0)) {
+                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.MASK_FILE[6]) != 0) &&
+                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.MASK_FILE[7]) != 0)) {
                 score -= 6 * 15;
             } else
             if (((pos.pieceTypeBB[Piece.WKING] & 0x6L) != 0) && // King on b1 or c1
                 ((pos.pieceTypeBB[Piece.WROOK] & 0x3L) != 0) && // Rook on a1 or b1
-                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.maskFile[0]) != 0) &&
-                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.maskFile[1]) != 0)) {
+                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.MASK_FILE[0]) != 0) &&
+                ((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.MASK_FILE[1]) != 0)) {
                 score -= 6 * 15;
             }
         }
         if (Position.getY(pos.bKingSq) == 7) {
             if (((pos.pieceTypeBB[Piece.BKING] & 0x6000000000000000L) != 0) && // King on f8 or g8
                 ((pos.pieceTypeBB[Piece.BROOK] & 0xC000000000000000L) != 0) && // Rook on g8 or h8
-                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.maskFile[6]) != 0) &&
-                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.maskFile[7]) != 0)) {
+                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.MASK_FILE[6]) != 0) &&
+                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.MASK_FILE[7]) != 0)) {
                 score += 6 * 15;
             } else
             if (((pos.pieceTypeBB[Piece.BKING] & 0x600000000000000L) != 0) && // King on b8 or c8
                 ((pos.pieceTypeBB[Piece.BROOK] & 0x300000000000000L) != 0) && // Rook on a8 or b8
-                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.maskFile[0]) != 0) &&
-                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.maskFile[1]) != 0)) {
+                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.MASK_FILE[0]) != 0) &&
+                ((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.MASK_FILE[1]) != 0)) {
                 score += 6 * 15;
             }
         }
@@ -863,8 +863,8 @@ public class Evaluate {
                 int halfOpenFiles = 0;
                 if (Position.getY(pos.wKingSq) < 2) {
                     long shelter = 1L << Position.getX(pos.wKingSq);
-                    shelter |= ((shelter & BitBoard.maskBToHFiles) >>> 1) |
-                               ((shelter & BitBoard.maskAToGFiles) << 1);
+                    shelter |= ((shelter & BitBoard.MASK_B_TO_H_FILES) >>> 1) |
+                               ((shelter & BitBoard.MASK_A_TO_G_FILES) << 1);
                     shelter <<= 8;
                     safety += 3 * Long.bitCount(wPawns & shelter);
                     safety -= 2 * Long.bitCount(bPawns & (shelter | (shelter << 8)));
@@ -893,8 +893,8 @@ public class Evaluate {
                 int halfOpenFiles = 0;
                 if (Position.getY(pos.bKingSq) >= 6) {
                     long shelter = 1L << (56 + Position.getX(pos.bKingSq));
-                    shelter |= ((shelter & BitBoard.maskBToHFiles) >>> 1) |
-                               ((shelter & BitBoard.maskAToGFiles) << 1);
+                    shelter |= ((shelter & BitBoard.MASK_B_TO_H_FILES) >>> 1) |
+                               ((shelter & BitBoard.MASK_A_TO_G_FILES) << 1);
                     shelter >>>= 8;
                     safety += 3 * Long.bitCount(bPawns & shelter);
                     safety -= 2 * Long.bitCount(wPawns & (shelter | (shelter >>> 8)));
@@ -982,13 +982,13 @@ public class Evaluate {
             } else if ((pos.pieceTypeBB[Piece.WROOK] | pos.pieceTypeBB[Piece.WKNIGHT] |
                         pos.pieceTypeBB[Piece.WQUEEN]) == 0) {
                 // Check for rook pawn + wrong color bishop
-                if (((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.maskBToHFiles) == 0) &&
-                    ((pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.maskLightSq) == 0) &&
+                if (((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.MASK_B_TO_H_FILES) == 0) &&
+                    ((pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.MASK_LIGHT_SQ) == 0) &&
                     ((pos.pieceTypeBB[Piece.BKING] & 0x0303000000000000L) != 0)) {
                     return 0;
                 } else
-                if (((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.maskAToGFiles) == 0) &&
-                    ((pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.maskDarkSq) == 0) &&
+                if (((pos.pieceTypeBB[Piece.WPAWN] & BitBoard.MASK_A_TO_G_FILES) == 0) &&
+                    ((pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.MASK_DARK_SQ) == 0) &&
                     ((pos.pieceTypeBB[Piece.BKING] & 0xC0C0000000000000L) != 0)) {
                     return 0;
                 }
@@ -1007,7 +1007,7 @@ public class Evaluate {
                         final int kSq = pos.getKingSq(false);
                         final int x = Position.getX(kSq);
                         final int y = Position.getY(kSq);
-                        if ((pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.maskDarkSq) != 0) {
+                        if ((pos.pieceTypeBB[Piece.WBISHOP] & BitBoard.MASK_DARK_SQ) != 0) {
                             score += (7 - distToH1A8[7-y][7-x]) * 10;
                         } else {
                             score += (7 - distToH1A8[7-y][x]) * 10;
@@ -1035,13 +1035,13 @@ public class Evaluate {
             } else if ((pos.pieceTypeBB[Piece.BROOK] | pos.pieceTypeBB[Piece.BKNIGHT] |
                         pos.pieceTypeBB[Piece.BQUEEN]) == 0) {
                 // Check for rook pawn + wrong color bishop
-                if (((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.maskBToHFiles) == 0) &&
-                    ((pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.maskDarkSq) == 0) &&
+                if (((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.MASK_B_TO_H_FILES) == 0) &&
+                    ((pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.MASK_DARK_SQ) == 0) &&
                     ((pos.pieceTypeBB[Piece.WKING] & 0x0303L) != 0)) {
                     return 0;
                 } else
-                if (((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.maskAToGFiles) == 0) &&
-                    ((pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.maskLightSq) == 0) &&
+                if (((pos.pieceTypeBB[Piece.BPAWN] & BitBoard.MASK_A_TO_G_FILES) == 0) &&
+                    ((pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.MASK_LIGHT_SQ) == 0) &&
                     ((pos.pieceTypeBB[Piece.WKING] & 0xC0C0L) != 0)) {
                     return 0;
                 }
@@ -1060,7 +1060,7 @@ public class Evaluate {
                         final int kSq = pos.getKingSq(true);
                         final int x = Position.getX(kSq);
                         final int y = Position.getY(kSq);
-                        if ((pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.maskDarkSq) != 0) {
+                        if ((pos.pieceTypeBB[Piece.BBISHOP] & BitBoard.MASK_DARK_SQ) != 0) {
                             score -= (7 - distToH1A8[7-y][7-x]) * 10;
                         } else {
                             score -= (7 - distToH1A8[7-y][x]) * 10;

@@ -108,15 +108,6 @@ public class Search {
         }
     }
 
-    static final class StopSearch extends Exception {
-        private static final long serialVersionUID = -5546906604987117015L;
-        public StopSearch() {
-        }
-        public StopSearch(String msg) {
-            super(msg);
-        }
-    }
-
     /**
      * Used to get various search information during search
      */
@@ -421,7 +412,7 @@ public class Search {
      * Main recursive search algorithm.
      * @return Score for the side to make a move, in position given by "pos".
      */
-    final public int negaScout(int alpha, int beta, int ply, int depth, int recaptureSquare,
+    public final int negaScout(int alpha, int beta, int ply, int depth, int recaptureSquare,
                                final boolean inCheck) throws StopSearch {
         if (log != null) {
             SearchTreeInfo sti = searchTreeInfo[ply-1];

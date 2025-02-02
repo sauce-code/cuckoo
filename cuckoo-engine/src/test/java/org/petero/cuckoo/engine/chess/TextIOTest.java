@@ -33,13 +33,12 @@ public class TextIOTest {
      */
     @Test
     public void testReadFEN() throws ChessParseError {
-        System.out.println("readFEN");
         String fen = "rnbqk2r/1p3ppp/p7/1NpPp3/QPP1P1n1/P4N2/4KbPP/R1B2B1R b kq - 0 1";
         Position pos = TextIO.readFEN(fen);
         assertEquals(fen, TextIO.toFEN(pos));
-        assertEquals(pos.getPiece(Position.getSquare(0, 3)), Piece.WQUEEN);
-        assertEquals(pos.getPiece(Position.getSquare(4, 7)), Piece.BKING);
-        assertEquals(pos.getPiece(Position.getSquare(4, 1)), Piece.WKING);
+        assertEquals(Piece.WQUEEN, pos.getPiece(Position.getSquare(0, 3)));
+        assertEquals(Piece.BKING, pos.getPiece(Position.getSquare(4, 7)));
+        assertEquals(Piece.WKING, pos.getPiece(Position.getSquare(4, 1)));
         assertFalse(pos.whiteMove);
         assertFalse(pos.a1Castle());
         assertFalse(pos.h1Castle());
@@ -110,9 +109,8 @@ public class TextIOTest {
      */
     @Test
     public void testMoveToString() throws ChessParseError {
-        System.out.println("moveToString");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
-        assertEquals(TextIO.startPosFEN, TextIO.toFEN(pos));
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
+        assertEquals(TextIO.START_POS_FEN, TextIO.toFEN(pos));
         Move move = new Move(Position.getSquare(4, 1), Position.getSquare(4, 3),
                 Piece.EMPTY);
         boolean longForm = true;
@@ -149,7 +147,6 @@ public class TextIOTest {
      */
     @Test
     public void testMoveToStringMate() throws ChessParseError {
-        System.out.println("moveToStringMate");
         Position pos = TextIO.readFEN("3k4/1PR5/3N4/8/4K3/8/8/8 w - - 0 1");
         boolean longForm = true;
 
@@ -175,7 +172,6 @@ public class TextIOTest {
      */
     @Test
     public void testMoveToStringShortForm() throws ChessParseError {
-        System.out.println("moveToStringShortForm");
         String fen = "r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1";
         Position pos = TextIO.readFEN(fen);
         assertEquals(fen, TextIO.toFEN(pos));
@@ -227,7 +223,6 @@ public class TextIOTest {
      */
     @Test
     public void testStringToMove() throws ChessParseError {
-        System.out.println("stringToMove");
         Position pos = TextIO.readFEN("r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1");
 
         Move mNe5 = new Move(Position.getSquare(3, 6), Position.getSquare(4, 4), Piece.EMPTY);
@@ -311,7 +306,6 @@ public class TextIOTest {
      */
     @Test
     public void testGetSquare() {
-        System.out.println("getSquare");
         assertEquals(Position.getSquare(0, 0), TextIO.getSquare("a1"));
         assertEquals(Position.getSquare(1, 7), TextIO.getSquare("b8"));
         assertEquals(Position.getSquare(3, 3), TextIO.getSquare("d4"));
@@ -325,7 +319,6 @@ public class TextIOTest {
      */
     @Test
     public void testSquareToString() {
-        System.out.println("squareToString");
         assertEquals("a1", TextIO.squareToString(Position.getSquare(0, 0)));
         assertEquals("h6", TextIO.squareToString(Position.getSquare(7, 5)));
         assertEquals("e4", TextIO.squareToString(Position.getSquare(4, 3)));
@@ -336,10 +329,8 @@ public class TextIOTest {
      */
     @Test
     public void testAsciiBoard() throws ChessParseError {
-        System.out.println("asciiBoard");
         Position pos = TextIO.readFEN("r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1");
         String aBrd = TextIO.asciiBoard(pos);
-//        System.out.print(aBrd);
         assertEquals(12, aBrd.length() - aBrd.replaceAll("\\*", "").length()); // 12 black pieces
         assertEquals(3, aBrd.length() - aBrd.replaceAll("\\*Q", " ").length()); // 3 black queens
         assertEquals(3, aBrd.length() - aBrd.replaceAll(" P", " ").length()); // 3 white pawns
@@ -350,8 +341,7 @@ public class TextIOTest {
      */
     @Test
     public void testUciStringToMove() throws ChessParseError {
-        System.out.println("stringToMove");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Move m = TextIO.uciStringToMove("e2e4");
         assertEquals(TextIO.stringToMove(pos, "e4"), m);
         m = TextIO.uciStringToMove("e2e5");

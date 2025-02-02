@@ -124,7 +124,7 @@ public class EngineControl {
 		moveGen = new MoveGen();
 	}
 
-	final public void startSearch(Position pos, ArrayList<Move> moves, SearchParams sPar) {
+	public final void startSearch(Position pos, ArrayList<Move> moves, SearchParams sPar) {
 		setupPosition(new Position(pos), moves);
 		computeTimeLimit(sPar);
 		ponder = false;
@@ -133,7 +133,7 @@ public class EngineControl {
 		searchMoves = sPar.searchMoves;
 	}
 
-	final public void startPonder(Position pos, List<Move> moves, SearchParams sPar) {
+  	public final void startPonder(Position pos, List<Move> moves, SearchParams sPar) {
 		setupPosition(new Position(pos), moves);
 		computeTimeLimit(sPar);
 		ponder = true;
@@ -141,7 +141,7 @@ public class EngineControl {
 		startThread(-1, -1, -1, -1);
 	}
 
-	final public void ponderHit() {
+	public final void ponderHit() {
 		Search mySearch;
 		synchronized (threadMutex) {
 			mySearch = sc;
@@ -159,11 +159,11 @@ public class EngineControl {
 		ponder = false;
 	}
 
-	final public void stopSearch() {
+	public final void stopSearch() {
 		stopThread();
 	}
 
-	final public void newGame() {
+	public final void newGame() {
 		randomSeed = new Random().nextLong();
 		tt.clear();
 	}
@@ -171,16 +171,12 @@ public class EngineControl {
 	/**
 	 * Compute thinking time for current search.
 	 */
-	final public void computeTimeLimit(SearchParams sPar) {
+	public final void computeTimeLimit(SearchParams sPar) {
 		minTimeLimit = -1;
 		maxTimeLimit = -1;
 		maxDepth = -1;
 		maxNodes = -1;
-		if (sPar.infinite) {
-			minTimeLimit = -1;
-			maxTimeLimit = -1;
-			maxDepth = -1;
-		} else if (sPar.depth > 0) {
+		if (sPar.depth > 0) {
 			maxDepth = sPar.depth;
 		} else if (sPar.mate > 0) {
 			maxDepth = sPar.mate * 2 - 1;
@@ -220,15 +216,14 @@ public class EngineControl {
 	}
 
 	private void startThread(final int minTimeLimit, final int maxTimeLimit, int maxDepth, final int maxNodes) {
-		synchronized (threadMutex) {
-		} // Must not start new search until old search is finished
-		sc = new Search(pos, posHashList, posHashListSize, tt);
+        // Must not start new search until old search is finished
+        sc = new Search(pos, posHashList, posHashListSize, tt);
 		sc.timeLimit(minTimeLimit, maxTimeLimit);
 		sc.setListener(new SearchListener(os));
 		sc.setStrength(strength, randomSeed);
 		MoveGen.MoveList moves = moveGen.pseudoLegalMoves(pos);
 		MoveGen.removeIllegal(pos, moves);
-		if ((searchMoves != null) && (searchMoves.size() > 0)) {
+		if ((searchMoves != null) && (!searchMoves.isEmpty())) {
 			Arrays.asList(moves.m).retainAll(searchMoves);
 		}
 		final MoveGen.MoveList srchMoves = moves;
@@ -345,20 +340,16 @@ public class EngineControl {
 		String ret = TextIO.squareToString(m.from);
 		ret += TextIO.squareToString(m.to);
 		switch (m.promoteTo) {
-		case Piece.WQUEEN:
-		case Piece.BQUEEN:
+		case Piece.WQUEEN, Piece.BQUEEN:
 			ret += "q";
 			break;
-		case Piece.WROOK:
-		case Piece.BROOK:
+		case Piece.WROOK, Piece.BROOK:
 			ret += "r";
 			break;
-		case Piece.WBISHOP:
-		case Piece.BBISHOP:
+		case Piece.WBISHOP, Piece.BBISHOP:
 			ret += "b";
 			break;
-		case Piece.WKNIGHT:
-		case Piece.BKNIGHT:
+		case Piece.WKNIGHT, Piece.BKNIGHT:
 			ret += "n";
 			break;
 		default:
@@ -382,12 +373,12 @@ public class EngineControl {
 			switch (p.type) {
 			case CHECK: {
 				CheckParam cp = (CheckParam) p;
-				os.printf("optionn name %s type check default %s\n", p.name, cp.defaultValue ? "true" : "false");
+				os.printf("optionn name %s type check default %s%n", p.name, cp.defaultValue ? "true" : "false");
 				break;
 			}
 			case SPIN: {
 				SpinParam sp = (SpinParam) p;
-				os.printf("option name %s type spin default %d min %d max %d\n", p.name, sp.defaultValue, sp.minValue,
+				os.printf("option name %s type spin default %d min %d max %d%n", p.name, sp.defaultValue, sp.minValue,
 						sp.maxValue);
 				break;
 			}
@@ -400,11 +391,11 @@ public class EngineControl {
 				break;
 			}
 			case BUTTON:
-				os.printf("option name %s type button\n", p.name);
+				os.printf("option name %s type button%n", p.name);
 				break;
 			case STRING: {
 				StringParam sp = (StringParam) p;
-				os.printf("option name %s type string default %s\n", p.name, sp.defaultValue);
+				os.printf("option name %s type string default %s%n", p.name, sp.defaultValue);
 				break;
 			}
 			}
@@ -413,20 +404,17 @@ public class EngineControl {
 
 	final void setOption(String optionName, String optionValue) {
 		try {
-			if (optionName.equals("hash")) {
-				hashSizeMB = Integer.parseInt(optionValue);
-				setupTT();
-			} else if (optionName.equals("ownbook")) {
-				ownBook = Boolean.parseBoolean(optionValue);
-			} else if (optionName.equals("ponder")) {
-				ponderMode = Boolean.parseBoolean(optionValue);
-			} else if (optionName.equals("uci_analysemode")) {
-				analyseMode = Boolean.parseBoolean(optionValue);
-			} else if (optionName.equals("strength")) {
-				strength = Integer.parseInt(optionValue);
-			} else {
-				Parameters.instance().set(optionName, optionValue);
-			}
+            switch (optionName) {
+                case "hash" -> {
+                    hashSizeMB = Integer.parseInt(optionValue);
+                    setupTT();
+                }
+                case "ownbook" -> ownBook = Boolean.parseBoolean(optionValue);
+                case "ponder" -> ponderMode = Boolean.parseBoolean(optionValue);
+                case "uci_analysemode" -> analyseMode = Boolean.parseBoolean(optionValue);
+                case "strength" -> strength = Integer.parseInt(optionValue);
+                default -> Parameters.instance().set(optionName, optionValue);
+            }
 		} catch (NumberFormatException ignored) {
 		}
 	}
