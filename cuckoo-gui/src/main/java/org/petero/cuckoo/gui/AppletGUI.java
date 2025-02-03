@@ -414,8 +414,4 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
         SwingUtilities.invokeLater(runnable);
     }
 
-    @Override
-    public boolean randomMode() {
-        return false;
-    }
 }

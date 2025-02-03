@@ -63,7 +63,7 @@ public class ComputerPlayer implements Player {
     }
 
     @Override
-    public String getCommand(Position pos, boolean drawOffer, List<Position> history) {
+    public String getCommand(Position pos, List<Position> history) {
         // Create a search object
         long[] posHashList = new long[200 + history.size()];
         int posHashListSize = 0;

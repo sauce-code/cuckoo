@@ -164,7 +164,7 @@ public class TUIGame extends Game {
     /**
      * Administrate a game between two players, human or computer.
      */
-    public void play() throws IOException {
+    public void play() {
         handleCommand("new");
         while (true) {
             // Print last move
@@ -180,7 +180,6 @@ public class TUIGame extends Game {
                                 moveStr);
                 System.out.println(msg);
             }
-//            System.out.printf("Hash: %016x\n", pos.zobristHash());
             {
                 Evaluate eval = new Evaluate();
                 int evScore = eval.evalPos(pos) * (pos.whiteMove ? 1 : -1);
@@ -199,7 +198,7 @@ public class TUIGame extends Game {
 
             // Get command from current player and act on it
             Player pl = pos.whiteMove ? whitePlayer : blackPlayer;
-            String moveStr = pl.getCommand(new Position(pos), haveDrawOffer(), getHistory());
+            String moveStr = pl.getCommand(new Position(pos), getHistory());
             if (moveStr.equals("quit")) {
                 return;
             } else {

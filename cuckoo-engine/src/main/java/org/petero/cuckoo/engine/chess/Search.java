@@ -80,10 +80,10 @@ public class Search {
     int totalNodes;
     long tLastStats;        // Time when notifyStats was last called
     boolean verbose;
-    
-    public final static int MATE0 = 32000;
 
-    public final static int UNKNOWN_SCORE = -32767; // Represents unknown static eval score
+    public static final int MATE0 = 32000;
+
+    public static final int UNKNOWN_SCORE = -32767; // Represents unknown static eval score
     int q0Eval; // Static eval score at first level of quiescence search 
 
     public Search(Position pos, long[] posHashList, int posHashListSize, TranspositionTable tt) {
@@ -124,7 +124,7 @@ public class Search {
         this.listener = listener;
     }
 
-    private final static class MoveInfo {
+    private static final class MoveInfo {
         final Move move;
         int nodes;
         MoveInfo(Move m, int n) { move = m;  nodes = n; }
@@ -170,7 +170,6 @@ public class Search {
     final public Move iterativeDeepening(MoveGen.MoveList scMovesIn,
             int maxDepth, int initialMaxNodes, boolean verbose) {
         tStart = System.currentTimeMillis();
-//        log = TreeLogger.getWriter("/home/petero/treelog.dmp", pos);
         totalNodes = 0;
         if (scMovesIn.size <= 0)
             return null; // No moves to search

@@ -36,7 +36,7 @@ public class HumanPlayer implements Player {
     }
 
     @Override
-    public String getCommand(Position pos, boolean drawOffer, List<Position> history) {
+    public String getCommand(Position pos, List<Position> history) {
         try {
             String color = pos.whiteMove ? "white" : "black";
             System.out.printf("Enter move (%s):", color);

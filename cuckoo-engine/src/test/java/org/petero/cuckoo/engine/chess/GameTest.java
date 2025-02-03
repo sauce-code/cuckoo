@@ -411,9 +411,7 @@ public class GameTest {
     private void doTestPerfT(Position pos, int maxDepth, long[] expectedNodeCounts) {
         for (int d = 1; d <= maxDepth; d++) {
             MoveGen moveGen = new MoveGen();
-            long t0 = System.nanoTime();
             long nodes = Game.perfT(moveGen, pos, d);
-            long t1 = System.nanoTime();
             assertEquals(expectedNodeCounts[d-1], nodes);
         }
     }

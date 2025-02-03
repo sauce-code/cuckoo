@@ -21,7 +21,6 @@ package org.petero.cuckoo.engine.chess;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
@@ -38,7 +37,6 @@ public final class TreeLogger {
     private final ByteBuffer bb = ByteBuffer.wrap(entryBuffer);
     
     // Used in write mode
-    private FileOutputStream os = null;
     private BufferedOutputStream bos = null;
     private long nextIndex = 0;
 
@@ -48,32 +46,6 @@ public final class TreeLogger {
     private int numEntries = 0;
 
     private TreeLogger() {
-    }
-
-    /** Get a logger object set up for writing to a log file. */
-    public static TreeLogger getWriter(String filename, Position pos) {
-        try {
-            TreeLogger log = new TreeLogger();
-            log.os = new FileOutputStream(filename);
-            log.bos = new BufferedOutputStream(log.os, 65536);
-            log.writeHeader(pos);
-            log.nextIndex = 0;
-            return log;
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException();
-        }
-    }
-
-    private void writeHeader(Position pos) {
-        try {
-            byte[] fen = TextIO.toFEN(pos).getBytes();
-            bos.write((byte)(fen.length));
-            bos.write(fen);
-            byte[] pad = new byte[128-1-fen.length];
-            bos.write(pad);
-        } catch (IOException e) {
-            throw new RuntimeException();
-        }
     }
 
     /** Get a logger object set up for analyzing a log file. */
@@ -292,7 +264,7 @@ public final class TreeLogger {
                 for (Move m : moves)
                     System.out.printf(" %s", TextIO.moveToUCIString(m));
                 System.out.print("\n");
-                printNodeInfo(rootPos, currIndex);
+                printNodeInfo(currIndex);
                 Position pos = getPosition(rootPos, currIndex);
                 System.out.print(TextIO.asciiBoard(pos));
                 System.out.printf("%s\n", TextIO.toFEN(pos));
@@ -300,7 +272,7 @@ public final class TreeLogger {
                 if (currIndex >= 0) {
                     ArrayList<Integer> children = findChildren(currIndex);
                     for (Integer c : children)
-                        printNodeInfo(rootPos, c);
+                        printNodeInfo(c);
                 }
             }
             doPrint = true;
@@ -330,7 +302,7 @@ public final class TreeLogger {
                 } else if (found.size() > 1) {
                     System.out.print("Ambiguous move\n");
                     for (Integer c : found)
-                        printNodeInfo(rootPos, c);
+                        printNodeInfo(c);
                     doPrint = false;
                 } else {
                     currIndex = found.getFirst();
@@ -343,12 +315,12 @@ public final class TreeLogger {
                 ArrayList<Integer> children = findChildren(currIndex);
                 String m = getArgStr(cmdStr, "");
                 for (Integer c : children)
-                    printNodeInfo(rootPos, c, m);
+                    printNodeInfo(c, m);
                 doPrint = false;
             } else if (cmdStr.startsWith("n")) {
                 ArrayList<Integer> nodes = getNodeSequence(currIndex);
                 for (int node : nodes)
-                    printNodeInfo(rootPos, node);
+                    printNodeInfo(node);
                 doPrint = false;
             } else if (cmdStr.startsWith("d")) {
                 ArrayList<Integer> nVec = getArgs(cmdStr, 0);
@@ -370,7 +342,7 @@ public final class TreeLogger {
                 hashKey = getHashKey(cmdStr, hashKey);
                 ArrayList<Integer> nodes = getNodeForHashKey(hashKey);
                 for (int node : nodes)
-                    printNodeInfo(rootPos, node);
+                    printNodeInfo(node);
                 doPrint = false;
             } else {
                 try {
@@ -575,10 +547,10 @@ public final class TreeLogger {
         return ret;
     }
 
-    private void printNodeInfo(Position rootPos, int index) {
-        printNodeInfo(rootPos, index, "");
+    private void printNodeInfo(int index) {
+        printNodeInfo(index, "");
     }
-    private void printNodeInfo(Position rootPos, int index, String filterMove) {
+    private void printNodeInfo(int index, String filterMove) {
         if (index < 0) { // Root node
             System.out.printf("%8d entries:%d%n", index, numEntries);
         } else {

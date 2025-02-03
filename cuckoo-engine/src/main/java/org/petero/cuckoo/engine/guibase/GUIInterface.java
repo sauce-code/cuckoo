@@ -40,9 +40,6 @@ public interface GUIInterface {
     /** Get the current time limit. */
     int timeLimit();
 
-    /** Get "random move" setting. */
-    boolean randomMode();
-
     /** Return true if "show thinking" is enabled. */
     boolean showThinking();
 

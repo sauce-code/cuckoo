@@ -18,8 +18,6 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import java.util.Comparator;
-
 /**
  *
  * @author petero
@@ -50,14 +48,7 @@ public class Move {
         this.promoteTo = promoteTo;
         this.score = score;
     }
-    
-    static public class SortByScore implements Comparator<Move> {
-        @Override
-		public int compare(Move sm1, Move sm2) {
-            return sm2.score - sm1.score;
-        }
-    }
-    
+
     public Move(Move m) {
         this.from = m.from;
         this.to = m.to;

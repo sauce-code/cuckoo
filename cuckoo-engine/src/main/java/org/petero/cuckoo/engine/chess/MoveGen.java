@@ -112,7 +112,7 @@ public final class MoveGen {
             long m = (pawns << 8) & ~occupied;
             if (addPawnMovesByMask(moveList, pos, m, -8, true)) return moveList;
             m = ((m & BitBoard.MASK_ROW_3) << 8) & ~occupied;
-            addPawnDoubleMovesByMask(moveList, pos, m, -16);
+            addPawnDoubleMovesByMask(moveList, m, -16);
 
             int epSquare = pos.getEpSquare();
             long epMask = (epSquare >= 0) ? (1L << epSquare) : 0L;
@@ -189,7 +189,7 @@ public final class MoveGen {
             long m = (pawns >>> 8) & ~occupied;
             if (addPawnMovesByMask(moveList, pos, m, 8, true)) return moveList;
             m = ((m & BitBoard.MASK_ROW_6) >>> 8) & ~occupied;
-            addPawnDoubleMovesByMask(moveList, pos, m, 16);
+            addPawnDoubleMovesByMask(moveList, m, 16);
 
             int epSquare = pos.getEpSquare();
             long epMask = (epSquare >= 0) ? (1L << epSquare) : 0L;
@@ -273,7 +273,7 @@ public final class MoveGen {
             long m = (pawns << 8) & ~occupied;
             if (addPawnMovesByMask(moveList, pos, m & validTargets, -8, true)) return moveList;
             m = ((m & BitBoard.MASK_ROW_3) << 8) & ~occupied;
-            addPawnDoubleMovesByMask(moveList, pos, m & validTargets, -16);
+            addPawnDoubleMovesByMask(moveList, m & validTargets, -16);
 
             int epSquare = pos.getEpSquare();
             long epMask = (epSquare >= 0) ? (1L << epSquare) : 0L;
@@ -346,7 +346,7 @@ public final class MoveGen {
             long m = (pawns >>> 8) & ~occupied;
             if (addPawnMovesByMask(moveList, pos, m & validTargets, 8, true)) return moveList;
             m = ((m & BitBoard.MASK_ROW_6) >>> 8) & ~occupied;
-            addPawnDoubleMovesByMask(moveList, pos, m & validTargets, 16);
+            addPawnDoubleMovesByMask(moveList, m & validTargets, 16);
 
             int epSquare = pos.getEpSquare();
             long epMask = (epSquare >= 0) ? (1L << epSquare) : 0L;
@@ -476,13 +476,13 @@ public final class MoveGen {
             m = ((pawns & pawnAll) << 8) & ~(pos.whiteBB | pos.blackBB);
             if (addPawnMovesByMask(moveList, pos, m, -8, false)) return moveList;
             m = ((m & BitBoard.MASK_ROW_3) << 8) & ~(pos.whiteBB | pos.blackBB);
-            addPawnDoubleMovesByMask(moveList, pos, m, -16);
+            addPawnDoubleMovesByMask(moveList, m, -16);
 
             // Normal checks
             m = ((pawns & ~pawnAll) << 8) & ~(pos.whiteBB | pos.blackBB);
             if (addPawnMovesByMask(moveList, pos, m & BitBoard.bPawnAttacks[bKingSq], -8, false)) return moveList;
             m = ((m & BitBoard.MASK_ROW_3) << 8) & ~(pos.whiteBB | pos.blackBB);
-            addPawnDoubleMovesByMask(moveList, pos, m & BitBoard.bPawnAttacks[bKingSq], -16);
+            addPawnDoubleMovesByMask(moveList, m & BitBoard.bPawnAttacks[bKingSq], -16);
         } else {
             int wKingSq = pos.getKingSq(true);
             long discovered = 0; // Squares that could generate discovered checks
@@ -582,13 +582,13 @@ public final class MoveGen {
             m = ((pawns & pawnAll) >>> 8) & ~(pos.whiteBB | pos.blackBB);
             if (addPawnMovesByMask(moveList, pos, m, 8, false)) return moveList;
             m = ((m & BitBoard.MASK_ROW_6) >>> 8) & ~(pos.whiteBB | pos.blackBB);
-            addPawnDoubleMovesByMask(moveList, pos, m, 16);
+            addPawnDoubleMovesByMask(moveList, m, 16);
 
             // Normal checks
             m = ((pawns & ~pawnAll) >>> 8) & ~(pos.whiteBB | pos.blackBB);
             if (addPawnMovesByMask(moveList, pos, m & BitBoard.wPawnAttacks[wKingSq], 8, false)) return moveList;
             m = ((m & BitBoard.MASK_ROW_6) >>> 8) & ~(pos.whiteBB | pos.blackBB);
-            addPawnDoubleMovesByMask(moveList, pos, m & BitBoard.wPawnAttacks[wKingSq], 16);
+            addPawnDoubleMovesByMask(moveList, m & BitBoard.wPawnAttacks[wKingSq], 16);
         }
 
         return moveList;
@@ -999,7 +999,7 @@ public final class MoveGen {
         return false;
     }
 
-    private static void addPawnDoubleMovesByMask(MoveList moveList, Position pos,
+    private static void addPawnDoubleMovesByMask(MoveList moveList,
                                                  long mask, int delta) {
         while (mask != 0) {
             int sq = BitBoard.numberOfTrailingZeros(mask);

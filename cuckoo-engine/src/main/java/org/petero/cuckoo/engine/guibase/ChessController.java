@@ -491,9 +491,8 @@ public class ChessController {
     private void startComputerThinking() {
     if (game.pos.whiteMove != humanIsWhite && computerThread == null) {
                 Runnable run = () -> {
-				    computerPlayer.timeLimit(gui.timeLimit(), gui.timeLimit(), gui.randomMode());
-				    final String cmd = computerPlayer.getCommand(new Position(game.pos),
-				            game.haveDrawOffer(), game.getHistory());
+				    computerPlayer.timeLimit(gui.timeLimit(), gui.timeLimit(), false);
+				    final String cmd = computerPlayer.getCommand(new Position(game.pos), game.getHistory());
 				    gui.runOnUIThread(() -> {
 					    game.processString(cmd);
 					    thinkingPV = "";
@@ -530,7 +529,7 @@ public class ChessController {
 
     public synchronized void setTimeLimit() {
         if (computerThread != null) {
-            computerPlayer.timeLimit(gui.timeLimit(), gui.timeLimit(), gui.randomMode());
+            computerPlayer.timeLimit(gui.timeLimit(), gui.timeLimit(), false);
         }
     }
 }

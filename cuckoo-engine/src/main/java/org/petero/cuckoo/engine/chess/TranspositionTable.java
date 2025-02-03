@@ -302,23 +302,6 @@ public class TranspositionTable {
         return ret.toString();
     }
 
-    /** Print hash table statistics. */
-    public final void printStats() {
-        List<Integer> depHist = new ArrayList<>();
-        final int maxDepth = 20;
-        for (int i = 0; i < maxDepth; i++) {
-            depHist.add(0);
-        }
-        for (TTEntry ent : table) {
-            if (ent.type == TTEntry.T_EMPTY) {
-            } else {
-                if (ent.getDepth() < maxDepth) {
-                    depHist.set(ent.getDepth(), depHist.get(ent.getDepth()) + 1);
-                }
-            }
-        }
-    }
-    
     private int h0(long key) {
         return (int)(key & (table.length - 1));
     }

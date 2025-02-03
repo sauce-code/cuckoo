@@ -61,14 +61,6 @@ public class Parameters {
         }
     }
 
-    public static final class ButtonParam extends ParamBase {
-        ButtonParam(String name, boolean visible) {
-            this.name = name;
-            this.type = Type.BUTTON;
-            this.visible = visible;
-        }
-    }
-
     public static final class StringParam extends ParamBase {
         public String value;
         public final String defaultValue;
@@ -111,14 +103,8 @@ public class Parameters {
         params.put(p.name.toLowerCase(), p);
     }
 
-    final boolean getBooleanPar(String name) {
-        return ((CheckParam)params.get(name.toLowerCase())).value;
-    }
     final int getIntPar(String name) {
         return ((SpinParam)params.get(name.toLowerCase())).value;
-    }
-    final String getStringPar(String name) {
-        return ((StringParam)params.get(name.toLowerCase())).value;
     }
 
     public final void set(String name, String value) {

@@ -34,7 +34,7 @@ public interface Player {
      *                This makes it possible for the player to correctly handle
      *                the draw by repetition rule.
      */
-    String getCommand(Position pos, boolean drawOffer, List<Position> history);
+    String getCommand(Position pos, List<Position> history);
     
     /** Return true if this player is a human player. */
     boolean isHumanPlayer();
