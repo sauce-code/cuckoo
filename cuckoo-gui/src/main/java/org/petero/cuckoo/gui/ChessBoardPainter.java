@@ -110,9 +110,7 @@ public class ChessBoardPainter extends JLabel {
 
                 int sq = Position.getSquare(x, y);
                 int p = pos.getPiece(sq);
-                if (doDrag && (sq == activeSquare)) {
-                    // Skip this piece. It will be drawn later at (dragX,dragY)
-                } else {
+                if (!doDrag || (sq != activeSquare)) {
                     drawPiece(g, xCrd + sqSize / 2, yCrd + sqSize / 2, p);
                 }
             }
@@ -153,6 +151,7 @@ public class ChessBoardPainter extends JLabel {
             if ((chessFont == null) || (chessFont.getSize() != sqSize)) {
                 InputStream inStream = getClass().getResourceAsStream("/casefont.ttf");
                 try {
+                    assert inStream != null;
                     Font font = Font.createFont(Font.TRUETYPE_FONT, inStream);
                     chessFont = font.deriveFont((float)sqSize);
                 } catch (FontFormatException | IOException ex) {
@@ -205,12 +204,12 @@ public class ChessBoardPainter extends JLabel {
         if ((selectedSquare >= 0) && (sq == selectedSquare)) {
             int fromPiece = pos.getPiece(selectedSquare);
             if ((fromPiece == Piece.EMPTY) || (Piece.isWhite(fromPiece) != pos.whiteMove)) {
-                return m; // Can't move the piece the oppenent just moved.
+                return null; // Can't move the piece the oppenent just moved.
             }
         }
         if ((selectedSquare < 0) &&
                 ((p == Piece.EMPTY) || (Piece.isWhite(p) != pos.whiteMove))) {
-            return m;  // You must click on one of your own pieces.
+            return null;  // You must click on one of your own pieces.
         }
         activeSquare = sq;
         dragging = false;

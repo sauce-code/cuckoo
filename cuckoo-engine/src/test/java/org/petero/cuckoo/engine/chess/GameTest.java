@@ -130,13 +130,13 @@ public class GameTest {
         boolean res = game.processString("draw 50");
         assertTrue(res);
         assertEquals(Game.GameState.ALIVE, game.getGameState());    // Draw claim invalid
-        res = game.processString("e4");
+        game.processString("e4");
         assertTrue(game.haveDrawOffer());   // Invalid claim converted to draw offer
         
         String cmd = "setpos 8/4k3/8/P7/8/8/8/1N2K2R w K - 99 83";
         res = game.processString(cmd);
         assertTrue(res);
-        res = game.processString("draw 50");
+        game.processString("draw 50");
         assertEquals(Game.GameState.ALIVE, game.getGameState());      // Draw claim invalid
 
         game.processString(cmd);

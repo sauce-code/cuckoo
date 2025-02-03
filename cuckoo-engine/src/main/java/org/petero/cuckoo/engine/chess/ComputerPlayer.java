@@ -20,6 +20,7 @@ package org.petero.cuckoo.engine.chess;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -95,7 +96,7 @@ public class ComputerPlayer implements Player {
         currentSearch = sc;
         sc.setListener(listener);
         Move bestM;
-        if ((moves.size == 1) && (canClaimDraw(pos, posHashList, posHashListSize, moves.m[0]) == "")) {
+        if ((moves.size == 1) && (Objects.equals(canClaimDraw(pos, posHashList, posHashListSize, moves.m[0]), ""))) {
             bestM = moves.m[0];
             bestM.score = 0;
         } else if (randomMode) {
@@ -105,13 +106,13 @@ public class ComputerPlayer implements Player {
             bestM = sc.iterativeDeepening(moves, maxDepth, maxNodes, verbose);
         }
         currentSearch = null;
-//        tt.printStats();
         String strMove = TextIO.moveToString(pos, bestM, false);
 
         // Claim draw if appropriate
+        assert bestM != null;
         if (bestM.score <= 0) {
             String drawClaim = canClaimDraw(pos, posHashList, posHashListSize, bestM);
-            if (drawClaim != "")
+            if (!Objects.equals(drawClaim, ""))
                 strMove = drawClaim;
         }
         return strMove;
@@ -190,6 +191,7 @@ public class ComputerPlayer implements Player {
         // Extract PV
         String PV = TextIO.moveToString(pos, bestM, false) + " ";
         UndoInfo ui = new UndoInfo();
+        assert bestM != null;
         pos.makeMove(bestM, ui);
         PV += tt.extractPV(pos);
         pos.unMakeMove(bestM, ui);
@@ -201,6 +203,7 @@ public class ComputerPlayer implements Player {
     private Move findSemiRandomMove(Search sc, MoveGen.MoveList moves) {
         sc.timeLimit(minTimeMillis, maxTimeMillis);
         Move bestM = sc.iterativeDeepening(moves, 1, maxNodes, verbose);
+        assert bestM != null;
         int bestScore = bestM.score;
 
         Random rndGen = new SecureRandom();

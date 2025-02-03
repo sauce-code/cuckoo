@@ -37,10 +37,12 @@ public class HistoryTest {
         History hs = new History();
         Move m1 = TextIO.stringToMove(pos, "e4");
         Move m2 = TextIO.stringToMove(pos, "d4");
+        assert m1 != null;
         assertEquals(0, hs.getHistScore(pos, m1));
 
         hs.addSuccess(pos, m1, 1);
         assertEquals(49, hs.getHistScore(pos, m1));
+        assert m2 != null;
         assertEquals(0, hs.getHistScore(pos, m2));
 
         hs.addSuccess(pos, m1, 1);

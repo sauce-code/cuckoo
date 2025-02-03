@@ -66,6 +66,7 @@ public class Book {
             List<Byte> buf = new ArrayList<>(8192);
             byte[] tmpBuf = new byte[1024];
             while (true) {
+                assert inStream != null;
                 int len = inStream.read(tmpBuf);
                 if (len <= 0) break;
                 for (int i = 0; i < len; i++)
@@ -196,6 +197,7 @@ public class Book {
         List<Byte> binBook = new ArrayList<>(0);
         try {
             InputStream inStream = Object.class.getResourceAsStream("/book.txt");
+            assert inStream != null;
             InputStreamReader inFile = new InputStreamReader(inStream);
             BufferedReader inBuf = new BufferedReader(inFile);
             LineNumberReader lnr = new LineNumberReader(inBuf);

@@ -234,7 +234,7 @@ public class Search {
                 int score = -negaScout(-beta, -alpha, 1, (depth - lmr - 1) * plyScale, -1, givesCheck);
                 if ((lmr > 0) && (score > alpha)) {
                     sti.lmr = 0;
-                    score = -negaScout(-beta, -alpha, 1, (depth - 1) * plyScale, -1, givesCheck);
+                    score = -negaScout(-beta, -alpha, 1, (depth - 1) * plyScale, -1, false);
                 }
                 int nodesThisMove = nodes + qNodes;
                 posHashListSize--;
@@ -484,7 +484,7 @@ public class Search {
                     if (score >= beta) {
                         hashMove = sti.hashMove;
                         ent.getMove(hashMove);
-                        if ((hashMove != null) && (hashMove.from != hashMove.to))
+                        if (hashMove.from != hashMove.to)
                             if (pos.getPiece(hashMove.to) == Piece.EMPTY)
                                 kt.addKiller(ply, hashMove);
                     }
@@ -674,8 +674,7 @@ public class Search {
             int newCaptureSquare = -1;
             boolean isCapture = (pos.getPiece(m.to) != Piece.EMPTY);
             boolean isPromotion = (m.promoteTo != Piece.EMPTY);
-            int sVal = Integer.MIN_VALUE;
-            // FIXME! Test extending pawn pushes to 7:th rank
+            int sVal;
             boolean mayReduce = (m.score < 53) && (!isCapture || m.score < 0) && !isPromotion;
             boolean givesCheck = MoveGen.givesCheck(pos, m); 
             boolean doFutility = false;
@@ -691,7 +690,7 @@ public class Search {
                 if (posExtend == 0) {
                     final int pV = Evaluate.pV;
                     if ((m.to == recaptureSquare)) {
-                        if (sVal == Integer.MIN_VALUE) sVal = SEE(m);
+                        sVal = SEE(m);
                         int tVal = Evaluate.pieceValue[pos.getPiece(m.to)];
                         if (sVal > tVal - pV / 2)
                             moveExtend = plyScale;
@@ -887,9 +886,7 @@ public class Search {
             }
             boolean givesCheck = false;
             boolean givesCheckComputed = false;
-            if (inCheck) {
-                // Allow all moves
-            } else {
+            if (!inCheck) {
                 if ((pos.getPiece(m.to) == Piece.EMPTY) && (m.promoteTo == Piece.EMPTY)) {
                     // Non-capture
                     if (!tryChecks)
@@ -991,7 +988,7 @@ public class Search {
         int valOnSquare = Evaluate.pieceValue[pos.getPiece(square)];
         long occupied = pos.whiteBB | pos.blackBB;
         while (true) {
-            int bestValue = Integer.MAX_VALUE;
+            int bestValue;
             long atk;
             if (white) {
                 atk = BitBoard.bPawnAttacks[square] & pos.pieceTypeBB[Piece.WPAWN] & occupied;
@@ -1091,7 +1088,7 @@ public class Search {
             boolean isCapture = (pos.getPiece(m.to) != Piece.EMPTY) || (m.promoteTo != Piece.EMPTY);
             int score = 0;
             if (isCapture) {
-                int seeScore = isCapture ? signSEE(m) : 0;
+                int seeScore = signSEE(m);
                 int v = pos.getPiece(m.to);
                 int a = pos.getPiece(m.from);
                 score = Evaluate.pieceValue[v]/10 * 1000 - Evaluate.pieceValue[a]/10;
