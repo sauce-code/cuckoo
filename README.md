@@ -3,6 +3,10 @@
 ![Source Encoding](https://img.shields.io/badge/Source%20Encoding-UTF--8-blue)
 
 ![Java CI with Maven](https://github.com/sauce-code/cuckoo/workflows/Java%20CI%20with%20Maven/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sauce-code_cuckoo&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sauce-code_cuckoo)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=sauce-code_cuckoo&metric=bugs)](https://sonarcloud.io/summary/new_code?id=sauce-code_cuckoo)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=sauce-code_cuckoo&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=sauce-code_cuckoo)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=sauce-code_cuckoo&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=sauce-code_cuckoo)
 
 # Cuckoo Chess
 
