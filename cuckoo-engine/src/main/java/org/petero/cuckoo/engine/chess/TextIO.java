@@ -179,9 +179,8 @@ public class TextIO {
     private static void safeSetPiece(Position pos, int col, int row, int p) throws ChessParseError {
         if (row < 0) throw new ChessParseError("Too many rows");
         if (col > 7) throw new ChessParseError("Too many columns");
-        if ((p == Piece.WPAWN) || (p == Piece.BPAWN)) {
-            if ((row == 0) || (row == 7))
-                throw new ChessParseError("Pawn on first/last rank");
+        if (((p == Piece.WPAWN) || (p == Piece.BPAWN)) && ((row == 0) || (row == 7))) {
+            throw new ChessParseError("Pawn on first/last rank");
         }
         pos.setPiece(Position.getSquare(col, row), p);
     }
@@ -334,15 +333,15 @@ public class TextIO {
                                 numSameRow++;
                         }
                     }
-                    if (numSameTarget < 2) {
-                        // No file/row info needed
-                    } else if (numSameFile < 2) {
-                        ret.append((char) (x1 + 'a'));   // Only file info needed
-                    } else if (numSameRow < 2) {
-                        ret.append((char) (y1 + '1'));   // Only row info needed
-                    } else {
-                        ret.append((char) (x1 + 'a'));   // File and row info needed
-                        ret.append((char) (y1 + '1'));
+                    if (numSameTarget >= 2) {
+                        if (numSameFile < 2) {
+                            ret.append((char) (x1 + 'a'));   // Only file info needed
+                        } else if (numSameRow < 2) {
+                            ret.append((char) (y1 + '1'));   // Only row info needed
+                        } else {
+                            ret.append((char) (x1 + 'a'));   // File and row info needed
+                            ret.append((char) (y1 + '1'));
+                        }
                     }
                 }
                 if (isCapture(pos, move)) {
@@ -376,20 +375,16 @@ public class TextIO {
         String ret = squareToString(m.from);
         ret += squareToString(m.to);
         switch (m.promoteTo) {
-            case Piece.WQUEEN:
-            case Piece.BQUEEN:
+            case Piece.WQUEEN, Piece.BQUEEN:
                 ret += "q";
                 break;
-            case Piece.WROOK:
-            case Piece.BROOK:
+            case Piece.WROOK, Piece.BROOK:
                 ret += "r";
                 break;
-            case Piece.WBISHOP:
-            case Piece.BBISHOP:
+            case Piece.WBISHOP, Piece.BBISHOP:
                 ret += "b";
                 break;
-            case Piece.WKNIGHT:
-            case Piece.BKNIGHT:
+            case Piece.WKNIGHT, Piece.BKNIGHT:
                 ret += "n";
                 break;
             default:

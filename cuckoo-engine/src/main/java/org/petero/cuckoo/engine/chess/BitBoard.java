@@ -212,15 +212,18 @@ public class BitBoard {
         int hi = inner ? 6 : 7;
         while (true) {
             if (dx != 0) {
-                x += dx; if ((x < lo) || (x > hi)) break;
+                x += dx;
+                if ((x < lo) || (x > hi)) break;
             }
             if (dy != 0) {
-                y += dy; if ((y < lo) || (y > hi)) break;
+                y += dy;
+                if ((y < lo) || (y > hi)) break;
             }
             int sq = Position.getSquare(x, y);
             mask |= 1L << sq;
-            if ((occupied & (1L << sq)) != 0)
+            if ((occupied & (1L << sq)) != 0) {
                 break;
+            }
         }
         return mask;
     }
@@ -243,7 +246,7 @@ public class BitBoard {
                 if (table[entry] == -1) {
                     table[entry] = atks;
                 } else if (table[entry] != atks) {
-                    throw new RuntimeException();
+                    throw new InitializationException();
                 }
             }
             rTables[sq] = table;
@@ -268,7 +271,7 @@ public class BitBoard {
                 if (table[entry] == -1) {
                     table[entry] = atks;
                 } else if (table[entry] != atks) {
-                    throw new RuntimeException();
+                    throw new InitializationException();
                 }
             }
             bTables[sq] = table;
