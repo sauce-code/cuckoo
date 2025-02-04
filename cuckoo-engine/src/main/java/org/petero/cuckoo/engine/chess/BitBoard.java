@@ -104,14 +104,14 @@ public class BitBoard {
             m = 0;
             for (int y2 = y+1; y2 < 8; y2++) {
                 if (x > 0) m |= 1L << Position.getSquare(x-1, y2);
-                           m |= 1L << Position.getSquare(x  , y2);
+                m |= 1L << Position.getSquare(x  , y2);
                 if (x < 7) m |= 1L << Position.getSquare(x+1, y2);
             }
             wPawnBlockerMask[sq] = m;
             m = 0;
             for (int y2 = y-1; y2 >= 0; y2--) {
                 if (x > 0) m |= 1L << Position.getSquare(x-1, y2);
-                           m |= 1L << Position.getSquare(x  , y2);
+                m |= 1L << Position.getSquare(x  , y2);
                 if (x < 7) m |= 1L << Position.getSquare(x+1, y2);
             }
             bPawnBlockerMask[sq] = m;

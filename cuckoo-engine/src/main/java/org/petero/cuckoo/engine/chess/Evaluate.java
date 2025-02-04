@@ -945,7 +945,7 @@ public class Evaluate {
             int wq = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.WQUEEN]);
             int bk = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BKING]);
             int bp = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BPAWN]);
-            score = evalKQKP(wk, wq, bk, bp);
+            score = evalKQKP(wk, bk, bp);
             handled = true;
         }
         if (!handled && (pos.wMtrl == rV) && (pos.bMtrl == pV) &&
@@ -961,7 +961,7 @@ public class Evaluate {
             int bq = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BQUEEN]);
             int wk = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.WKING]);
             int wp = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.WPAWN]);
-            score = -evalKQKP(63-bk, 63-bq, 63-wk, 63-wp);
+            score = -evalKQKP(63-bk, 63-wk, 63-wp);
             handled = true;
         }
         if (!handled && (pos.bMtrl == rV) && (pos.wMtrl == pV) &&
@@ -1068,20 +1068,18 @@ public class Evaluate {
                     } else {
                         score -= 300;       // Enough excess material, should win
                     }
-                    handled = true;
                 } else if ((wMtrlNoPawns + bMtrlNoPawns == 0) && (bMtrlPawns == pV)) { // KPK
                     int bp = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BPAWN]);
                     score = -kpkEval(63-pos.getKingSq(false), 63-pos.getKingSq(true),
                                      63-bp, !pos.whiteMove);
-                    handled = true;
                 }
             }
         }
         return score;
     }
 
-    private static int evalKQKP(int wKing, int wQueen, int bKing, int bPawn) {
-        boolean canWin = false;
+    private static int evalKQKP(int wKing, int bKing, int bPawn) {
+        boolean canWin;
         if (((1L << bKing) & 0xFFFF) == 0) {
             canWin = true; // King doesn't support pawn
         } else if (Math.abs(Position.getX(bPawn) - Position.getX(bKing)) > 2) {
