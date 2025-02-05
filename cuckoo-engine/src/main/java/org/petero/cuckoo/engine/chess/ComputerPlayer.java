@@ -38,7 +38,7 @@ public class ComputerPlayer implements Player {
     TranspositionTable tt;
     final Book book;
     boolean bookEnabled;
-    boolean randomMode;
+    boolean randomMode; // TODO remove this field
     Search currentSearch;
 
     public ComputerPlayer() {

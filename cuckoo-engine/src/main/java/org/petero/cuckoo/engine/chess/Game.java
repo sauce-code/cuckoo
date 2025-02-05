@@ -375,10 +375,7 @@ public class Game {
             UndoInfo ui = new UndoInfo();
             pos.makeMove(move, ui);
         }
-        if ((whiteMove.length() > 0) || (blackMove.length() > 0)) {
-            if (whiteMove.length() == 0) {
-                whiteMove = "...";
-            }
+        if (!whiteMove.isEmpty()) {
             if (compressed) {
                 ret.append(String.format("%d. %s %s ",
                         pos.fullMoveCounter, whiteMove, blackMove));

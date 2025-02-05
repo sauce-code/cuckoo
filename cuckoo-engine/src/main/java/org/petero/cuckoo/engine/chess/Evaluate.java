@@ -939,10 +939,8 @@ public class Evaluate {
             // King + minor piece vs king + minor piece is a draw
             return 0;
         }
-        if (!handled && (pos.wMtrl == qV) && (pos.bMtrl == pV) &&
-            (Long.bitCount(pos.pieceTypeBB[Piece.WQUEEN]) == 1)) {
+        if (pos.wMtrl == qV && pos.bMtrl == pV && Long.bitCount(pos.pieceTypeBB[Piece.WQUEEN]) == 1) {
             int wk = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.WKING]);
-            int wq = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.WQUEEN]);
             int bk = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BKING]);
             int bp = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BPAWN]);
             score = evalKQKP(wk, bk, bp);

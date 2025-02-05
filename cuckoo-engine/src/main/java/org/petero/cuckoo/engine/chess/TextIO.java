@@ -400,11 +400,11 @@ public class TextIO {
     public static Move uciStringToMove(String move) {
         Move m = null;
         if ((move.length() < 4) || (move.length() > 5))
-            return m;
+            return null;
         int fromSq = TextIO.getSquare(move.substring(0, 2));
         int toSq   = TextIO.getSquare(move.substring(2, 4));
         if ((fromSq < 0) || (toSq < 0)) {
-            return m;
+            return null;
         }
         char prom = ' ';
         boolean white = true;
@@ -415,7 +415,7 @@ public class TextIO {
             } else if (Position.getY(toSq) == 0) {
                 white = false;
             } else {
-                return m;
+                return null;
             }
         }
         int promoteTo;
@@ -436,7 +436,7 @@ public class TextIO {
                 promoteTo = white ? Piece.WKNIGHT : Piece.BKNIGHT;
                 break;
             default:
-                return m;
+                return null;
         }
         m = new Move(fromSq, toSq, promoteTo);
         return m;
@@ -459,7 +459,7 @@ public class TextIO {
     public static Move stringToMove(Position pos, String strMove) {
         strMove = strMove.replaceAll("=", "");
         Move move = null;
-        if (strMove.isEmpty()) return move;
+        if (strMove.isEmpty()) return null;
         MoveGen.MoveList moves = MoveGen.instance.pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moves);
         {
@@ -523,7 +523,7 @@ public class TextIO {
             if (move != null)
                 return move;
         }
-        return move;
+        return null;
     }
 
     /**
