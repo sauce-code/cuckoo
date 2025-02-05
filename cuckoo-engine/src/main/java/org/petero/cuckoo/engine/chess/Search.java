@@ -273,7 +273,6 @@ public class Search {
                     int retryDelta = Search.MATE0 * 2;
                     while (score <= alpha) {
                         alpha = Math.max(score - retryDelta, -Search.MATE0);
-                        retryDelta = Search.MATE0 * 2;
                         needMoreTime = searchNeedMoreTime = true;
                         if (verbose)
                             System.out.printf("%-6s %6d %6d %6d <=\n", TextIO.moveToString(pos, m, false),

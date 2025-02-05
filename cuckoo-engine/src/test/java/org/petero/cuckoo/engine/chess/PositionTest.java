@@ -136,8 +136,6 @@ public class PositionTest {
         // Test castling rights (king move)
         move = new Move(Position.getSquare(4, 0), Position.getSquare(4,1), Piece.EMPTY);
         pos.makeMove(move, ui);
-        castleMask = (1 << Position.A8_CASTLE) |
-                     (1 << Position.H8_CASTLE);
         assertEquals(castleMask,pos.getCastleMask());
         assertEquals(-1, pos.getEpSquare());
         pos.unMakeMove(move, ui);
@@ -169,9 +167,6 @@ public class PositionTest {
         Position origPos2 = new Position(pos);
         move = new Move(Position.getSquare(6,2), Position.getSquare(7,0), Piece.EMPTY);
         pos.makeMove(move, ui);
-        castleMask = (1 << Position.A1_CASTLE) |
-                     (1 << Position.A8_CASTLE) |
-                     (1 << Position.H8_CASTLE);
         assertEquals(castleMask,pos.getCastleMask());
         assertEquals(-1, pos.getEpSquare());
         pos.unMakeMove(move, ui);

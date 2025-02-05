@@ -729,25 +729,30 @@ public final class MoveGen {
         }
     }
 
-    /** Like nextPiece(), but handles board edges. */
-    private static int nextPieceSafe(Position pos, int sq, int delta) {
-        int dx = 0;
-        int dy = 0;
-        switch (delta) {
-        case 1: dx=1; dy=0; break;
-        case 9: dx=1; dy=1; break;
-        case 8: dx=0; dy=1; break;
-        case 7: dx=-1; dy=1; break;
-        case -1: dx=-1; dy=0; break;
-        case -9: dx=-1; dy=-1; break;
-        case -8: dx=0; dy=-1; break;
-        case -7: dx=1; dy=-1; break;
+    private record Delta(int dx, int dy) {
+        static Delta of(int delta) {
+            return switch (delta) {
+                case 1 -> new Delta(1, 0);
+                case 9 -> new Delta(1, 1);
+                case 8 -> new Delta(0, 1);
+                case 7 -> new Delta(-1, 1);
+                case -1 -> new Delta(-1, 0);
+                case -9 -> new Delta(-1, -1);
+                case -8 -> new Delta(0, -1);
+                case -7 -> new Delta(1, -1);
+                default -> new Delta(0, 0);
+            };
         }
+    }
+
+    /** Like nextPiece(), but handles board edges. */
+    private static int nextPieceSafe(Position pos, int sq, int deltaValue) {
+        Delta delta = Delta.of(deltaValue);
         int x = Position.getX(sq);
         int y = Position.getY(sq);
         while (true) {
-            x += dx;
-            y += dy;
+            x += delta.dx();
+            y += delta.dy();
             if ((x < 0) || (x > 7) || (y < 0) || (y > 7)) {
                 return Piece.EMPTY;
             }

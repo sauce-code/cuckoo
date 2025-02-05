@@ -244,6 +244,7 @@ public class Evaluate {
         try {
             int off = 0;
             while (off < table.length) {
+                assert inStream != null;
                 int len = inStream.read(table, off, table.length - off);
                 if (len < 0)
                     throw new RuntimeException();

@@ -410,12 +410,12 @@ public class TextIO {
         boolean white = true;
         if (move.length() == 5) {
             prom = move.charAt(4);
-            if (Position.getY(toSq) == 7) {
-                white = true;
-            } else if (Position.getY(toSq) == 0) {
-                white = false;
-            } else {
-                return null;
+            if (Position.getY(toSq) != 7) {
+                if (Position.getY(toSq) == 0) {
+                    white = false;
+                } else {
+                    return null;
+                }
             }
         }
         int promoteTo;

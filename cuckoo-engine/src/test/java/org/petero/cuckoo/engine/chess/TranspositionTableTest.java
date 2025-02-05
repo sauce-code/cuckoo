@@ -58,7 +58,6 @@ public class TranspositionTableTest {
         // Test positive mate score
         TTEntry ent2 = new TTEntry();
         score = mate0 - 6;
-        ply = 3;
         ent2.key = 3;
         move = new Move(8, 0, Piece.BQUEEN);
         ent2.setMove(move);
@@ -91,7 +90,6 @@ public class TranspositionTableTest {
         // Test negative mate score
         TTEntry ent3 = new TTEntry();
         score = -mate0 + 5;
-        ply = 3;
         ent3.key = 3;
         move = new Move(8, 0, Piece.BQUEEN);
         ent3.setMove(move);
