@@ -399,14 +399,13 @@ public class TextIO {
      * Convert a string to a Move object.
      * @return A move object, or null if move has invalid syntax
      */
-    public static Move uciStringToMove(String move) {
-        Move m = null;
+    public static Optional<Move> uciStringToMove(String move) {
         if ((move.length() < 4) || (move.length() > 5))
-            return null;
+            return Optional.empty();
         int fromSq = TextIO.getSquare(move.substring(0, 2));
         int toSq   = TextIO.getSquare(move.substring(2, 4));
         if ((fromSq < 0) || (toSq < 0)) {
-            return null;
+            return Optional.empty();
         }
         char prom = ' ';
         boolean white = true;
@@ -416,7 +415,7 @@ public class TextIO {
                 if (Position.getY(toSq) == 0) {
                     white = false;
                 } else {
-                    return null;
+                    return Optional.empty();
                 }
             }
         }
@@ -438,10 +437,9 @@ public class TextIO {
                 promoteTo = white ? Piece.WKNIGHT : Piece.BKNIGHT;
                 break;
             default:
-                return null;
+                return Optional.empty();
         }
-        m = new Move(fromSq, toSq, promoteTo);
-        return m;
+        return Optional.of(new Move(fromSq, toSq, promoteTo));
     }
 
     private static boolean isCapture(Position pos, Move move) {

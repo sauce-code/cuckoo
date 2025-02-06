@@ -36,6 +36,12 @@ public class TextIOTest {
         return optionalMove.get();
     }
 
+    private Move uciMove(String strMove) {
+        Optional<Move> optionalMove = TextIO.uciStringToMove(strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
+    }
+
     /**
      * Test of readFEN method, of class TextIO.
      */
@@ -385,25 +391,27 @@ public class TextIOTest {
     @Test
     public void testUciStringToMove() throws ChessParseError {
         Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
-        Move m = TextIO.uciStringToMove("e2e4");
-        assertEquals(move(pos, "e4"), m);
+        Optional<Move> m = TextIO.uciStringToMove("e2e4");
+        assertEquals(TextIO.stringToMove(pos, "e4"), m);
         m = TextIO.uciStringToMove("e2e5");
-        assertEquals(new Move(12, 12+8*3, Piece.EMPTY), m);
+        assertEquals(Optional.of(new Move(12, 12+8*3, Piece.EMPTY)), m);
 
         m = TextIO.uciStringToMove("e2e5q");
-        assertNull(m);
+        assertEquals(Optional.empty(), m);
 
-        m = TextIO.uciStringToMove("e7e8q");
-        assertEquals(Piece.WQUEEN, m.promoteTo);
-        m = TextIO.uciStringToMove("e7e8r");
-        assertEquals(Piece.WROOK, m.promoteTo);
-        m = TextIO.uciStringToMove("e7e8b");
-        assertEquals(Piece.WBISHOP, m.promoteTo);
-        m = TextIO.uciStringToMove("e2e1n");
-        assertEquals(Piece.BKNIGHT, m.promoteTo);
-        m = TextIO.uciStringToMove("e7e8x");
-        assertNull(m);  // Invalid promotion piece
-        m = TextIO.uciStringToMove("i1i3");
-        assertNull(m);  // Outside board
+        Move uciMove;
+        uciMove = uciMove("e7e8q");
+        assertEquals(Piece.WQUEEN, uciMove.promoteTo);
+        uciMove = uciMove("e7e8r");
+        assertEquals(Piece.WROOK, uciMove.promoteTo);
+        uciMove = uciMove("e7e8b");
+        assertEquals(Piece.WBISHOP, uciMove.promoteTo);
+        uciMove = uciMove("e2e1n");
+        assertEquals(Piece.BKNIGHT, uciMove.promoteTo);
+        Optional<Move> uciMoveOpt;
+        uciMoveOpt = TextIO.uciStringToMove("e7e8x");
+        assertEquals(Optional.empty(), uciMoveOpt);  // Invalid promotion piece
+        uciMoveOpt = TextIO.uciStringToMove("i1i3");
+        assertEquals(Optional.empty(), uciMoveOpt);  // Outside board
     }
 }

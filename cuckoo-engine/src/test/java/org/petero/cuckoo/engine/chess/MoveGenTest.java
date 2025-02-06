@@ -402,7 +402,9 @@ public class MoveGenTest {
         // King captures must be included in check evasions
         pos = TextIO.readFEN("r1bq2r1/pp3pbk/2p1p1P1/8/3P4/2PB1N2/PP3PPR/2KR4 b - - 0 1");
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.uciStringToMove("g7h6"), ui);
+        Optional<Move> opt = TextIO.uciStringToMove("g7h6");
+        assertTrue(opt.isPresent());
+        pos.makeMove(opt.get(), ui);
         getMoveList(pos, false);
         List<String> evList = getCheckEvasions(pos, false);
         assertTrue(evList.contains("g6h7"));
@@ -418,7 +420,6 @@ public class MoveGenTest {
         List<String> swapList = getMoveList0(swap, onlyLegal);
         List<String> ret = getMoveList0(pos, onlyLegal);
         assertEquals(swapList.size(), ret.size());
-        // FIXME! Test that swapList contains swapped moves compared to ret
         return ret;
     }
 
@@ -445,32 +446,29 @@ public class MoveGenTest {
             assertTrue(strMoves.containsAll(evList));
         UndoInfo ui = new UndoInfo();
         for (String sm : strMoves) {
-            Move m = TextIO.uciStringToMove(sm);
-            if (m != null) {
-                pos.makeMove(m, ui);
+            Optional<Move> m = TextIO.uciStringToMove(sm);
+            if (m.isPresent()) {
+                pos.makeMove(m.get(), ui);
                 boolean invalid = MoveGen.canTakeKing(pos);
-                pos.unMakeMove(m, ui);
-                if (invalid) m = null;
+                pos.unMakeMove(m.get(), ui);
+                if (invalid) m = Optional.empty();
             }
-            if (m == null) // Move was illegal (but pseudo-legal)
+            if (m.isEmpty()) // Move was illegal (but pseudo-legal)
                 continue;
             boolean qProm = false; // Promotion types considered in qsearch
-            switch (m.promoteTo) {
-            case Piece.WQUEEN: case Piece.BQUEEN:
-            case Piece.WKNIGHT: case Piece.BKNIGHT:
-            case Piece.EMPTY:
+            switch (m.get().promoteTo) {
+            case Piece.WQUEEN, Piece.BQUEEN, Piece.WKNIGHT, Piece.BKNIGHT, Piece.EMPTY:
                 qProm = true;
                 break;
             default:
                 break;
             }
-            if (!MoveGen.canTakeKing(pos) && MoveGen.givesCheck(pos, m)) {
+            if (!MoveGen.canTakeKing(pos) && MoveGen.givesCheck(pos, m.get())) {
                 if (qProm)
                     assertTrue(capList2.contains(sm));
             } else {
-                switch (m.promoteTo) {
-                case Piece.WQUEEN: case Piece.BQUEEN:
-                case Piece.WKNIGHT: case Piece.BKNIGHT:
+                switch (m.get().promoteTo) {
+                case Piece.WQUEEN, Piece.BQUEEN, Piece.WKNIGHT,  Piece.BKNIGHT:
                     assertTrue(capList1.contains(sm)); // All queen/knight promotions
                     assertTrue(capList2.contains(sm)); // All queen/knight promotions
                     break;
@@ -482,7 +480,7 @@ public class MoveGenTest {
                     break;
                 }
             }
-            if (pos.getPiece(m.to) != Piece.EMPTY) {
+            if (pos.getPiece(m.get().to) != Piece.EMPTY) {
                 if (qProm) {
                     assertTrue(capList1.contains(sm));
                     assertTrue(capList2.contains(sm));

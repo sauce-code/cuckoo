@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Optional;
+
 import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Move;
@@ -136,9 +138,9 @@ public class UCIProtocol {
                         moves.clear();
                         if ((idx < tokens.length) && tokens[idx++].equals("moves")) {
                             for (int i = idx; i < tokens.length; i++) {
-                                Move m = TextIO.uciStringToMove(tokens[i]);
-                                if (m != null) {
-                                    moves.add(m);
+                                Optional<Move> m = TextIO.uciStringToMove(tokens[i]);
+                                if (m.isPresent()) {
+                                    moves.add(m.get());
                                 } else {
                                     break;
                                 }
@@ -163,9 +165,9 @@ public class UCIProtocol {
                         switch (subCmd) {
                             case "searchmoves" -> {
                                 while (idx < tokens.length) {
-                                    Move m = TextIO.uciStringToMove(tokens[idx]);
-                                    if (m != null) {
-                                        sPar.searchMoves.add(m);
+                                    Optional<Move> m = TextIO.uciStringToMove(tokens[idx]);
+                                    if (m.isPresent()) {
+                                        sPar.searchMoves.add(m.get());
                                         idx++;
                                     } else {
                                         break;
