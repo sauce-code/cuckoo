@@ -18,21 +18,22 @@
 
 package org.petero.cuckoo.gui;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Move;
 import org.petero.cuckoo.engine.chess.Position;
 import org.petero.cuckoo.engine.guibase.ChessController;
 import org.petero.cuckoo.engine.guibase.GUIInterface;
 
+import java.awt.*;
 import java.io.Serial;
 
 /**
  * The main class for the chess GUI.
  * @author petero
  */
-public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
+public class AppletGUI extends JFrame implements GUIInterface {
     @Serial
     private static final long serialVersionUID = 7357610346389734323L;
     ChessBoardPainter cbp;
@@ -41,17 +42,16 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
     String moveListStr = "";
     String thinkingStr = "";
 
-    /** Initializes the applet AppletGUI */
-    @Override
-    public void init() {
+    public AppletGUI(String title) throws HeadlessException {
+        super(title);
         ctrl = new ChessController(this);
         try {
             java.awt.EventQueue.invokeAndWait(() -> {
-			    initComponents();
-			    cbp = (ChessBoardPainter) chessBoard;
-			    ctrl.newGame(playerWhite.isSelected(), TT_LOG_SIZE, true);
-			    ctrl.startGame();
-			});
+                initComponents();
+                cbp = (ChessBoardPainter) chessBoard;
+                ctrl.newGame(playerWhite.isSelected(), TT_LOG_SIZE, true);
+                ctrl.startGame();
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -61,10 +61,7 @@ public class AppletGUI extends javax.swing.JApplet implements GUIInterface {
      * Entry point for the GUI version of the chess program.
      */
     public static void main(String[] args) {
-        javax.swing.JApplet theApplet = new AppletGUI();
-        theApplet.init();
-        javax.swing.JFrame window = new javax.swing.JFrame(ComputerPlayer.engineName);
-        window.setContentPane(theApplet);
+        AppletGUI window = new AppletGUI(ComputerPlayer.engineName);
         window.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         window.pack();
         window.setVisible(true);
