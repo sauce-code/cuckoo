@@ -25,11 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Implements an opening book.
@@ -232,15 +228,15 @@ public class Book {
                 strMove = strMove.substring(0, strMove.length() - 1);
                 bad = 1;
             }
-            Move m = TextIO.stringToMove(pos, strMove);
-            if (m == null) {
+            Optional<Move> m = TextIO.stringToMove(pos, strMove);
+            if (m.isEmpty()) {
                 return false;
             }
-            int prom = pieceToProm(m.promoteTo);
-            int val = m.from + (m.to << 6) + (prom << 12) + (bad << 15);
+            int prom = pieceToProm(m.get().promoteTo);
+            int val = m.get().from + (m.get().to << 6) + (prom << 12) + (bad << 15);
             binBook.add((byte)(val >> 8));
             binBook.add((byte)(val & 255));
-            pos.makeMove(m, ui);
+            pos.makeMove(m.get(), ui);
         }
         binBook.add((byte)0);
         binBook.add((byte)0);

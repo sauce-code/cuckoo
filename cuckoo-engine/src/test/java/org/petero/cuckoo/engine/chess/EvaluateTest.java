@@ -22,11 +22,19 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 /**
  *
  * @author petero
  */
 public class EvaluateTest {
+
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
+    }
 
     /**
      * Test of evalPos method, of class Evaluate.
@@ -35,12 +43,12 @@ public class EvaluateTest {
     public void testEvalPos() throws ChessParseError {
         Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "e4"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "e5"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nf3"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nc6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Bb5"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nge7"), ui);
+        pos.makeMove(move(pos, "e4"), ui);
+        pos.makeMove(move(pos, "e5"), ui);
+        pos.makeMove(move(pos, "Nf3"), ui);
+        pos.makeMove(move(pos, "Nc6"), ui);
+        pos.makeMove(move(pos, "Bb5"), ui);
+        pos.makeMove(move(pos, "Nge7"), ui);
         assertTrue(moveScore(pos, "O-O") > 0);      // Castling is good
         assertTrue(moveScore(pos, "Ke2") < 0);      // Losing right to castle is bad
         assertTrue(moveScore(pos, "Kf1") < 0);
@@ -71,7 +79,7 @@ public class EvaluateTest {
         
         pos = TextIO.readFEN("r3kb1r/p3pp1p/bpPq1np1/4N3/2pP4/2N1PQ2/P1PB1PPP/R3K2R b KQkq - 0 12");
         assertTrue(moveScore(pos, "O-O-O") > 0);    // Black long castle is bad for black
-        pos.makeMove(TextIO.stringToMove(pos, "O-O-O"), ui);
+        pos.makeMove(move(pos, "O-O-O"), ui);
         assertTrue(moveScore(pos, "O-O") > 0);      // White short castle is good for white
         
         pos = TextIO.readFEN("8/3k4/2p5/1pp5/1P1P4/3K4/8/8 w - - 0 1");
@@ -102,23 +110,23 @@ public class EvaluateTest {
         int score = evalWhite(pos);
         assertEquals(0, score);    // Should be zero, by symmetry
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "e4"), ui);
+        pos.makeMove(move(pos, "e4"), ui);
         score = evalWhite(pos);
         assertTrue(score > 0);     // Centralizing a pawn is a good thing
-        pos.makeMove(TextIO.stringToMove(pos, "e5"), ui);
+        pos.makeMove(move(pos, "e5"), ui);
         score = evalWhite(pos);
         assertEquals(0, score);    // Should be zero, by symmetry
-        assertTrue(moveScore(pos, "Nf3") > 0);      // Developing knight is good        
-        pos.makeMove(TextIO.stringToMove(pos, "Nf3"), ui);
-        assertTrue(moveScore(pos, "Nc6") < 0);      // Developing knight is good        
-        pos.makeMove(TextIO.stringToMove(pos, "Nc6"), ui);
+        assertTrue(moveScore(pos, "Nf3") > 0);      // Developing knight is good
+        pos.makeMove(move(pos, "Nf3"), ui);
+        assertTrue(moveScore(pos, "Nc6") < 0);      // Developing knight is good
+        pos.makeMove(move(pos, "Nc6"), ui);
         assertTrue(moveScore(pos, "Bb5") > 0);      // Developing bishop is good
-        pos.makeMove(TextIO.stringToMove(pos, "Bb5"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nge7"), ui);
+        pos.makeMove(move(pos, "Bb5"), ui);
+        pos.makeMove(move(pos, "Nge7"), ui);
         assertTrue(moveScore(pos, "Qe2") > 0);      // Queen away from edge is good
         score = evalWhite(pos);
-        pos.makeMove(TextIO.stringToMove(pos, "Bxc6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nxc6"), ui);
+        pos.makeMove(move(pos, "Bxc6"), ui);
+        pos.makeMove(move(pos, "Nxc6"), ui);
         int score2 = evalWhite(pos);
         assertTrue(score2 < score);                 // Bishop worth more than knight in this case
         
@@ -142,21 +150,21 @@ public class EvaluateTest {
         Position pos = TextIO.readFEN(fen);
         int score1 = evalWhite(pos);
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "Rxg6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Kxg6"), ui);
+        pos.makeMove(move(pos, "Rxg6"), ui);
+        pos.makeMove(move(pos, "Kxg6"), ui);
         int score2 = evalWhite(pos);
         assertTrue(score2 > score1);    // White ahead, trading pieces is good
         
         pos = TextIO.readFEN(fen);
-        pos.makeMove(TextIO.stringToMove(pos, "cxd4"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "cxd4"), ui);
+        pos.makeMove(move(pos, "cxd4"), ui);
+        pos.makeMove(move(pos, "cxd4"), ui);
         score2 = evalWhite(pos);
         assertTrue(score2 < score1);    // White ahead, trading pawns is bad
 
         pos = TextIO.readFEN("8/8/1b2b3/4kp2/5N2/4NKP1/6B1/8 w - - 0 62");
         score1 = evalWhite(pos);
-        pos.makeMove(TextIO.stringToMove(pos, "Nxe6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Kxe6"), ui);
+        pos.makeMove(move(pos, "Nxe6"), ui);
+        pos.makeMove(move(pos, "Kxe6"), ui);
         score2 = evalWhite(pos);
         assertTrue(score2 > score1); // White ahead, trading pieces is good
     }
@@ -176,19 +184,19 @@ public class EvaluateTest {
         assertTrue(qV > pV);
         
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "e4"), ui);
+        pos.makeMove(move(pos, "e4"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "d5"), ui);
+        pos.makeMove(move(pos, "d5"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "exd5"), ui);
+        pos.makeMove(move(pos, "exd5"), ui);
         assertEquals(pV, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Qxd5"), ui);
+        pos.makeMove(move(pos, "Qxd5"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Nc3"), ui);
+        pos.makeMove(move(pos, "Nc3"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Qxd2"), ui);
+        pos.makeMove(move(pos, "Qxd2"), ui);
         assertEquals(-pV, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Qxd2"), ui);
+        pos.makeMove(move(pos, "Qxd2"), ui);
         assertEquals(-pV+qV, Evaluate.material(pos));
     }
 
@@ -400,7 +408,7 @@ public class EvaluateTest {
         int score1 = evalWhite(pos);
         assertTrue(score1 < 0);
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "Nxd4"), ui);
+        pos.makeMove(move(pos, "Nxd4"), ui);
         int score2 = evalWhite(pos);
         assertTrue(score2 <= 0);
         assertTrue(score2 > score1);
@@ -454,7 +462,7 @@ public class EvaluateTest {
         int score1 = evalWhite(pos);
         Position tmpPos = new Position(pos);
         UndoInfo ui = new UndoInfo();
-        tmpPos.makeMove(TextIO.stringToMove(tmpPos, moveStr), ui);
+        tmpPos.makeMove(move(tmpPos, moveStr), ui);
         int score2 = evalWhite(tmpPos);
         return score2 - score1;
     }

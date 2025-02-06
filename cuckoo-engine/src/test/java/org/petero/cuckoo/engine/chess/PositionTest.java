@@ -22,6 +22,8 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.junit.Test;
 
 /**
@@ -29,6 +31,12 @@ import org.junit.Test;
  * @author petero
  */
 public class PositionTest {
+
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
+    }
 
     /**
      * Test of getPiece method, of class Position.
@@ -177,7 +185,7 @@ public class PositionTest {
     public void testCastleMask() throws ChessParseError {
         Position pos = TextIO.readFEN("rnbqk1nr/pppp1ppp/8/4p3/4P3/2N2N2/PPPP1bPP/R1BQKB1R w KQkq - 0 1");
         UndoInfo ui = new UndoInfo();
-        Move m = TextIO.stringToMove(pos, "Kxf2");
+        Move m = move(pos, "Kxf2");
         pos.makeMove(m, ui);
         int castleMask = (1 << Position.A8_CASTLE) |
                          (1 << Position.H8_CASTLE);
@@ -231,47 +239,47 @@ public class PositionTest {
         String fen = "r1bqk2r/2ppbppp/p1n2n2/1pP1p3/B3P3/5N2/PP1P1PPP/RNBQK2R w KQkq b6 0 7";
         Position pos = TextIO.readFEN(fen);
         
-        Move move = TextIO.stringToMove(pos, "Nc3");
+        Move move = move(pos, "Nc3");
         UndoInfo ui = new UndoInfo();
         pos.makeMove(move, ui);
         assertEquals(1, pos.halfMoveClock);
         assertEquals(7, pos.fullMoveCounter);
         pos.unMakeMove(move, ui);
         
-        move = TextIO.stringToMove(pos, "O-O");
+        move = move(pos, "O-O");
         pos.makeMove(move, ui);
         assertEquals(1, pos.halfMoveClock);     // Castling does not reset 50 move counter
         assertEquals(7, pos.fullMoveCounter);
         pos.unMakeMove(move, ui);
         
-        move = TextIO.stringToMove(pos, "a3");
+        move = move(pos, "a3");
         pos.makeMove(move, ui);
         assertEquals(0, pos.halfMoveClock);     // Pawn move resets 50 move counter
         assertEquals(7, pos.fullMoveCounter);
         pos.unMakeMove(move, ui);
         
-        move = TextIO.stringToMove(pos, "Nxe5");
+        move = move(pos, "Nxe5");
         pos.makeMove(move, ui);
         assertEquals(0, pos.halfMoveClock);     // Capture move resets 50 move counter
         assertEquals(7, pos.fullMoveCounter);
         pos.unMakeMove(move, ui);
 
-        move = TextIO.stringToMove(pos, "cxb6");
+        move = move(pos, "cxb6");
         pos.makeMove(move, ui);
         assertEquals(0, pos.halfMoveClock);     // EP capture move resets 50 move counter
         assertEquals(7, pos.fullMoveCounter);
         pos.unMakeMove(move, ui);
 
-        move = TextIO.stringToMove(pos, "Kf1");
+        move = move(pos, "Kf1");
         pos.makeMove(move, ui);
         assertEquals(1, pos.halfMoveClock);     // Loss of castling rights does not reset 50 move counter
         assertEquals(7, pos.fullMoveCounter);
         pos.unMakeMove(move, ui);
         
-        Move firstMove = TextIO.stringToMove(pos, "Nc3");
+        Move firstMove = move(pos, "Nc3");
         UndoInfo firstUi = new UndoInfo();
         pos.makeMove(move, firstUi);
-        move = TextIO.stringToMove(pos, "O-O");
+        move = move(pos, "O-O");
         pos.makeMove(move, ui);
         assertEquals(2, pos.halfMoveClock);
         assertEquals(8, pos.fullMoveCounter);   // Black move increases fullMoveCounter
@@ -280,7 +288,7 @@ public class PositionTest {
         
         fen = "8/8/8/4k3/8/8/2p5/5K2 b - - 47 68";
         pos = TextIO.readFEN(fen);
-        move = TextIO.stringToMove(pos, "c1Q");
+        move = move(pos, "c1Q");
         pos.makeMove(move, ui);
         assertEquals(0, pos.halfMoveClock);     // Pawn promotion resets 50 move counter
         assertEquals(69, pos.fullMoveCounter);
@@ -294,39 +302,39 @@ public class PositionTest {
         Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Position origPos = new Position(pos);
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "Nf3"), ui);
+        pos.makeMove(move(pos, "Nf3"), ui);
         assertFalse(pos.drawRuleEquals(origPos));
-        pos.makeMove(TextIO.stringToMove(pos, "Nf6"), ui);
+        pos.makeMove(move(pos, "Nf6"), ui);
         assertFalse(pos.drawRuleEquals(origPos));
-        pos.makeMove(TextIO.stringToMove(pos, "Ng1"), ui);
+        pos.makeMove(move(pos, "Ng1"), ui);
         assertFalse(pos.drawRuleEquals(origPos));
-        pos.makeMove(TextIO.stringToMove(pos, "Ng8"), ui);
+        pos.makeMove(move(pos, "Ng8"), ui);
         assertTrue(pos.drawRuleEquals(origPos));
         assertNotEquals(pos, origPos);       // Move counters have changed
         
         String fen = "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1";
         pos = TextIO.readFEN(fen);
         origPos = new Position(pos);
-        pos.makeMove(TextIO.stringToMove(pos, "Ke2"), ui);
+        pos.makeMove(move(pos, "Ke2"), ui);
         assertFalse(pos.drawRuleEquals(origPos));
-        pos.makeMove(TextIO.stringToMove(pos, "Be7"), ui);
+        pos.makeMove(move(pos, "Be7"), ui);
         assertFalse(pos.drawRuleEquals(origPos));
-        pos.makeMove(TextIO.stringToMove(pos, "Ke1"), ui);
+        pos.makeMove(move(pos, "Ke1"), ui);
         assertFalse(pos.drawRuleEquals(origPos));
-        pos.makeMove(TextIO.stringToMove(pos, "Bf8"), ui);
+        pos.makeMove(move(pos, "Bf8"), ui);
         assertFalse(pos.drawRuleEquals(origPos));   // Not equal, castling rights lost
 
         pos = TextIO.readFEN(TextIO.START_POS_FEN);
-        pos.makeMove(TextIO.stringToMove(pos, "c4"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "a6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "c5"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "b5"), ui);
+        pos.makeMove(move(pos, "c4"), ui);
+        pos.makeMove(move(pos, "a6"), ui);
+        pos.makeMove(move(pos, "c5"), ui);
+        pos.makeMove(move(pos, "b5"), ui);
         assertEquals(Position.getSquare(1, 5), pos.getEpSquare());
         origPos = new Position(pos);
-        pos.makeMove(TextIO.stringToMove(pos, "Nc3"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nc6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nb1"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nb8"), ui);
+        pos.makeMove(move(pos, "Nc3"), ui);
+        pos.makeMove(move(pos, "Nc6"), ui);
+        pos.makeMove(move(pos, "Nb1"), ui);
+        pos.makeMove(move(pos, "Nb8"), ui);
         assertFalse(pos.drawRuleEquals(origPos));   // Not equal, en passant rights lost
     }
 
@@ -339,7 +347,7 @@ public class PositionTest {
         long h1 = pos.zobristHash();
         assertEquals(h1, pos.computeZobristHash());
         UndoInfo ui = new UndoInfo();
-        Move move = TextIO.stringToMove(pos, "e4");
+        Move move = move(pos, "e4");
         pos.makeMove(move, ui);
         assertTrue(h1 != pos.zobristHash());
         pos.unMakeMove(move, ui);
@@ -368,7 +376,7 @@ public class PositionTest {
         List<Move> moveList = new ArrayList<>();
         for (int i = 0; i < moves.length; i++) {
             uiList.add(new UndoInfo());
-            Move m = TextIO.stringToMove(pos, moves[i]);
+            Move m = move(pos, moves[i]);
             moveList.add(m);
             pos.makeMove(m, uiList.get(i));
             long h = pos.zobristHash();
@@ -397,10 +405,10 @@ public class PositionTest {
         assertEquals(TextIO.getSquare("e1"), pos.getKingSq(true));
         assertEquals(TextIO.getSquare("e7"), pos.getKingSq(false));
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "o-o"), ui);
+        pos.makeMove(move(pos, "o-o"), ui);
         assertEquals(TextIO.getSquare("g1"), pos.getKingSq(true));
         assertEquals(TextIO.getSquare("e7"), pos.getKingSq(false));
-        pos.makeMove(TextIO.stringToMove(pos, "Kd6"), ui);
+        pos.makeMove(move(pos, "Kd6"), ui);
         assertEquals(TextIO.getSquare("g1"), pos.getKingSq(true));
         assertEquals(TextIO.getSquare("d6"), pos.getKingSq(false));
     }

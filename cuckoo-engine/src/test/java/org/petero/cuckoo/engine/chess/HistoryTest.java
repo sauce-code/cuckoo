@@ -22,11 +22,19 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 /**
  *
  * @author petero
  */
 public class HistoryTest {
+
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
+    }
 
     /**
      * Test of getHistScore method, of class History.
@@ -35,8 +43,8 @@ public class HistoryTest {
     public void testGetHistScore() throws ChessParseError {
         Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         History hs = new History();
-        Move m1 = TextIO.stringToMove(pos, "e4");
-        Move m2 = TextIO.stringToMove(pos, "d4");
+        Move m1 = move(pos, "e4");
+        Move m2 = move(pos, "d4");
         assert m1 != null;
         assertEquals(0, hs.getHistScore(pos, m1));
 

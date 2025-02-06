@@ -22,11 +22,19 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 /**
  *
  * @author petero
  */
 public class TextIOTest {
+
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
+    }
 
     /**
      * Test of readFEN method, of class TextIO.
@@ -218,86 +226,121 @@ public class TextIOTest {
         assertEquals("Rfd8", result);     // File disambiguation needed
     }
 
+  @Test
+  public void testStringToMove_mNe5() throws ChessParseError {
+      Position pos = TextIO.readFEN("r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1");
+
+      Optional<Move> m;
+
+      Move mNe5 = new Move(Position.getSquare(3, 6), Position.getSquare(4, 4), Piece.EMPTY);
+      m = TextIO.stringToMove(pos, "Ne5");
+      assertEquals(Optional.of(mNe5), m);
+      m = TextIO.stringToMove(pos, "ne");
+      assertEquals(Optional.of(mNe5), m);
+      m = TextIO.stringToMove(pos, "N");
+      assertEquals(Optional.empty(), m);
+  }
+
+    @Test
+    public void testStringToMove_mQc6e4() throws ChessParseError {
+        Position pos = TextIO.readFEN("r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1");
+        Optional<Move> m;
+        Move mQc6e4 = new Move(Position.getSquare(2, 5), Position.getSquare(4, 3), Piece.EMPTY);
+        m = TextIO.stringToMove(pos, "Qc6-e4");
+        assertEquals(Optional.of(mQc6e4), m);
+        m = TextIO.stringToMove(pos, "Qc6e4");
+        assertEquals(Optional.of(mQc6e4), m);
+        m = TextIO.stringToMove(pos, "Qce4");
+        assertEquals(Optional.empty(), m);
+        m = TextIO.stringToMove(pos, "Q6e4");
+        assertEquals(Optional.empty(), m);
+    }
+
+    @Test
+    public void testStringToMove_maxb1Q() throws ChessParseError {
+        Position pos = TextIO.readFEN("r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1");
+        Optional<Move> m;
+        Move maxb1Q = new Move(Position.getSquare(0, 1), Position.getSquare(1, 0), Piece.BQUEEN);
+        m = TextIO.stringToMove(pos, "axb1Q");
+        assertEquals(Optional.of(maxb1Q), m);
+        m = TextIO.stringToMove(pos, "axb1Q#");
+        assertEquals(Optional.of(maxb1Q), m);
+        m = TextIO.stringToMove(pos, "axb1Q+");
+        assertEquals(Optional.empty(), m);
+    }
+
+    @Test
+    public void testStringToMove_mh5() throws ChessParseError {
+        Position pos = TextIO.readFEN("r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1");
+        Optional<Move> m;
+        Move mh5 = new Move(Position.getSquare(7, 6), Position.getSquare(7, 4), Piece.EMPTY);
+        m = TextIO.stringToMove(pos, "h5");
+        assertEquals(Optional.of(mh5), m);
+        m = TextIO.stringToMove(pos, "h7-h5");
+        assertEquals(Optional.of(mh5), m);
+        m = TextIO.stringToMove(pos, "h");
+        assertEquals(Optional.empty(), m);
+    }
+
+    @Test
+    public void testStringToMove_from() throws ChessParseError {
+        Position pos = TextIO.readFEN("r1b1k2r/1pqpppbp/p5pn/3BP3/8/2pP4/PPPBQPPP/R3K2R w KQkq - 0 12");
+        Move m;
+        m = move(pos, "bxc3");
+        assertEquals(TextIO.getSquare("b2"), m.from);
+        m = move(pos, "Bxc3");
+        assertEquals(TextIO.getSquare("d2"), m.from);
+        m = move(pos, "bxc");
+        assertEquals(TextIO.getSquare("b2"), m.from);
+        m = move(pos, "Bxc");
+        assertEquals(TextIO.getSquare("d2"), m.from);
+    }
+
+    @Test
+    public void testStringToMove_castling() throws ChessParseError {
+        // Test castling. o-o is a substring of o-o-o, which could cause problems.
+        Position pos = TextIO.readFEN("5k2/p1pQn3/1p2Bp1r/8/4P1pN/2N5/PPP2PPP/R3K2R w KQ - 0 16");
+        Optional<Move> m;
+        Move kCastle = new Move(Position.getSquare(4,0), Position.getSquare(6,0), Piece.EMPTY);
+        Move qCastle = new Move(Position.getSquare(4,0), Position.getSquare(2,0), Piece.EMPTY);
+        m = TextIO.stringToMove(pos, "o");
+        assertEquals(Optional.empty(), m);
+        m = TextIO.stringToMove(pos, "o-o");
+        assertEquals(Optional.of(kCastle), m);
+        m = TextIO.stringToMove(pos, "O-O");
+        assertEquals(Optional.of(kCastle), m);
+        m = TextIO.stringToMove(pos, "o-o-o");
+        assertEquals(Optional.of(qCastle), m);
+    }
+
+    @Test
+    public void testStringToMove_castlingcheck() throws ChessParseError {
+        // Test 'o-o+'
+        Position pos = TextIO.readFEN("5k2/p1pQn3/1p2Bp1r/8/4P1pN/2N5/PPP2PPP/R3K2R w KQ - 0 16");
+        pos.setPiece(Position.getSquare(5,1), Piece.EMPTY);
+        pos.setPiece(Position.getSquare(5,5), Piece.EMPTY);
+        Optional<Move> m;
+        Move kCastle = new Move(Position.getSquare(4,0), Position.getSquare(6,0), Piece.EMPTY);
+        Move qCastle = new Move(Position.getSquare(4,0), Position.getSquare(2,0), Piece.EMPTY);
+        m = TextIO.stringToMove(pos, "o");
+        assertEquals(Optional.empty(), m);
+        m = TextIO.stringToMove(pos, "o-o");
+        assertEquals(Optional.of(kCastle), m);
+        m = TextIO.stringToMove(pos, "o-o-o");
+        assertEquals(Optional.of(qCastle), m);
+        m = TextIO.stringToMove(pos, "o-o+");
+        assertEquals(Optional.of(kCastle), m);
+    }
+
     /**
      * Test of stringToMove method, of class TextIO.
      */
     @Test
-    public void testStringToMove() throws ChessParseError {
-        Position pos = TextIO.readFEN("r4rk1/2pn3p/2q1q1n1/8/2q2p2/6R1/p4PPP/1R4K1 b - - 0 1");
-
-        Move mNe5 = new Move(Position.getSquare(3, 6), Position.getSquare(4, 4), Piece.EMPTY);
-        Move m = TextIO.stringToMove(pos, "Ne5");
-        assertEquals(mNe5, m);
-        m = TextIO.stringToMove(pos, "ne");
-        assertEquals(mNe5, m);
-        m = TextIO.stringToMove(pos, "N");
-        assertNull(m);
-        
-        Move mQc6e4 = new Move(Position.getSquare(2, 5), Position.getSquare(4, 3), Piece.EMPTY);
-        m = TextIO.stringToMove(pos, "Qc6-e4");
-        assertEquals(mQc6e4, m);
-        m = TextIO.stringToMove(pos, "Qc6e4");
-        assertEquals(mQc6e4, m);
-        m = TextIO.stringToMove(pos, "Qce4");
-        assertNull(m);
-        m = TextIO.stringToMove(pos, "Q6e4");
-        assertNull(m);
-
-        Move maxb1Q = new Move(Position.getSquare(0, 1), Position.getSquare(1, 0), Piece.BQUEEN);
-        m = TextIO.stringToMove(pos, "axb1Q");
-        assertEquals(maxb1Q, m);
-        m = TextIO.stringToMove(pos, "axb1Q#");
-        assertEquals(maxb1Q, m);
-        m = TextIO.stringToMove(pos, "axb1Q+");
-        assertNull(m);
-        
-        Move mh5= new Move(Position.getSquare(7, 6), Position.getSquare(7, 4), Piece.EMPTY);
-        m = TextIO.stringToMove(pos, "h5");
-        assertEquals(mh5, m);
-        m = TextIO.stringToMove(pos, "h7-h5");
-        assertEquals(mh5, m);
-        m = TextIO.stringToMove(pos, "h");
-        assertNull(m);
-
-        pos = TextIO.readFEN("r1b1k2r/1pqpppbp/p5pn/3BP3/8/2pP4/PPPBQPPP/R3K2R w KQkq - 0 12");
-        m = TextIO.stringToMove(pos, "bxc3");
-        assertEquals(TextIO.getSquare("b2"), m.from);
-        m = TextIO.stringToMove(pos, "Bxc3");
-        assertEquals(TextIO.getSquare("d2"), m.from);
-        m = TextIO.stringToMove(pos, "bxc");
-        assertEquals(TextIO.getSquare("b2"), m.from);
-        m = TextIO.stringToMove(pos, "Bxc");
-        assertEquals(TextIO.getSquare("d2"), m.from);
-        
-        // Test castling. o-o is a substring of o-o-o, which could cause problems.
-        pos = TextIO.readFEN("5k2/p1pQn3/1p2Bp1r/8/4P1pN/2N5/PPP2PPP/R3K2R w KQ - 0 16");
-        Move kCastle = new Move(Position.getSquare(4,0), Position.getSquare(6,0), Piece.EMPTY);
-        Move qCastle = new Move(Position.getSquare(4,0), Position.getSquare(2,0), Piece.EMPTY);
-        m = TextIO.stringToMove(pos, "o");
-        assertNull(m);
-        m = TextIO.stringToMove(pos, "o-o");
-        assertEquals(kCastle, m);
-        m = TextIO.stringToMove(pos, "O-O");
-        assertEquals(kCastle, m);
-        m = TextIO.stringToMove(pos, "o-o-o");
-        assertEquals(qCastle, m);
-        
-        // Test 'o-o+'
-        pos.setPiece(Position.getSquare(5,1), Piece.EMPTY);
-        pos.setPiece(Position.getSquare(5,5), Piece.EMPTY);
-        m = TextIO.stringToMove(pos, "o");
-        assertNull(m);
-        m = TextIO.stringToMove(pos, "o-o");
-        assertEquals(kCastle, m);
-        m = TextIO.stringToMove(pos, "o-o-o");
-        assertEquals(qCastle, m);
-        m = TextIO.stringToMove(pos, "o-o+");
-        assertEquals(kCastle, m);
-        
+    public void testStringToMove_syntax() throws ChessParseError {
         // Test d8=Q+ syntax
-        pos = TextIO.readFEN("1r3r2/2kP2Rp/p1bN1p2/2p5/5P2/2P5/P5PP/3R2K1 w - -");
-        m = TextIO.stringToMove(pos, "d8=Q+");
-        Move m2 = TextIO.stringToMove(pos, "d8Q");
+        Position pos = TextIO.readFEN("1r3r2/2kP2Rp/p1bN1p2/2p5/5P2/2P5/P5PP/3R2K1 w - -");
+        Optional<Move> m = TextIO.stringToMove(pos, "d8=Q+");
+        Optional<Move> m2 = TextIO.stringToMove(pos, "d8Q");
         assertEquals(m2, m);
     }
 
@@ -343,7 +386,7 @@ public class TextIOTest {
     public void testUciStringToMove() throws ChessParseError {
         Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Move m = TextIO.uciStringToMove("e2e4");
-        assertEquals(TextIO.stringToMove(pos, "e4"), m);
+        assertEquals(move(pos, "e4"), m);
         m = TextIO.uciStringToMove("e2e5");
         assertEquals(new Move(12, 12+8*3, Piece.EMPTY), m);
 

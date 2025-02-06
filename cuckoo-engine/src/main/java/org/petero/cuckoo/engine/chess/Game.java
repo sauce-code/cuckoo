@@ -21,6 +21,7 @@ package org.petero.cuckoo.engine.chess;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -58,20 +59,20 @@ public class Game {
             return false;
         }
 
-        Move m = TextIO.stringToMove(pos, str);
-        if (m == null) {
+        Optional<Move> m = TextIO.stringToMove(pos, str);
+        if (m.isEmpty()) {
             return false;
         }
 
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(m, ui);
+        pos.makeMove(m.get(), ui);
         TextIO.fixupEPSquare(pos);
         while (currentMove < moveList.size()) {
             moveList.remove(currentMove);
             uiInfoList.remove(currentMove);
             drawOfferList.remove(currentMove);
         }
-        moveList.add(m);
+        moveList.add(m.get());
         uiInfoList.add(ui);
         drawOfferList.add(pendingDrawOffer);
         pendingDrawOffer = false;
@@ -437,7 +438,7 @@ public class Game {
     private boolean handleDrawCmd(String drawCmd) {
         if (drawCmd.startsWith("rep") || drawCmd.startsWith("50")) {
             boolean rep = drawCmd.startsWith("rep");
-            Move m = null;
+            Optional<Move> m = Optional.empty();
             String ms = drawCmd.substring(drawCmd.indexOf(" ") + 1);
             if (!ms.isEmpty()) {
                 m = TextIO.stringToMove(pos, ms);
@@ -446,10 +447,10 @@ public class Game {
             if (rep) {
                 valid = false;
                 List<Position> oldPositions = new ArrayList<>();
-                if (m != null) {
+                if (m.isPresent()) {
                     UndoInfo ui = new UndoInfo();
                     Position tmpPos = new Position(pos);
-                    tmpPos.makeMove(m, ui);
+                    tmpPos.makeMove(m.get(), ui);
                     oldPositions.add(tmpPos);
                 }
                 oldPositions.add(pos);
@@ -470,21 +471,19 @@ public class Game {
                 }
             } else {
                 Position tmpPos = new Position(pos);
-                if (m != null) {
+                if (m.isPresent()) {
                     UndoInfo ui = new UndoInfo();
-                    tmpPos.makeMove(m, ui);
+                    tmpPos.makeMove(m.get(), ui);
                 }
                 valid = tmpPos.halfMoveClock >= 100;
             }
             if (valid) {
                 drawState = rep ? GameState.DRAW_REP : GameState.DRAW_50;
                 drawStateMoveStr = null;
-                if (m != null) {
-                    drawStateMoveStr = TextIO.moveToString(pos, m, false);
-                }
+                m.ifPresent(move -> drawStateMoveStr = TextIO.moveToString(pos, move, false));
             } else {
                 pendingDrawOffer = true;
-                if (m != null) {
+                if (m.isPresent()) {
                     processString(ms);
                 }
             }
@@ -492,7 +491,7 @@ public class Game {
         } else if (drawCmd.startsWith("offer ")) {
             pendingDrawOffer = true;
             String ms = drawCmd.substring(drawCmd.indexOf(" ") + 1);
-            if (TextIO.stringToMove(pos, ms) != null) {
+            if (TextIO.stringToMove(pos, ms).isPresent()) {
                 processString(ms);
             }
             return true;

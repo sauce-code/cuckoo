@@ -22,6 +22,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 /**
  *
  * @author petero
@@ -50,8 +52,9 @@ public class BookTest {
         String[] strMoves = moveListString.split("\\([0-9]*\\) ");
         assertTrue(strMoves.length > 1);
         for (String strMove : strMoves) {
-            Move m = TextIO.stringToMove(pos, strMove);
-            checkValid(pos, m);
+            Optional<Move> m = TextIO.stringToMove(pos, strMove);
+            assertTrue(m.isPresent());
+            checkValid(pos, m.get());
         }
     }
 

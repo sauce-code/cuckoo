@@ -23,11 +23,19 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.petero.cuckoo.engine.chess.TranspositionTable.TTEntry;
 
+import java.util.Optional;
+
 /**
  *
  * @author petero
  */
 public class TranspositionTableTest {
+
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
+    }
 
     /**
      * Test of TTEntry nested class, of class TranspositionTable.
@@ -36,7 +44,7 @@ public class TranspositionTableTest {
     public void testTTEntry() throws ChessParseError {
         final int mate0 = Search.MATE0;
         Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
-        Move move = TextIO.stringToMove(pos, "e4");
+        Move move = move(pos, "e4");
 
         // Test "normal" (non-mate) score
         int score = 17;
@@ -116,7 +124,7 @@ public class TranspositionTableTest {
         };
         UndoInfo ui = new UndoInfo();
         for (int i = 0; i < moves.length; i++) {
-            Move m = TextIO.stringToMove(pos, moves[i]);
+            Move m = move(pos, moves[i]);
             pos.makeMove(m, ui);
             int score = i * 17 + 3;
             m.score = score;
@@ -128,7 +136,7 @@ public class TranspositionTableTest {
 
         pos = TextIO.readFEN(TextIO.START_POS_FEN);
         for (int i = 0; i < moves.length; i++) {
-            Move m = TextIO.stringToMove(pos, moves[i]);
+            Move m = move(pos, moves[i]);
             pos.makeMove(m, ui);
             TranspositionTable.TTEntry ent = tt.probe(pos.historyHash());
             assertEquals(TranspositionTable.TTEntry.T_EXACT, ent.type);

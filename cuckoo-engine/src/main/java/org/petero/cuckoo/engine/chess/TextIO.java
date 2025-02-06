@@ -18,6 +18,8 @@
 
 package org.petero.cuckoo.engine.chess;
 
+import java.util.Optional;
+
 /**
  *
  * @author petero
@@ -456,10 +458,10 @@ public class TextIO {
      * Any prefix of the string representation of a valid move counts as a legal move string,
      * as long as the string only matches one valid move.
      */
-    public static Move stringToMove(Position pos, String strMove) {
+    public static Optional<Move> stringToMove(Position pos, String strMove) {
         strMove = strMove.replaceAll("=", "");
         Move move = null;
-        if (strMove.isEmpty()) return null;
+        if (strMove.isEmpty()) return Optional.empty();
         MoveGen.MoveList moves = MoveGen.instance.pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moves);
         {
@@ -488,12 +490,12 @@ public class TextIO {
                 String str2 = normalizeMoveString(TextIO.moveToString(pos, m, false, moves));
                 if (i == 0) {
                     if (strMove.equals(str1) || strMove.equals(str2)) {
-                        return m;
+                        return Optional.of(m);
                     }
                 } else {
                     if (strMove.equalsIgnoreCase(str1) ||
                             strMove.equalsIgnoreCase(str2)) {
-                        return m;
+                        return Optional.of(m);
                     }
                 }
             }
@@ -514,16 +516,16 @@ public class TextIO {
                 }
                 if (match) {
                     if (move != null) {
-                        return null; // More than one match, not ok
+                        return Optional.empty(); // More than one match, not ok
                     } else {
                         move = m;
                     }
                 }
             }
             if (move != null)
-                return move;
+                return Optional.of(move);
         }
-        return null;
+        return Optional.empty();
     }
 
     /**

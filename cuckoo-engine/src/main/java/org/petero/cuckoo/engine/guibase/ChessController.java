@@ -18,10 +18,8 @@
 
 package org.petero.cuckoo.engine.guibase;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+
 import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Game;
@@ -322,8 +320,8 @@ public class ChessController {
             String strMove = sc.next();
             strMove = strMove.replaceFirst("\\$?[0-9]*\\.*([^?!]*)[?!]*", "$1");
             if (strMove.isEmpty()) continue;
-            Move m = TextIO.stringToMove(game.pos, strMove);
-            if (m == null)
+            Optional<Move> m = TextIO.stringToMove(game.pos, strMove);
+            if (m.isEmpty())
                 break;
             game.processString(strMove);
         }
