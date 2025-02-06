@@ -542,27 +542,34 @@ public class Evaluate {
         return score;
     }
 
+    private record PawnStats(long pawnFiles, int dbl, int islands, int isolated) {
+        private static PawnStats of(long pawns) {
+            long pawnFiles = BitBoard.southFill(pawns) & 0xff;
+            int dbl = Long.bitCount(pawns) - Long.bitCount(pawnFiles);
+            int islands = Long.bitCount(((~pawnFiles) >>> 1) & pawnFiles);
+            int isolated = Long.bitCount(~(pawnFiles<<1) & pawnFiles & ~(pawnFiles>>>1));
+            return new PawnStats(pawnFiles, dbl, islands, isolated);
+        }
+        private int score(PawnStats other) {
+            int score = 0;
+            score -= (dbl - other.dbl) * 25;
+            score -= (islands - other.islands) * 15;
+            score -= (isolated - other.isolated) * 15;
+            return score;
+        }
+    }
+
     /** Compute pawn hash data for pos. */
     private void computePawnHashData(Position pos, PawnHashData ph) {
-        int score = 0;
 
         // Evaluate double pawns and pawn islands
         long wPawns = pos.pieceTypeBB[Piece.WPAWN];
-        long wPawnFiles = BitBoard.southFill(wPawns) & 0xff;
-        int wDouble = Long.bitCount(wPawns) - Long.bitCount(wPawnFiles);
-        int wIslands = Long.bitCount(((~wPawnFiles) >>> 1) & wPawnFiles);
-        int wIsolated = Long.bitCount(~(wPawnFiles<<1) & wPawnFiles & ~(wPawnFiles>>>1));
-
+        PawnStats wPawnStats = PawnStats.of(wPawns);
         
         long bPawns = pos.pieceTypeBB[Piece.BPAWN];
-        long bPawnFiles = BitBoard.southFill(bPawns) & 0xff;
-        int bDouble = Long.bitCount(bPawns) - Long.bitCount(bPawnFiles);
-        int bIslands = Long.bitCount(((~bPawnFiles) >>> 1) & bPawnFiles);
-        int bIsolated = Long.bitCount(~(bPawnFiles<<1) & bPawnFiles & ~(bPawnFiles>>>1));
+        PawnStats bPawnStats = PawnStats.of(bPawns);
 
-        score -= (wDouble - bDouble) * 25;
-        score -= (wIslands - bIslands) * 15;
-        score -= (wIsolated - bIsolated) * 15;
+        int score = wPawnStats.score(bPawnStats);
 
         // Evaluate backward pawns, defined as a pawn that guards a friendly pawn,
         // can't be guarded by friendly pawns, can advance, but can't advance without
@@ -573,12 +580,12 @@ public class Evaluate {
                          ~BitBoard.northFill(wPawnAttacks);
         wBackward &= (((wPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
                       ((wPawns & BitBoard.MASK_A_TO_G_FILES) >>> 7));
-        wBackward &= ~BitBoard.northFill(bPawnFiles);
+        wBackward &= ~BitBoard.northFill(bPawnStats.pawnFiles());
         long bBackward = bPawns & ~((wPawns | bPawns) << 8) & (wPawnAttacks << 8) &
                          ~BitBoard.southFill(bPawnAttacks);
         bBackward &= (((bPawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
                       ((bPawns & BitBoard.MASK_A_TO_G_FILES) << 9));
-        bBackward &= ~BitBoard.northFill(wPawnFiles);
+        bBackward &= ~BitBoard.northFill(wPawnStats.pawnFiles());
         score -= (Long.bitCount(wBackward) - Long.bitCount(bBackward)) * 15;
 
         // Evaluate passed pawn bonus, white
