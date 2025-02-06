@@ -37,7 +37,6 @@ public class SearchParams {
     int nodes;               // If >0, don't search more nodes than this
     int mate;                // If >0, search for mate-in-x
     int moveTime;            // If >0, search for exactly this amount of time, ms
-    boolean infinite;
 
     public SearchParams() {
         searchMoves = new ArrayList<>();

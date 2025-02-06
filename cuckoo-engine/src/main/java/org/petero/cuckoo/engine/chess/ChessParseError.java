@@ -27,8 +27,6 @@ import java.io.Serial;
 public class ChessParseError extends Exception {
     @Serial
     private static final long serialVersionUID = -6051856171275301175L;
-    public ChessParseError() {
-    }
     public ChessParseError(String msg) {
         super(msg);
     }

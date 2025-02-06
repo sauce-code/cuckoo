@@ -218,20 +218,8 @@ public final class MoveGen {
         MoveList moveList = getMoveListObj();
         final long occupied = pos.whiteBB | pos.blackBB;
         if (pos.whiteMove) {
-            long kingThreats = pos.pieceTypeBB[Piece.BKNIGHT] & BitBoard.knightAttacks[pos.wKingSq];
-            long rookPieces = pos.pieceTypeBB[Piece.BROOK] | pos.pieceTypeBB[Piece.BQUEEN];
-            if (rookPieces != 0)
-                kingThreats |= rookPieces & BitBoard.rookAttacks(pos.wKingSq, occupied);
-            long bishPieces = pos.pieceTypeBB[Piece.BBISHOP] | pos.pieceTypeBB[Piece.BQUEEN];
-            if (bishPieces != 0)
-                kingThreats |= bishPieces & BitBoard.bishopAttacks(pos.wKingSq, occupied);
-            kingThreats |= pos.pieceTypeBB[Piece.BPAWN] & BitBoard.wPawnAttacks[pos.wKingSq];
-            long validTargets = 0;
-            if ((kingThreats != 0) && ((kingThreats & (kingThreats-1)) == 0)) { // Exactly one attacking piece
-                int threatSq = BitBoard.numberOfTrailingZeros(kingThreats);
-                validTargets = kingThreats | BitBoard.squaresBetween[pos.wKingSq][threatSq];
-            }
-            validTargets |= pos.pieceTypeBB[Piece.BKING];
+            long validTargets = getValidTargetsWhite(pos, occupied);
+
             // Queen moves
             long squares = pos.pieceTypeBB[Piece.WQUEEN];
             while (squares != 0) {
@@ -291,20 +279,8 @@ public final class MoveGen {
             m = (pawns << 9) & BitBoard.MASK_B_TO_H_FILES & ((pos.blackBB & validTargets) | epMask);
             if (addPawnMovesByMask(moveList, pos, m, -9, true)) return moveList;
         } else {
-            long kingThreats = pos.pieceTypeBB[Piece.WKNIGHT] & BitBoard.knightAttacks[pos.bKingSq];
-            long rookPieces = pos.pieceTypeBB[Piece.WROOK] | pos.pieceTypeBB[Piece.WQUEEN];
-            if (rookPieces != 0)
-                kingThreats |= rookPieces & BitBoard.rookAttacks(pos.bKingSq, occupied);
-            long bishPieces = pos.pieceTypeBB[Piece.WBISHOP] | pos.pieceTypeBB[Piece.WQUEEN];
-            if (bishPieces != 0)
-                kingThreats |= bishPieces & BitBoard.bishopAttacks(pos.bKingSq, occupied);
-            kingThreats |= pos.pieceTypeBB[Piece.WPAWN] & BitBoard.bPawnAttacks[pos.bKingSq];
-            long validTargets = 0;
-            if ((kingThreats != 0) && ((kingThreats & (kingThreats-1)) == 0)) { // Exactly one attacking piece
-                int threatSq = BitBoard.numberOfTrailingZeros(kingThreats);
-                validTargets = kingThreats | BitBoard.squaresBetween[pos.bKingSq][threatSq];
-            }
-            validTargets |= pos.pieceTypeBB[Piece.WKING];
+            long validTargets = getValidTargetsBlack(pos, occupied);
+
             // Queen moves
             long squares = pos.pieceTypeBB[Piece.BQUEEN];
             while (squares != 0) {
@@ -379,6 +355,42 @@ public final class MoveGen {
         */
 
         return moveList;
+    }
+
+    private static long getValidTargetsBlack(Position pos, long occupied) {
+        long kingThreats = pos.pieceTypeBB[Piece.WKNIGHT] & BitBoard.knightAttacks[pos.bKingSq];
+        long rookPieces = pos.pieceTypeBB[Piece.WROOK] | pos.pieceTypeBB[Piece.WQUEEN];
+        if (rookPieces != 0)
+            kingThreats |= rookPieces & BitBoard.rookAttacks(pos.bKingSq, occupied);
+        long bishPieces = pos.pieceTypeBB[Piece.WBISHOP] | pos.pieceTypeBB[Piece.WQUEEN];
+        if (bishPieces != 0)
+            kingThreats |= bishPieces & BitBoard.bishopAttacks(pos.bKingSq, occupied);
+        kingThreats |= pos.pieceTypeBB[Piece.WPAWN] & BitBoard.bPawnAttacks[pos.bKingSq];
+        long validTargets = 0;
+        if ((kingThreats != 0) && ((kingThreats & (kingThreats-1)) == 0)) { // Exactly one attacking piece
+            int threatSq = BitBoard.numberOfTrailingZeros(kingThreats);
+            validTargets = kingThreats | BitBoard.squaresBetween[pos.bKingSq][threatSq];
+        }
+        validTargets |= pos.pieceTypeBB[Piece.WKING];
+        return validTargets;
+    }
+
+    private static long getValidTargetsWhite(Position pos, long occupied) {
+        long kingThreats = pos.pieceTypeBB[Piece.BKNIGHT] & BitBoard.knightAttacks[pos.wKingSq];
+        long rookPieces = pos.pieceTypeBB[Piece.BROOK] | pos.pieceTypeBB[Piece.BQUEEN];
+        if (rookPieces != 0)
+            kingThreats |= rookPieces & BitBoard.rookAttacks(pos.wKingSq, occupied);
+        long bishPieces = pos.pieceTypeBB[Piece.BBISHOP] | pos.pieceTypeBB[Piece.BQUEEN];
+        if (bishPieces != 0)
+            kingThreats |= bishPieces & BitBoard.bishopAttacks(pos.wKingSq, occupied);
+        kingThreats |= pos.pieceTypeBB[Piece.BPAWN] & BitBoard.wPawnAttacks[pos.wKingSq];
+        long validTargets = 0;
+        if ((kingThreats != 0) && ((kingThreats & (kingThreats-1)) == 0)) { // Exactly one attacking piece
+            int threatSq = BitBoard.numberOfTrailingZeros(kingThreats);
+            validTargets = kingThreats | BitBoard.squaresBetween[pos.wKingSq][threatSq];
+        }
+        validTargets |= pos.pieceTypeBB[Piece.BKING];
+        return validTargets;
     }
 
     /** Generate captures, checks, and possibly some other moves that are too hard to filter out. */

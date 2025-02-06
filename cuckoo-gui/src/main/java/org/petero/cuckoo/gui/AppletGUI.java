@@ -341,7 +341,7 @@ public class AppletGUI extends JFrame implements GUIInterface {
         }
     }//GEN-LAST:event_ChessBoardMouseReleased
 
-  // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel chessBoard;
     private javax.swing.JCheckBox flipBoard;
     private javax.swing.JTextPane logTextArea;

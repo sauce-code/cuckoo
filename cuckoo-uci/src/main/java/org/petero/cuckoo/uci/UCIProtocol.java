@@ -184,7 +184,6 @@ public class UCIProtocol {
                             case "nodes" -> sPar.nodes = Integer.parseInt(tokens[idx++]);
                             case "mate" -> sPar.mate = Integer.parseInt(tokens[idx++]);
                             case "movetime" -> sPar.moveTime = Integer.parseInt(tokens[idx++]);
-                            case "infinite" -> sPar.infinite = true;
                         }
                     }
                     if (ponder) {

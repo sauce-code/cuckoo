@@ -33,7 +33,6 @@ import org.petero.cuckoo.engine.chess.Parameters.ComboParam;
 import org.petero.cuckoo.engine.chess.Parameters.ParamBase;
 import org.petero.cuckoo.engine.chess.Parameters.SpinParam;
 import org.petero.cuckoo.engine.chess.Parameters.StringParam;
-import org.petero.cuckoo.engine.chess.Piece;
 import org.petero.cuckoo.engine.chess.Position;
 import org.petero.cuckoo.engine.chess.Search;
 import org.petero.cuckoo.engine.chess.TextIO;

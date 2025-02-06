@@ -23,7 +23,6 @@ import java.util.*;
 import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Game;
-import org.petero.cuckoo.engine.chess.Game.GameState;
 import org.petero.cuckoo.engine.chess.HumanPlayer;
 import org.petero.cuckoo.engine.chess.Move;
 import org.petero.cuckoo.engine.chess.MoveGen;
@@ -142,10 +141,6 @@ public class ChessController {
         threadStack = 0;
     }
 
-    public void setThreadStackSize(int size) {
-        threadStack = size;
-    }
-    
     public final void newGame(boolean humanIsWhite, int ttLogSize, boolean verbose) {
         stopComputerThinking();
         this.humanIsWhite = humanIsWhite;
@@ -164,88 +159,6 @@ public class ChessController {
         gui.setSelection(-1);
         updateGUI();
         startComputerThinking();
-    }
-    
-    public final void setPosHistory(List<String> posHistStr) {
-        try {
-            String fen = posHistStr.getFirst();
-            Position pos = TextIO.readFEN(fen);
-            game.processString("new");
-            game.pos = pos;
-            String[] strArr = posHistStr.get(1).split(" ");
-            final int arrLen = strArr.length;
-            for (String s : strArr) {
-                game.processString(s);
-            }
-            int numUndo = Integer.parseInt(posHistStr.get(2));
-            for (int i = 0; i < numUndo; i++) {
-                game.processString("undo");
-            }
-        } catch (ChessParseError e) {
-            // Just ignore invalid positions
-        }
-    }
-    
-    public final List<String> getPosHistory() {
-        return game.getPosHistory();
-    }
-    
-    public String getFEN() {
-        return TextIO.toFEN(game.pos);
-    }
-    
-    /** Convert current game to PGN format. */
-    public String getPGN() {
-        StringBuilder pgn = new StringBuilder();
-        List<String> posHist = getPosHistory();
-        String fen = posHist.getFirst();
-        String moves = game.getMoveListString(true);
-        if (game.getGameState() == GameState.ALIVE)
-            moves += " *";
-        int year, month, day;
-        {
-            Calendar now = Calendar.getInstance();
-            year = now.get(Calendar.YEAR);
-            month = now.get(Calendar.MONTH) + 1;
-            day = now.get(Calendar.DAY_OF_MONTH);
-        }
-        pgn.append(String.format("[Date \"%04d.%02d.%02d\"]%n", year, month, day));
-        String white = "Player";
-        String black = ComputerPlayer.engineName;
-        if (!humanIsWhite) {
-            String tmp = white; white = black; black = tmp;
-        }
-        pgn.append(String.format("[White \"%s\"]%n", white));
-        pgn.append(String.format("[Black \"%s\"]%n", black));
-        pgn.append(String.format("[Result \"%s\"]%n", game.getPGNResultString()));
-        if (!fen.equals(TextIO.START_POS_FEN)) {
-            pgn.append(String.format("[FEN \"%s\"]%n", fen));
-            pgn.append("[SetUp \"1\"]\n");
-        }
-        pgn.append("\n");
-        String[] strArr = moves.split(" ");
-        int currLineLength = 0;
-        final int arrLen = strArr.length;
-        for (String s : strArr) {
-            String move = s.trim();
-            int moveLen = move.length();
-            if (moveLen > 0) {
-                if (currLineLength + 1 + moveLen >= 80) {
-                    pgn.append("\n");
-                    pgn.append(move);
-                    currLineLength = moveLen;
-                } else {
-                    if (currLineLength > 0) {
-                        pgn.append(" ");
-                        currLineLength++;
-                    }
-                    pgn.append(move);
-                    currLineLength += moveLen;
-                }
-            }
-        }
-        pgn.append("\n\n");
-        return pgn.toString();
     }
 
     public void setPGN(String pgn) throws ChessParseError {
@@ -328,31 +241,6 @@ public class ChessController {
         sc.close();
     }
 
-    public void setFENOrPGN(String fenPgn) throws ChessParseError {
-        try {
-            Position pos = TextIO.readFEN(fenPgn);
-            game.processString("new");
-            game.pos = pos;
-        } catch (ChessParseError e) {
-            // Try read as PGN instead
-            setPGN(fenPgn);
-        }
-        gui.setSelection(-1);
-        updateGUI();
-        startComputerThinking();
-    }
-
-    /** Set color for human player. Doesn't work when computer is thinking. */
-    public final void setHumanWhite(final boolean humanIsWhite) {
-        if (computerThread != null)
-            return;
-        if (this.humanIsWhite != humanIsWhite) {
-            this.humanIsWhite = humanIsWhite;
-            game.processString("swap");
-            startComputerThinking();
-        }
-    }
-    
     public final boolean humansTurn() {
         return game.pos.whiteMove == humanIsWhite;
     }

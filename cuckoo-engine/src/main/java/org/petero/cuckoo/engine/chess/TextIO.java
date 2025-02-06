@@ -76,30 +76,7 @@ public class TextIO {
         pos.setWhiteMove(words[1].charAt(0) == 'w');
 
         // Castling rights
-        int castleMask = 0;
-        if (words.length > 2) {
-            for (int i = 0; i < words[2].length(); i++) {
-                char c = words[2].charAt(i);
-                switch (c) {
-                    case 'K':
-                        castleMask |= (1 << Position.H1_CASTLE);
-                        break;
-                    case 'Q':
-                        castleMask |= (1 << Position.A1_CASTLE);
-                        break;
-                    case 'k':
-                        castleMask |= (1 << Position.H8_CASTLE);
-                        break;
-                    case 'q':
-                        castleMask |= (1 << Position.A8_CASTLE);
-                        break;
-                    case '-':
-                        break;
-                    default:
-                        throw new ChessParseError("Invalid castling flags");
-                }
-            }
-        }
+        int castleMask = getCastleMask(words);
         pos.setCastleMask(castleMask);
 
         if (words.length > 3) {
@@ -154,6 +131,34 @@ public class TextIO {
         fixupEPSquare(pos);
 
         return pos;
+    }
+
+    private static int getCastleMask(String[] words) throws ChessParseError {
+        int castleMask = 0;
+        if (words.length > 2) {
+            for (int i = 0; i < words[2].length(); i++) {
+                char c = words[2].charAt(i);
+                switch (c) {
+                    case 'K':
+                        castleMask |= (1 << Position.H1_CASTLE);
+                        break;
+                    case 'Q':
+                        castleMask |= (1 << Position.A1_CASTLE);
+                        break;
+                    case 'k':
+                        castleMask |= (1 << Position.H8_CASTLE);
+                        break;
+                    case 'q':
+                        castleMask |= (1 << Position.A8_CASTLE);
+                        break;
+                    case '-':
+                        break;
+                    default:
+                        throw new ChessParseError("Invalid castling flags");
+                }
+            }
+        }
+        return castleMask;
     }
 
     /** Remove pseudo-legal EP square if it is not legal, ie would leave king in check. */
