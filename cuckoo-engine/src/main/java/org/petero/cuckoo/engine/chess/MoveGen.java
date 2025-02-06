@@ -77,25 +77,7 @@ public final class MoveGen {
                 int sq = pos.getKingSq(true);
                 long m = BitBoard.kingAttacks[sq] & ~pos.whiteBB;
                 if (addMovesByMask(moveList, pos, sq, m)) return moveList;
-                final int k0 = 4;
-                if (sq == k0) {
-                    final long OO_SQ = 0x60L;
-                    final long OOO_SQ = 0xEL;
-                    if (((pos.getCastleMask() & (1 << Position.H1_CASTLE)) != 0) &&
-                        ((OO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 + 3) == Piece.WROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 + 1)) {
-                        setMove(moveList, k0, k0 + 2, Piece.EMPTY);
-                    }
-                    if (((pos.getCastleMask() & (1 << Position.A1_CASTLE)) != 0) &&
-                        ((OOO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 - 4) == Piece.WROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 - 1)) {
-                        setMove(moveList, k0, k0 - 2, Piece.EMPTY);
-                    }
-                }
+                kingMovesWhite(pos, moveList, sq);
             }
 
             // Knight moves
@@ -154,25 +136,7 @@ public final class MoveGen {
                 int sq = pos.getKingSq(false);
                 long m = BitBoard.kingAttacks[sq] & ~pos.blackBB;
                 if (addMovesByMask(moveList, pos, sq, m)) return moveList;
-                final int k0 = 60;
-                if (sq == k0) {
-                    final long OO_SQ = 0x6000000000000000L;
-                    final long OOO_SQ = 0xE00000000000000L;
-                    if (((pos.getCastleMask() & (1 << Position.H8_CASTLE)) != 0) &&
-                        ((OO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 + 3) == Piece.BROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 + 1)) {
-                        setMove(moveList, k0, k0 + 2, Piece.EMPTY);
-                    }
-                    if (((pos.getCastleMask() & (1 << Position.A8_CASTLE)) != 0) &&
-                        ((OOO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 - 4) == Piece.BROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 - 1)) {
-                        setMove(moveList, k0, k0 - 2, Piece.EMPTY);
-                    }
-                }
+                kingMovesBlack(pos, moveList, sq);
             }
 
             // Knight moves
@@ -200,6 +164,50 @@ public final class MoveGen {
             if (addPawnMovesByMask(moveList, pos, m, 7, true)) return moveList;
         }
         return moveList;
+    }
+
+    private void kingMovesBlack(Position pos, MoveList moveList, int sq) {
+        final int k0 = 60;
+        if (sq == k0) {
+            final long OO_SQ = 0x6000000000000000L;
+            final long OOO_SQ = 0xE00000000000000L;
+            if (((pos.getCastleMask() & (1 << Position.H8_CASTLE)) != 0) &&
+                ((OO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
+                (pos.getPiece(k0 + 3) == Piece.BROOK) &&
+                !sqAttacked(pos, k0) &&
+                !sqAttacked(pos, k0 + 1)) {
+                setMove(moveList, k0, k0 + 2, Piece.EMPTY);
+            }
+            if (((pos.getCastleMask() & (1 << Position.A8_CASTLE)) != 0) &&
+                ((OOO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
+                (pos.getPiece(k0 - 4) == Piece.BROOK) &&
+                !sqAttacked(pos, k0) &&
+                !sqAttacked(pos, k0 - 1)) {
+                setMove(moveList, k0, k0 - 2, Piece.EMPTY);
+            }
+        }
+    }
+
+    private void kingMovesWhite(Position pos, MoveList moveList, int sq) {
+        final int k0 = 4;
+        if (sq == k0) {
+            final long OO_SQ = 0x60L;
+            final long OOO_SQ = 0xEL;
+            if (((pos.getCastleMask() & (1 << Position.H1_CASTLE)) != 0) &&
+                ((OO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
+                (pos.getPiece(k0 + 3) == Piece.WROOK) &&
+                !sqAttacked(pos, k0) &&
+                !sqAttacked(pos, k0 + 1)) {
+                setMove(moveList, k0, k0 + 2, Piece.EMPTY);
+            }
+            if (((pos.getCastleMask() & (1 << Position.A1_CASTLE)) != 0) &&
+                ((OOO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
+                (pos.getPiece(k0 - 4) == Piece.WROOK) &&
+                !sqAttacked(pos, k0) &&
+                !sqAttacked(pos, k0 - 1)) {
+                setMove(moveList, k0, k0 - 2, Piece.EMPTY);
+            }
+        }
     }
 
     /**
@@ -428,25 +436,7 @@ public final class MoveGen {
                 long m = BitBoard.kingAttacks[sq];
                 m &= ((discovered & (1L<<sq)) == 0) ? pos.blackBB : ~pos.whiteBB;
                 if (addMovesByMask(moveList, pos, sq, m)) return moveList;
-                final int k0 = 4;
-                if (sq == k0) {
-                    final long OO_SQ = 0x60L;
-                    final long OOO_SQ = 0xEL;
-                    if (((pos.getCastleMask() & (1 << Position.H1_CASTLE)) != 0) &&
-                        ((OO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 + 3) == Piece.WROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 + 1)) {
-                        setMove(moveList, k0, k0 + 2, Piece.EMPTY);
-                    }
-                    if (((pos.getCastleMask() & (1 << Position.A1_CASTLE)) != 0) &&
-                        ((OOO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 - 4) == Piece.WROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 - 1)) {
-                        setMove(moveList, k0, k0 - 2, Piece.EMPTY);
-                    }
-                }
+                kingMovesWhite(pos, moveList, sq);
             }
 
             // Knight moves
@@ -534,25 +524,7 @@ public final class MoveGen {
                 long m = BitBoard.kingAttacks[sq];
                 m &= ((discovered & (1L<<sq)) == 0) ? pos.whiteBB : ~pos.blackBB;
                 if (addMovesByMask(moveList, pos, sq, m)) return moveList;
-                final int k0 = 60;
-                if (sq == k0) {
-                    final long OO_SQ = 0x6000000000000000L;
-                    final long OOO_SQ = 0xE00000000000000L;
-                    if (((pos.getCastleMask() & (1 << Position.H8_CASTLE)) != 0) &&
-                        ((OO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 + 3) == Piece.BROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 + 1)) {
-                        setMove(moveList, k0, k0 + 2, Piece.EMPTY);
-                    }
-                    if (((pos.getCastleMask() & (1 << Position.A8_CASTLE)) != 0) &&
-                        ((OOO_SQ & (pos.whiteBB | pos.blackBB)) == 0) &&
-                        (pos.getPiece(k0 - 4) == Piece.BROOK) &&
-                        !sqAttacked(pos, k0) &&
-                        !sqAttacked(pos, k0 - 1)) {
-                        setMove(moveList, k0, k0 - 2, Piece.EMPTY);
-                    }
-                }
+                kingMovesBlack(pos, moveList, sq);
             }
 
             // Knight moves
