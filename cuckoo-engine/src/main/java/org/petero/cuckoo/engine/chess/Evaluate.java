@@ -565,12 +565,10 @@ public class Evaluate {
         score -= (wIsolated - bIsolated) * 15;
 
         // Evaluate backward pawns, defined as a pawn that guards a friendly pawn,
-        // can't be guarded by friendly pawns, can advance, but can't advance without 
+        // can't be guarded by friendly pawns, can advance, but can't advance without
         // being captured by an enemy pawn.
-        long wPawnAttacks = (((wPawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
-                             ((wPawns & BitBoard.MASK_A_TO_G_FILES) << 9));
-        long bPawnAttacks = (((bPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
-                             ((bPawns & BitBoard.MASK_A_TO_G_FILES) >>> 7));
+        long wPawnAttacks = wPawnAttacks(wPawns);
+        long bPawnAttacks = bPawnAttacks(bPawns);
         long wBackward = wPawns & ~((wPawns | bPawns) >>> 8) & (bPawnAttacks >>> 8) &
                          ~BitBoard.northFill(wPawnAttacks);
         wBackward &= (((wPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
@@ -588,12 +586,11 @@ public class Evaluate {
         final int[] ppBonus = {-1,24,26,30,36,47,64,-1};
         int passedBonusW = 0;
         if (passedPawnsW != 0) {
-            long guardedPassedW = passedPawnsW & (((wPawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
-                                                  ((wPawns & BitBoard.MASK_A_TO_G_FILES) << 9));
+            long guardedPassedW = passedPawnsW & wPawnAttacks(wPawns);
             passedBonusW += 15 * Long.bitCount(guardedPassedW);
             long m = passedPawnsW;
             while (m != 0) {
-                int sq = Long .numberOfTrailingZeros(m);
+                int sq = Long.numberOfTrailingZeros(m);
                 int y = Position.getY(sq);
                 passedBonusW += ppBonus[y];
                 m &= m-1;
@@ -604,8 +601,7 @@ public class Evaluate {
         long passedPawnsB = bPawns & ~BitBoard.northFill(wPawns | wPawnAttacks | (bPawns << 8));
         int passedBonusB = 0;
         if (passedPawnsB != 0) {
-            long guardedPassedB = passedPawnsB & (((bPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
-                                                  ((bPawns & BitBoard.MASK_A_TO_G_FILES) >>> 7));
+            long guardedPassedB = passedPawnsB & bPawnAttacks(bPawns);
             passedBonusB += 15 * Long.bitCount(guardedPassedB);
             long m = passedPawnsB;
             while (m != 0) {
@@ -622,6 +618,16 @@ public class Evaluate {
         ph.passedBonusB = (short)passedBonusB;
         ph.passedPawnsW = passedPawnsW;
         ph.passedPawnsB = passedPawnsB;
+    }
+
+    private static long bPawnAttacks(long bPawns) {
+        return ((bPawns & BitBoard.MASK_B_TO_H_FILES) >>> 9) |
+                ((bPawns & BitBoard.MASK_A_TO_G_FILES) >>> 7);
+    }
+
+    private static long wPawnAttacks(long wPawns) {
+        return ((wPawns & BitBoard.MASK_B_TO_H_FILES) << 7) |
+                ((wPawns & BitBoard.MASK_A_TO_G_FILES) << 9);
     }
 
     /** Compute rook bonus. Rook on open/half-open file. */
@@ -957,7 +963,6 @@ public class Evaluate {
         if (!handled && (pos.bMtrl == qV) && (pos.wMtrl == pV) && 
             (Long.bitCount(pos.pieceTypeBB[Piece.BQUEEN]) == 1)) {
             int bk = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BKING]);
-            int bq = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.BQUEEN]);
             int wk = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.WKING]);
             int wp = BitBoard.numberOfTrailingZeros(pos.pieceTypeBB[Piece.WPAWN]);
             score = -evalKQKP(63-bk, 63-wk, 63-wp);

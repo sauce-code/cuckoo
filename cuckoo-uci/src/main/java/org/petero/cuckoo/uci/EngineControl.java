@@ -370,32 +370,32 @@ public class EngineControl {
 
 		for (String pName : Parameters.instance().getParamNames()) {
 			ParamBase p = Parameters.instance().getParam(pName);
-			switch (p.type) {
+			switch (p.getType()) {
 			case CHECK: {
 				CheckParam cp = (CheckParam) p;
-				os.printf("optionn name %s type check default %s%n", p.name, cp.defaultValue ? "true" : "false");
+				os.printf("optionn name %s type check default %s%n", p.getName(), cp.defaultValue ? "true" : "false");
 				break;
 			}
 			case SPIN: {
 				SpinParam sp = (SpinParam) p;
-				os.printf("option name %s type spin default %d min %d max %d%n", p.name, sp.defaultValue, sp.minValue,
+				os.printf("option name %s type spin default %d min %d max %d%n", p.getName(), sp.defaultValue, sp.minValue,
 						sp.maxValue);
 				break;
 			}
 			case COMBO: {
 				ComboParam cp = (ComboParam) p;
-				os.printf("option name %s type combo default %s ", cp.name, cp.defaultValue);
+				os.printf("option name %s type combo default %s ", cp.getName(), cp.defaultValue);
 				for (String s : cp.allowedValues)
 					os.printf(" var %s", s);
 				os.print("\n");
 				break;
 			}
 			case BUTTON:
-				os.printf("option name %s type button%n", p.name);
+				os.printf("option name %s type button%n", p.getName());
 				break;
 			case STRING: {
 				StringParam sp = (StringParam) p;
-				os.printf("option name %s type string default %s%n", p.name, sp.defaultValue);
+				os.printf("option name %s type string default %s%n", p.getName(), sp.defaultValue);
 				break;
 			}
 			}

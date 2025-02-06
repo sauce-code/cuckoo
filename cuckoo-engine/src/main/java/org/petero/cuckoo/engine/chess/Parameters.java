@@ -14,19 +14,25 @@ public class Parameters {
     }
 
     public static class ParamBase {
-        public String name;
-        public Type type;
-        public boolean visible;
+        protected String name;
+        protected Type type;
+        protected boolean visible;
+
+        public String getName() {
+            return name;
+        }
+
+        public Type getType() {
+            return type;
+        }
     }
 
     public static final class CheckParam extends ParamBase {
-        public boolean value;
         public final boolean defaultValue;
         CheckParam(String name, boolean visible, boolean def) {
             this.name = name;
             this.type = Type.CHECK;
             this.visible = visible;
-            this.value = def;
             this.defaultValue = def;
         }
     }
@@ -34,7 +40,7 @@ public class Parameters {
     public static final class SpinParam extends ParamBase {
         public final int minValue;
         public final int maxValue;
-        public int value;
+        private int value;
         public final int defaultValue;
         SpinParam(String name) {
             this.name = name;
@@ -49,26 +55,22 @@ public class Parameters {
 
     public static final class ComboParam extends ParamBase {
         public final String[] allowedValues;
-        public String value;
         public final String defaultValue;
         ComboParam(String name, boolean visible, String[] allowed, String def) {
             this.name = name;
             this.type = Type.COMBO;
             this.visible = visible;
             this.allowedValues = allowed;
-            this.value = def;
             this.defaultValue = def;
         }
     }
 
     public static final class StringParam extends ParamBase {
-        public String value;
         public final String defaultValue;
         StringParam(String name, boolean visible, String def) {
             this.name = name;
             this.type = Type.STRING;
             this.visible = visible;
-            this.value = def;
             this.defaultValue = def;
         }
     }
@@ -112,14 +114,8 @@ public class Parameters {
         if (p == null)
             return;
         switch (p.type) {
-        case CHECK: {
-            CheckParam cp = (CheckParam)p;
-            if (value.equalsIgnoreCase("true"))
-                cp.value = true;
-            else if (value.equalsIgnoreCase("false"))
-                cp.value = false;
+        case CHECK, BUTTON, STRING:
             break;
-        }
         case SPIN: {
             SpinParam sp = (SpinParam)p;
             try {
@@ -134,16 +130,8 @@ public class Parameters {
             ComboParam cp = (ComboParam)p;
             for (String allowed : cp.allowedValues)
                 if (allowed.equalsIgnoreCase(value)) {
-                    cp.value = allowed;
                     break;
                 }
-            break;
-        }
-        case BUTTON:
-            break;
-        case STRING: {
-            StringParam sp = (StringParam)p;
-            sp.value = value;
             break;
         }
         }

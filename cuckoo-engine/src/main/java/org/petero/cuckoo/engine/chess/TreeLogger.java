@@ -20,7 +20,6 @@ package org.petero.cuckoo.engine.chess;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
@@ -61,10 +60,8 @@ public final class TreeLogger {
             log.computeForwardPointers();
             raf.close();
             return log;
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException();
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new TreeLoggerException();
         }
     }
 
@@ -296,7 +293,7 @@ public final class TreeLogger {
                     if (TextIO.moveToUCIString(se.move).equals(cmdStr))
                         found.add(c);
                 }
-                if (found.size() == 0) {
+                if (found.isEmpty()) {
                     System.out.print("No such move\n");
                     doPrint = false;
                 } else if (found.size() > 1) {
