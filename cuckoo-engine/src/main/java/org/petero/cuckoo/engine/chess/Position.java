@@ -412,13 +412,7 @@ public class Position {
             }
 
             if (((pieceTypeBB[Piece.WKING] | pieceTypeBB[Piece.BKING]) & fromMask) != 0) {
-                if (wtm) {
-                    setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H1_CASTLE));
-                } else {
-                    setCastleMask(castleMask & ~(1 << Position.A8_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H8_CASTLE));
-                }
+                setCastleMask(wtm);
             }
 
             // Perform move
@@ -440,13 +434,7 @@ public class Position {
                 } else if (move.to == k0 - 2) { // O-O-O
                     movePieceNotPawn(k0 - 4, k0 - 1);
                 }
-                if (wtm) {
-                    setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H1_CASTLE));
-                } else {
-                    setCastleMask(castleMask & ~(1 << Position.A8_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H8_CASTLE));
-                }
+                setCastleMask(wtm);
             }
 
             // Perform move
@@ -477,6 +465,16 @@ public class Position {
 
         hashKey ^= whiteHashKey;
         whiteMove = !wtm;
+    }
+
+    private void setCastleMask(boolean wtm) {
+        if (wtm) {
+            setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
+            setCastleMask(castleMask & ~(1 << Position.H1_CASTLE));
+        } else {
+            setCastleMask(castleMask & ~(1 << Position.A8_CASTLE));
+            setCastleMask(castleMask & ~(1 << Position.H8_CASTLE));
+        }
     }
 
     public final void unMakeMove(Move move, UndoInfo ui) {
