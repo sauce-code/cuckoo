@@ -18,10 +18,11 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import java.util.Optional;
 
 /**
  *
@@ -29,15 +30,10 @@ import static org.junit.Assert.*;
  */
 public class EvaluateTest {
 
-    public EvaluateTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
     }
 
     /**
@@ -45,15 +41,14 @@ public class EvaluateTest {
      */
     @Test
     public void testEvalPos() throws ChessParseError {
-        System.out.println("evalPos");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "e4"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "e5"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nf3"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nc6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Bb5"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nge7"), ui);
+        pos.makeMove(move(pos, "e4"), ui);
+        pos.makeMove(move(pos, "e5"), ui);
+        pos.makeMove(move(pos, "Nf3"), ui);
+        pos.makeMove(move(pos, "Nc6"), ui);
+        pos.makeMove(move(pos, "Bb5"), ui);
+        pos.makeMove(move(pos, "Nge7"), ui);
         assertTrue(moveScore(pos, "O-O") > 0);      // Castling is good
         assertTrue(moveScore(pos, "Ke2") < 0);      // Losing right to castle is bad
         assertTrue(moveScore(pos, "Kf1") < 0);
@@ -61,10 +56,10 @@ public class EvaluateTest {
         assertTrue(moveScore(pos, "Rf1") < 0);
 
         pos = TextIO.readFEN("8/8/8/1r3k2/4pP2/4P3/8/4K2R w K - 0 1");
-        assertEquals(true, pos.h1Castle());
+        assertTrue(pos.h1Castle());
         int cs1 = evalWhite(pos);
         pos.setCastleMask(pos.getCastleMask() & ~(1 << Position.H1_CASTLE));
-        assertEquals(false, pos.h1Castle());
+        assertFalse(pos.h1Castle());
         int cs2 = evalWhite(pos);
         assertTrue(cs2 >= cs1);    // No bonus for useless castle right
 
@@ -84,7 +79,7 @@ public class EvaluateTest {
         
         pos = TextIO.readFEN("r3kb1r/p3pp1p/bpPq1np1/4N3/2pP4/2N1PQ2/P1PB1PPP/R3K2R b KQkq - 0 12");
         assertTrue(moveScore(pos, "O-O-O") > 0);    // Black long castle is bad for black
-        pos.makeMove(TextIO.stringToMove(pos, "O-O-O"), ui);
+        pos.makeMove(move(pos, "O-O-O"), ui);
         assertTrue(moveScore(pos, "O-O") > 0);      // White short castle is good for white
         
         pos = TextIO.readFEN("8/3k4/2p5/1pp5/1P1P4/3K4/8/8 w - - 0 1");
@@ -111,28 +106,27 @@ public class EvaluateTest {
      */
     @Test
     public void testPieceSquareEval() throws ChessParseError {
-        System.out.println("pieceSquareEval");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         int score = evalWhite(pos);
         assertEquals(0, score);    // Should be zero, by symmetry
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "e4"), ui);
+        pos.makeMove(move(pos, "e4"), ui);
         score = evalWhite(pos);
         assertTrue(score > 0);     // Centralizing a pawn is a good thing
-        pos.makeMove(TextIO.stringToMove(pos, "e5"), ui);
+        pos.makeMove(move(pos, "e5"), ui);
         score = evalWhite(pos);
         assertEquals(0, score);    // Should be zero, by symmetry
-        assertTrue(moveScore(pos, "Nf3") > 0);      // Developing knight is good        
-        pos.makeMove(TextIO.stringToMove(pos, "Nf3"), ui);
-        assertTrue(moveScore(pos, "Nc6") < 0);      // Developing knight is good        
-        pos.makeMove(TextIO.stringToMove(pos, "Nc6"), ui);
+        assertTrue(moveScore(pos, "Nf3") > 0);      // Developing knight is good
+        pos.makeMove(move(pos, "Nf3"), ui);
+        assertTrue(moveScore(pos, "Nc6") < 0);      // Developing knight is good
+        pos.makeMove(move(pos, "Nc6"), ui);
         assertTrue(moveScore(pos, "Bb5") > 0);      // Developing bishop is good
-        pos.makeMove(TextIO.stringToMove(pos, "Bb5"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nge7"), ui);
+        pos.makeMove(move(pos, "Bb5"), ui);
+        pos.makeMove(move(pos, "Nge7"), ui);
         assertTrue(moveScore(pos, "Qe2") > 0);      // Queen away from edge is good
         score = evalWhite(pos);
-        pos.makeMove(TextIO.stringToMove(pos, "Bxc6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Nxc6"), ui);
+        pos.makeMove(move(pos, "Bxc6"), ui);
+        pos.makeMove(move(pos, "Nxc6"), ui);
         int score2 = evalWhite(pos);
         assertTrue(score2 < score);                 // Bishop worth more than knight in this case
         
@@ -152,26 +146,25 @@ public class EvaluateTest {
      */
     @Test
     public void testTradeBonus() throws ChessParseError {
-        System.out.println("tradeBonus");
         String fen = "8/5k2/6r1/2p1p3/3p4/2P2N2/3PPP2/4K1R1 w - - 0 1";
         Position pos = TextIO.readFEN(fen);
         int score1 = evalWhite(pos);
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "Rxg6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Kxg6"), ui);
+        pos.makeMove(move(pos, "Rxg6"), ui);
+        pos.makeMove(move(pos, "Kxg6"), ui);
         int score2 = evalWhite(pos);
         assertTrue(score2 > score1);    // White ahead, trading pieces is good
         
         pos = TextIO.readFEN(fen);
-        pos.makeMove(TextIO.stringToMove(pos, "cxd4"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "cxd4"), ui);
+        pos.makeMove(move(pos, "cxd4"), ui);
+        pos.makeMove(move(pos, "cxd4"), ui);
         score2 = evalWhite(pos);
         assertTrue(score2 < score1);    // White ahead, trading pawns is bad
 
         pos = TextIO.readFEN("8/8/1b2b3/4kp2/5N2/4NKP1/6B1/8 w - - 0 62");
         score1 = evalWhite(pos);
-        pos.makeMove(TextIO.stringToMove(pos, "Nxe6"), ui);
-        pos.makeMove(TextIO.stringToMove(pos, "Kxe6"), ui);
+        pos.makeMove(move(pos, "Nxe6"), ui);
+        pos.makeMove(move(pos, "Kxe6"), ui);
         score2 = evalWhite(pos);
         assertTrue(score2 > score1); // White ahead, trading pieces is good
     }
@@ -181,8 +174,7 @@ public class EvaluateTest {
      */
     @Test
     public void testMaterial() throws ChessParseError {
-        System.out.println("material");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         assertEquals(0, Evaluate.material(pos));
         
         final int pV = Evaluate.pV;
@@ -192,19 +184,19 @@ public class EvaluateTest {
         assertTrue(qV > pV);
         
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "e4"), ui);
+        pos.makeMove(move(pos, "e4"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "d5"), ui);
+        pos.makeMove(move(pos, "d5"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "exd5"), ui);
+        pos.makeMove(move(pos, "exd5"), ui);
         assertEquals(pV, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Qxd5"), ui);
+        pos.makeMove(move(pos, "Qxd5"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Nc3"), ui);
+        pos.makeMove(move(pos, "Nc3"), ui);
         assertEquals(0, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Qxd2"), ui);
+        pos.makeMove(move(pos, "Qxd2"), ui);
         assertEquals(-pV, Evaluate.material(pos));
-        pos.makeMove(TextIO.stringToMove(pos, "Qxd2"), ui);
+        pos.makeMove(move(pos, "Qxd2"), ui);
         assertEquals(-pV+qV, Evaluate.material(pos));
     }
 
@@ -213,7 +205,6 @@ public class EvaluateTest {
      */
     @Test
     public void testKingSafety() throws ChessParseError {
-        System.out.println("kingSafety");
         Position pos = TextIO.readFEN("r3kb1r/p1p1pppp/b2q1n2/4N3/3P4/2N1PQ2/P2B1PPP/R3R1K1 w kq - 0 1");
         int s1 = evalWhite(pos);
         pos.setPiece(TextIO.getSquare("g7"), Piece.EMPTY);
@@ -242,7 +233,6 @@ public class EvaluateTest {
      */
     @Test
     public void testEndGameEval() throws ChessParseError {
-        System.out.println("endGameEval");
         Position pos = new Position();
         pos.setPiece(Position.getSquare(4, 1), Piece.WKING);
         pos.setPiece(Position.getSquare(4, 6), Piece.BKING);
@@ -308,7 +298,6 @@ public class EvaluateTest {
      */
     @Test
     public void testPassedPawns() throws ChessParseError {
-        System.out.println("passedPawns");
         Position pos = TextIO.readFEN("8/8/8/P3k/8/8/p/K w");
         int score = evalWhite(pos);
         assertTrue(score > 300); // Unstoppable passed pawn
@@ -322,14 +311,6 @@ public class EvaluateTest {
         pos.setPiece(TextIO.getSquare("d4"), Piece.WKING);
         int score2 = evalWhite(pos);
         assertTrue(score2 > score); // King closer to passed pawn promotion square
-
-        // Connected passed pawn test. Disabled because it didn't help in tests
-//        pos = TextIO.readFEN("4k3/8/8/4P3/3P1K2/8/8/8 w - - 0 1");
-//        score = evalWhite(pos);
-//        pos.setPiece(TextIO.getSquare("d4"), Piece.EMPTY);
-//        pos.setPiece(TextIO.getSquare("d5"), Piece.WPAWN);
-//        score2 = evalWhite(pos);
-//        assertTrue(score2 > score); // Advancing passed pawn is good
     }
 
     /**
@@ -337,7 +318,6 @@ public class EvaluateTest {
      */
     @Test
     public void testBishAndRookPawns() throws ChessParseError {
-        System.out.println("bishAndRookPawns");
         final int pV = Evaluate.pV;
         final int bV = Evaluate.bV;
         final int winScore = pV + bV;
@@ -390,7 +370,6 @@ public class EvaluateTest {
      */
     @Test
     public void testKQKP() throws ChessParseError {
-        System.out.println("KQKP");
         final int pV = Evaluate.pV;
         final int qV = Evaluate.qV;
         final int winScore = qV - pV - 200;
@@ -413,7 +392,6 @@ public class EvaluateTest {
     
     @Test
     public void testKRKP() throws ChessParseError {
-        System.out.println("KRKP");
         final int pV = Evaluate.pV;
         final int rV = Evaluate.rV;
         final int winScore = rV - pV;
@@ -430,14 +408,14 @@ public class EvaluateTest {
         int score1 = evalWhite(pos);
         assertTrue(score1 < 0);
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(TextIO.stringToMove(pos, "Nxd4"), ui);
+        pos.makeMove(move(pos, "Nxd4"), ui);
         int score2 = evalWhite(pos);
         assertTrue(score2 <= 0);
         assertTrue(score2 > score1);
     }
 
-    /** Return static evaluation score for white, regardless of whose turn it is to move. */
-    final static int evalWhite(Position pos) {
+  /** Return static evaluation score for white, regardless of whose turn it is to move. */
+  static int evalWhite(Position pos) {
         Evaluate eval = new Evaluate();
         int ret = eval.evalPos(pos);
         Position symPos = swapColors(pos);
@@ -449,7 +427,7 @@ public class EvaluateTest {
         return ret;
     }
 
-    final static Position swapColors(Position pos) {
+  static Position swapColors(Position pos) {
         Position sym = new Position();
         sym.whiteMove = !pos.whiteMove;
         for (int x = 0; x < 8; x++) {
@@ -480,13 +458,12 @@ public class EvaluateTest {
     }
 
     /** Compute change in eval score for white after making "moveStr" in position "pos". */
-    private final int moveScore(Position pos, String moveStr) {
+    private int moveScore(Position pos, String moveStr) {
         int score1 = evalWhite(pos);
         Position tmpPos = new Position(pos);
         UndoInfo ui = new UndoInfo();
-        tmpPos.makeMove(TextIO.stringToMove(tmpPos, moveStr), ui);
+        tmpPos.makeMove(move(tmpPos, moveStr), ui);
         int score2 = evalWhite(tmpPos);
-//        System.out.printf("move:%s s1:%d s2:%d\n", moveStr, score1, score2);
         return score2 - score1;
     }
 }

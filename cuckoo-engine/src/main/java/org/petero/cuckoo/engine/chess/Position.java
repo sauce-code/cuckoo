@@ -92,8 +92,7 @@ public class Position {
 
     public Position(Position other) {
         squares = new int[64];
-        for (int i = 0; i < 64; i++)
-            squares[i] = other.squares[i];
+        System.arraycopy(other.squares, 0, squares, 0, 64);
         pieceTypeBB = new long[Piece.nPieceTypes];
         psScore1 = new short[Piece.nPieceTypes];
         psScore2 = new short[Piece.nPieceTypes];
@@ -132,9 +131,7 @@ public class Position {
             return false;
         if (hashKey != other.hashKey)
             return false;
-        if (pHashKey != other.pHashKey)
-            return false;
-        return true;
+        return pHashKey == other.pHashKey;
     }
     @Override
     public int hashCode() {
@@ -177,9 +174,7 @@ public class Position {
             return false;
         if (castleMask != other.castleMask)
             return false;
-        if (epSquare != other.epSquare)
-            return false;
-        return true;
+        return epSquare == other.epSquare;
     }
 
     public final void setWhiteMove(boolean whiteMove) {
@@ -189,19 +184,19 @@ public class Position {
         }
     }
     /** Return index in squares[] vector corresponding to (x,y). */
-    public final static int getSquare(int x, int y) {
+    public static int getSquare(int x, int y) {
         return y * 8 + x;
     }
     /** Return x position (file) corresponding to a square. */
-    public final static int getX(int square) {
+    public static int getX(int square) {
         return square & 7;
     }
     /** Return y position (rank) corresponding to a square. */
-    public final static int getY(int square) {
+    public static int getY(int square) {
         return square >> 3;
     }
     /** Return true if (x,y) is a dark square. */
-    public final static boolean darkSquare(int x, int y) {
+    public static boolean darkSquare(int x, int y) {
         return (x & 1) == (y & 1);
     }
 
@@ -211,7 +206,7 @@ public class Position {
     }
 
     /** Move a non-pawn piece to an empty square. */
-    private final void movePieceNotPawn(int from, int to) {
+    private void movePieceNotPawn(int from, int to) {
         final int piece = squares[from];
         hashKey ^= psHashKeys[piece][from];
         hashKey ^= psHashKeys[piece][to];
@@ -237,8 +232,8 @@ public class Position {
                 bKingSq = to;
         }
 
-        psScore1[piece] += Evaluate.psTab1[piece][to] - Evaluate.psTab1[piece][from];
-        psScore2[piece] += Evaluate.psTab2[piece][to] - Evaluate.psTab2[piece][from];
+        psScore1[piece] += (short) (Evaluate.psTab1[piece][to] - Evaluate.psTab1[piece][from]);
+        psScore2[piece] += (short) (Evaluate.psTab2[piece][to] - Evaluate.psTab2[piece][from]);
     }
 
     /** Set a square to a piece value. */
@@ -298,10 +293,10 @@ public class Position {
         }
 
         // Update piece/square table scores
-        psScore1[removedPiece] -= Evaluate.psTab1[removedPiece][square];
-        psScore2[removedPiece] -= Evaluate.psTab2[removedPiece][square];
-        psScore1[piece]        += Evaluate.psTab1[piece][square];
-        psScore2[piece]        += Evaluate.psTab2[piece][square];
+        psScore1[removedPiece] -= (short) Evaluate.psTab1[removedPiece][square];
+        psScore2[removedPiece] -= (short) Evaluate.psTab2[removedPiece][square];
+        psScore1[piece]        += (short) Evaluate.psTab1[piece][square];
+        psScore2[piece]        += (short) Evaluate.psTab2[piece][square];
     }
 
     /**
@@ -417,13 +412,7 @@ public class Position {
             }
 
             if (((pieceTypeBB[Piece.WKING] | pieceTypeBB[Piece.BKING]) & fromMask) != 0) {
-                if (wtm) {
-                    setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H1_CASTLE));
-                } else {
-                    setCastleMask(castleMask & ~(1 << Position.A8_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H8_CASTLE));
-                }
+                setCastleMask(wtm);
             }
 
             // Perform move
@@ -445,13 +434,7 @@ public class Position {
                 } else if (move.to == k0 - 2) { // O-O-O
                     movePieceNotPawn(k0 - 4, k0 - 1);
                 }
-                if (wtm) {
-                    setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H1_CASTLE));
-                } else {
-                    setCastleMask(castleMask & ~(1 << Position.A8_CASTLE));
-                    setCastleMask(castleMask & ~(1 << Position.H8_CASTLE));
-                }
+                setCastleMask(wtm);
             }
 
             // Perform move
@@ -459,22 +442,22 @@ public class Position {
         }
         if (wtm) {
             // Update castling rights when rook moves
-            if ((BitBoard.maskCorners & fromMask) != 0) {
+            if ((BitBoard.MASK_CORNERS & fromMask) != 0) {
                 if (p == Piece.WROOK)
                     removeCastleRights(move.from);
             }
-            if ((BitBoard.maskCorners & (1L << move.to)) != 0) {
+            if ((BitBoard.MASK_CORNERS & (1L << move.to)) != 0) {
                 if (capP == Piece.BROOK)
                     removeCastleRights(move.to);
             }
         } else {
             fullMoveCounter++;
             // Update castling rights when rook moves
-            if ((BitBoard.maskCorners & fromMask) != 0) {
+            if ((BitBoard.MASK_CORNERS & fromMask) != 0) {
                 if (p == Piece.BROOK)
                     removeCastleRights(move.from);
             }
-            if ((BitBoard.maskCorners & (1L << move.to)) != 0) {
+            if ((BitBoard.MASK_CORNERS & (1L << move.to)) != 0) {
                 if (capP == Piece.WROOK)
                     removeCastleRights(move.to);
             }
@@ -482,6 +465,16 @@ public class Position {
 
         hashKey ^= whiteHashKey;
         whiteMove = !wtm;
+    }
+
+    private void setCastleMask(boolean wtm) {
+        if (wtm) {
+            setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
+            setCastleMask(castleMask & ~(1 << Position.H1_CASTLE));
+        } else {
+            setCastleMask(castleMask & ~(1 << Position.A8_CASTLE));
+            setCastleMask(castleMask & ~(1 << Position.H8_CASTLE));
+        }
     }
 
     public final void unMakeMove(Move move, UndoInfo ui) {
@@ -591,7 +584,7 @@ public class Position {
         }
     }
 
-    private final void removeCastleRights(int square) {
+    private void removeCastleRights(int square) {
         if (square == Position.getSquare(0, 0)) {
             setCastleMask(castleMask & ~(1 << Position.A1_CASTLE));
         } else if (square == Position.getSquare(7, 0)) {
@@ -649,7 +642,7 @@ public class Position {
         return hash;
     }
 
-    private final static long getRandomHashVal(int rndNo) {
+    private static long getRandomHashVal(int rndNo) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
             byte[] input = new byte[4];

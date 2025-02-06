@@ -18,15 +18,22 @@
 
 package org.petero.cuckoo.engine.chess;
 
+import java.util.Optional;
+
 /**
  *
  * @author petero
  */
 public class TextIO {
-    static public final String startPosFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    private TextIO() {
+    }
+
+    public static final String START_POS_FEN =
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     /** Parse a FEN string and return a chess Position object. */
-    public static final Position readFEN(String fen) throws ChessParseError {
+    public static Position readFEN(String fen) throws ChessParseError {
         Position pos = new Position();
         String[] words = fen.split(" ");
         if (words.length < 2) {
@@ -63,36 +70,13 @@ public class TextIO {
                 default: throw new ChessParseError("Invalid piece");
             }
         }
-        if (words[1].length() == 0) {
+        if (words[1].isEmpty()) {
             throw new ChessParseError("Invalid side");
         }
         pos.setWhiteMove(words[1].charAt(0) == 'w');
 
         // Castling rights
-        int castleMask = 0;
-        if (words.length > 2) {
-            for (int i = 0; i < words[2].length(); i++) {
-                char c = words[2].charAt(i);
-                switch (c) {
-                    case 'K':
-                        castleMask |= (1 << Position.H1_CASTLE);
-                        break;
-                    case 'Q':
-                        castleMask |= (1 << Position.A1_CASTLE);
-                        break;
-                    case 'k':
-                        castleMask |= (1 << Position.H8_CASTLE);
-                        break;
-                    case 'q':
-                        castleMask |= (1 << Position.A8_CASTLE);
-                        break;
-                    case '-':
-                        break;
-                    default:
-                        throw new ChessParseError("Invalid castling flags");
-                }
-            }
-        }
+        int castleMask = getCastleMask(words);
         pos.setCastleMask(castleMask);
 
         if (words.length > 3) {
@@ -149,8 +133,36 @@ public class TextIO {
         return pos;
     }
 
+    private static int getCastleMask(String[] words) throws ChessParseError {
+        int castleMask = 0;
+        if (words.length > 2) {
+            for (int i = 0; i < words[2].length(); i++) {
+                char c = words[2].charAt(i);
+                switch (c) {
+                    case 'K':
+                        castleMask |= (1 << Position.H1_CASTLE);
+                        break;
+                    case 'Q':
+                        castleMask |= (1 << Position.A1_CASTLE);
+                        break;
+                    case 'k':
+                        castleMask |= (1 << Position.H8_CASTLE);
+                        break;
+                    case 'q':
+                        castleMask |= (1 << Position.A8_CASTLE);
+                        break;
+                    case '-':
+                        break;
+                    default:
+                        throw new ChessParseError("Invalid castling flags");
+                }
+            }
+        }
+        return castleMask;
+    }
+
     /** Remove pseudo-legal EP square if it is not legal, ie would leave king in check. */
-    public static final void fixupEPSquare(Position pos) {
+    public static void fixupEPSquare(Position pos) {
         int epSquare = pos.getEpSquare();
         if (epSquare >= 0) {
             MoveGen.MoveList moves = MoveGen.instance.pseudoLegalMoves(pos);
@@ -171,18 +183,17 @@ public class TextIO {
         }
     }
 
-    private static final void safeSetPiece(Position pos, int col, int row, int p) throws ChessParseError {
+    private static void safeSetPiece(Position pos, int col, int row, int p) throws ChessParseError {
         if (row < 0) throw new ChessParseError("Too many rows");
         if (col > 7) throw new ChessParseError("Too many columns");
-        if ((p == Piece.WPAWN) || (p == Piece.BPAWN)) {
-            if ((row == 0) || (row == 7))
-                throw new ChessParseError("Pawn on first/last rank");
+        if (((p == Piece.WPAWN) || (p == Piece.BPAWN)) && ((row == 0) || (row == 7))) {
+            throw new ChessParseError("Pawn on first/last rank");
         }
         pos.setPiece(Position.getSquare(col, row), p);
     }
     
     /** Return a FEN string corresponding to a chess Position object. */
-    public static final String toFEN(Position pos) {
+    public static String toFEN(Position pos) {
         StringBuilder ret = new StringBuilder();
         // Piece placement
         for (int r = 7; r >=0; r--) {
@@ -267,18 +278,18 @@ public class TextIO {
     }
     
     /**
-     * Convert a chess move to human readable form.
+     * Convert a chess move to human-readable form.
      * @param pos      The chess position.
      * @param move     The executed move.
-     * @param longForm If true, use long notation, eg Ng1-f3.
-     *                 Otherwise, use short notation, eg Nf3
+     * @param longForm If true, use long notation, e.g. Ng1-f3.
+     *                 Otherwise, use short notation, e.g. Nf3
      */
-    public static final String moveToString(Position pos, Move move, boolean longForm) {
+    public static String moveToString(Position pos, Move move, boolean longForm) {
         MoveGen.MoveList moves = MoveGen.instance.pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moves);
         return moveToString(pos, move, longForm, moves);
     }
-    private static final String moveToString(Position pos, Move move, boolean longForm, MoveGen.MoveList moves) {
+    private static String moveToString(Position pos, Move move, boolean longForm, MoveGen.MoveList moves) {
         StringBuilder ret = new StringBuilder();
         int wKingOrigPos = Position.getSquare(4, 0);
         int bKingOrigPos = Position.getSquare(4, 7);
@@ -297,7 +308,7 @@ public class TextIO {
                 ret.append("O-O-O");
             }
         }
-        if (ret.length() == 0) {
+        if (ret.isEmpty()) {
             int p = pos.getPiece(move.from);
             ret.append(pieceToChar(p));
             int x1 = Position.getX(move.from);
@@ -329,15 +340,15 @@ public class TextIO {
                                 numSameRow++;
                         }
                     }
-                    if (numSameTarget < 2) {
-                        // No file/row info needed
-                    } else if (numSameFile < 2) {
-                        ret.append((char) (x1 + 'a'));   // Only file info needed
-                    } else if (numSameRow < 2) {
-                        ret.append((char) (y1 + '1'));   // Only row info needed
-                    } else {
-                        ret.append((char) (x1 + 'a'));   // File and row info needed
-                        ret.append((char) (y1 + '1'));
+                    if (numSameTarget >= 2) {
+                        if (numSameFile < 2) {
+                            ret.append((char) (x1 + 'a'));   // Only file info needed
+                        } else if (numSameRow < 2) {
+                            ret.append((char) (y1 + '1'));   // Only row info needed
+                        } else {
+                            ret.append((char) (x1 + 'a'));   // File and row info needed
+                            ret.append((char) (y1 + '1'));
+                        }
                     }
                 }
                 if (isCapture(pos, move)) {
@@ -366,30 +377,21 @@ public class TextIO {
         return ret.toString();
     }
 
+    public static String getPromotionString(Move m) {
+        return switch (m.promoteTo) {
+            case Piece.WQUEEN, Piece.BQUEEN -> "q";
+            case Piece.WROOK, Piece.BROOK -> "r";
+            case Piece.WBISHOP, Piece.BBISHOP -> "b";
+            case Piece.WKNIGHT, Piece.BKNIGHT -> "n";
+            default -> "";
+        };
+    }
+
     /** Convert a move object to UCI string format. */
-    public static final String moveToUCIString(Move m) {
+    public static String moveToUCIString(Move m) {
         String ret = squareToString(m.from);
         ret += squareToString(m.to);
-        switch (m.promoteTo) {
-            case Piece.WQUEEN:
-            case Piece.BQUEEN:
-                ret += "q";
-                break;
-            case Piece.WROOK:
-            case Piece.BROOK:
-                ret += "r";
-                break;
-            case Piece.WBISHOP:
-            case Piece.BBISHOP:
-                ret += "b";
-                break;
-            case Piece.WKNIGHT:
-            case Piece.BKNIGHT:
-                ret += "n";
-                break;
-            default:
-                break;
-        }
+        ret += getPromotionString(m);
         return ret;
     }
 
@@ -397,25 +399,24 @@ public class TextIO {
      * Convert a string to a Move object.
      * @return A move object, or null if move has invalid syntax
      */
-    public static final Move uciStringToMove(String move) {
-        Move m = null;
+    public static Optional<Move> uciStringToMove(String move) {
         if ((move.length() < 4) || (move.length() > 5))
-            return m;
+            return Optional.empty();
         int fromSq = TextIO.getSquare(move.substring(0, 2));
         int toSq   = TextIO.getSquare(move.substring(2, 4));
         if ((fromSq < 0) || (toSq < 0)) {
-            return m;
+            return Optional.empty();
         }
         char prom = ' ';
         boolean white = true;
         if (move.length() == 5) {
             prom = move.charAt(4);
-            if (Position.getY(toSq) == 7) {
-                white = true;
-            } else if (Position.getY(toSq) == 0) {
-                white = false;
-            } else {
-                return m;
+            if (Position.getY(toSq) != 7) {
+                if (Position.getY(toSq) == 0) {
+                    white = false;
+                } else {
+                    return Optional.empty();
+                }
             }
         }
         int promoteTo;
@@ -436,20 +437,15 @@ public class TextIO {
                 promoteTo = white ? Piece.WKNIGHT : Piece.BKNIGHT;
                 break;
             default:
-                return m;
+                return Optional.empty();
         }
-        m = new Move(fromSq, toSq, promoteTo);
-        return m;
+        return Optional.of(new Move(fromSq, toSq, promoteTo));
     }
 
-    private static final boolean isCapture(Position pos, Move move) {
+    private static boolean isCapture(Position pos, Move move) {
         if (pos.getPiece(move.to) == Piece.EMPTY) {
             int p = pos.getPiece(move.from);
-            if ((p == (pos.whiteMove ? Piece.WPAWN : Piece.BPAWN)) && (move.to == pos.getEpSquare())) {
-                return true;
-            } else {
-                return false;
-            }
+            return (p == (pos.whiteMove ? Piece.WPAWN : Piece.BPAWN)) && (move.to == pos.getEpSquare());
         } else {
             return true;
         }
@@ -460,11 +456,10 @@ public class TextIO {
      * Any prefix of the string representation of a valid move counts as a legal move string,
      * as long as the string only matches one valid move.
      */
-    public static final Move stringToMove(Position pos, String strMove) {
+    public static Optional<Move> stringToMove(Position pos, String strMove) {
         strMove = strMove.replaceAll("=", "");
         Move move = null;
-        if (strMove.length() == 0)
-            return move;
+        if (strMove.isEmpty()) return Optional.empty();
         MoveGen.MoveList moves = MoveGen.instance.pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moves);
         {
@@ -493,12 +488,12 @@ public class TextIO {
                 String str2 = normalizeMoveString(TextIO.moveToString(pos, m, false, moves));
                 if (i == 0) {
                     if (strMove.equals(str1) || strMove.equals(str2)) {
-                        return m;
+                        return Optional.of(m);
                     }
                 } else {
-                    if (strMove.toLowerCase().equals(str1.toLowerCase()) ||
-                            strMove.toLowerCase().equals(str2.toLowerCase())) {
-                        return m;
+                    if (strMove.equalsIgnoreCase(str1) ||
+                            strMove.equalsIgnoreCase(str2)) {
+                        return Optional.of(m);
                     }
                 }
             }
@@ -519,23 +514,23 @@ public class TextIO {
                 }
                 if (match) {
                     if (move != null) {
-                        return null; // More than one match, not ok
+                        return Optional.empty(); // More than one match, not ok
                     } else {
                         move = m;
                     }
                 }
             }
             if (move != null)
-                return move;
+                return Optional.of(move);
         }
-        return move;
+        return Optional.empty();
     }
 
     /**
      * Convert a string, such as "e4" to a square number.
      * @return The square number, or -1 if not a legal square.
      */
-    public static final int getSquare(String s) {
+    public static int getSquare(String s) {
         int x = s.charAt(0) - 'a';
         int y = s.charAt(1) - '1';
         if ((x < 0) || (x > 7) || (y < 0) || (y > 7))
@@ -546,7 +541,7 @@ public class TextIO {
     /**
      * Convert a square number to a string, such as "e4".
      */
-    public static final String squareToString(int square) {
+    public static String squareToString(int square) {
         StringBuilder ret = new StringBuilder();
         int x = Position.getX(square);
         int y = Position.getY(square);
@@ -558,7 +553,7 @@ public class TextIO {
     /**
      * Create an ascii representation of a position.
      */
-    public static final String asciiBoard(Position pos) {
+    public static String asciiBoard(Position pos) {
         StringBuilder ret = new StringBuilder(400);
         String nl = String.format("%n");
         ret.append("    +----+----+----+----+----+----+----+----+"); ret.append(nl);
@@ -573,8 +568,7 @@ public class TextIO {
                 } else {
                     ret.append(Piece.isWhite(p) ? ' ' : '*');
                     String pieceName = pieceToChar(p);
-                    if (pieceName.length() == 0)
-                        pieceName = "P";
+                    if (pieceName.isEmpty()) pieceName = "P";
                     ret.append(pieceName);
                     ret.append(" |");
                 }
@@ -589,8 +583,8 @@ public class TextIO {
     /**
      * Convert move string to lower case and remove special check/mate symbols.
      */
-    private static final String normalizeMoveString(String str) {
-        if (str.length() > 0) {
+    private static String normalizeMoveString(String str) {
+        if (!str.isEmpty()) {
             char lastChar = str.charAt(str.length() - 1);
             if ((lastChar == '#') || (lastChar == '+')) {
                 str = str.substring(0, str.length() - 1);
@@ -599,14 +593,14 @@ public class TextIO {
         return str;
     }
     
-    private final static String pieceToChar(int p) {
-        switch (p) {
-            case Piece.WQUEEN:  case Piece.BQUEEN:  return "Q";
-            case Piece.WROOK:   case Piece.BROOK:   return "R";
-            case Piece.WBISHOP: case Piece.BBISHOP: return "B";
-            case Piece.WKNIGHT: case Piece.BKNIGHT: return "N";
-            case Piece.WKING:   case Piece.BKING:   return "K";
-        }
-        return "";
+    private static String pieceToChar(int p) {
+        return switch (p) {
+            case Piece.WQUEEN, Piece.BQUEEN -> "Q";
+            case Piece.WROOK, Piece.BROOK -> "R";
+            case Piece.WBISHOP, Piece.BBISHOP -> "B";
+            case Piece.WKNIGHT, Piece.BKNIGHT -> "N";
+            case Piece.WKING, Piece.BKING -> "K";
+            default -> "";
+        };
     }
 }

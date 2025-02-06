@@ -18,10 +18,9 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  *
@@ -29,26 +28,14 @@ import static org.junit.Assert.*;
  */
 public class PieceTest {
 
-    public PieceTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     /**
      * Test of isWhite method, of class Piece.
      */
     @Test
     public void testIsWhite() {
-        System.out.println("isWhite");
-        assertEquals(false, Piece.isWhite(Piece.BBISHOP));
-        assertEquals(true , Piece.isWhite(Piece.WBISHOP));
-        assertEquals(true , Piece.isWhite(Piece.WKING));
-        assertEquals(false, Piece.isWhite(Piece.BKING));
+        assertFalse(Piece.isWhite(Piece.BBISHOP));
+        assertTrue(Piece.isWhite(Piece.WBISHOP));
+        assertTrue(Piece.isWhite(Piece.WKING));
+        assertFalse(Piece.isWhite(Piece.BKING));
     }
 }

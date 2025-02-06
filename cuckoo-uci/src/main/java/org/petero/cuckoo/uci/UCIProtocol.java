@@ -18,17 +18,19 @@
 
 package org.petero.cuckoo.uci;
 
-import org.petero.cuckoo.engine.chess.ChessParseError;
-import org.petero.cuckoo.engine.chess.ComputerPlayer;
-import org.petero.cuckoo.engine.chess.Move;
-import org.petero.cuckoo.engine.chess.Position;
-import org.petero.cuckoo.engine.chess.TextIO;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Optional;
+
+import org.petero.cuckoo.engine.chess.ChessParseError;
+import org.petero.cuckoo.engine.chess.ComputerPlayer;
+import org.petero.cuckoo.engine.chess.Move;
+import org.petero.cuckoo.engine.chess.Position;
+import org.petero.cuckoo.engine.chess.TextIO;
 
 /**
  * Handle the UCI protocol mode.
@@ -37,7 +39,7 @@ import java.util.ArrayList;
 public class UCIProtocol {
     // Data set by the "position" command.
     Position pos;
-    ArrayList<Move> moves;
+    final ArrayList<Move> moves;
 
     // Engine data
     EngineControl engine;
@@ -54,11 +56,11 @@ public class UCIProtocol {
 
     public UCIProtocol() {
         pos = null;
-        moves = new ArrayList<Move>();
+        moves = new ArrayList<>();
         quit = false;
     }
 
-    final public void mainLoop(InputStream is, PrintStream os, boolean autoStart) {
+    public final void mainLoop(InputStream is, PrintStream os, boolean autoStart) {
         try {
             if (autoStart) {
                 handleCommand("uci", os);
@@ -81,135 +83,129 @@ public class UCIProtocol {
         String[] tokens = tokenize(cmdLine);
         try {
             String cmd = tokens[0];
-            if (cmd.equals("uci")) {
-                os.printf("id name %s%n", ComputerPlayer.engineName);
-                os.printf("id author Peter Osterlund%n");
-                EngineControl.printOptions(os);
-                os.printf("uciok%n");
-            } else if (cmd.equals("isready")) {
-                initEngine(os);
-                os.printf("readyok%n");
-            } else if (cmd.equals("setoption")) {
-                initEngine(os);
-                StringBuilder optionName = new StringBuilder();
-                StringBuilder optionValue = new StringBuilder();
-                if (tokens[1].endsWith("name")) {
-                    int idx = 2;
-                    while ((idx < tokens.length) && !tokens[idx].equals("value")) {
-                        optionName.append(tokens[idx++].toLowerCase());
-                        optionName.append(' ');
-                    }
-                    if ((idx < tokens.length) && tokens[idx++].equals("value")) {
-                        while ((idx < tokens.length)) {
-                            optionValue.append(tokens[idx++].toLowerCase());
-                            optionValue.append(' ');
+            switch (cmd) {
+                case "uci" -> {
+                    os.printf("id name %s%n", ComputerPlayer.engineName);
+                    os.printf("id author Peter Osterlund%n");
+                    EngineControl.printOptions(os);
+                    os.printf("uciok%n");
+                }
+                case "isready" -> {
+                    initEngine(os);
+                    os.printf("readyok%n");
+                }
+                case "setoption" -> {
+                    initEngine(os);
+                    StringBuilder optionName = new StringBuilder();
+                    StringBuilder optionValue = new StringBuilder();
+                    if (tokens[1].endsWith("name")) {
+                        int idx = 2;
+                        while ((idx < tokens.length) && !tokens[idx].equals("value")) {
+                            optionName.append(tokens[idx++].toLowerCase());
+                            optionName.append(' ');
                         }
+                        if ((idx < tokens.length) && tokens[idx++].equals("value")) {
+                            while ((idx < tokens.length)) {
+                                optionValue.append(tokens[idx++].toLowerCase());
+                                optionValue.append(' ');
+                            }
+                        }
+                        engine.setOption(optionName.toString().trim(), optionValue.toString().trim());
                     }
-                    engine.setOption(optionName.toString().trim(), optionValue.toString().trim());
                 }
-            } else if (cmd.equals("ucinewgame")) {
-                if (engine != null) {
-                    engine.newGame();
-                }
-            } else if (cmd.equals("position")) {
-                String fen = null;
-                int idx = 1;
-                if (tokens[idx].equals("startpos")) {
-                    idx++;
-                    fen = TextIO.startPosFEN;
-                } else if (tokens[idx].equals("fen")) {
-                    idx++;
-                    StringBuilder sb = new StringBuilder();
-                    while ((idx < tokens.length) && !tokens[idx].equals("moves")) {
-                        sb.append(tokens[idx++]);
-                        sb.append(' ');
+                case "ucinewgame" -> {
+                    if (engine != null) {
+                        engine.newGame();
                     }
-                    fen = sb.toString().trim();
                 }
-                if (fen != null) {
-                    pos = TextIO.readFEN(fen);
-                    moves.clear();
-                    if ((idx < tokens.length) && tokens[idx++].equals("moves")) {
-                        for (int i = idx; i < tokens.length; i++) {
-                            Move m = TextIO.uciStringToMove(tokens[i]);
-                            if (m != null) {
-                                moves.add(m);
-                            } else {
-                                break;
+                case "position" -> {
+                    String fen = null;
+                    int idx = 1;
+                    if (tokens[idx].equals("startpos")) {
+                        idx++;
+                        fen = TextIO.START_POS_FEN;
+                    } else if (tokens[idx].equals("fen")) {
+                        idx++;
+                        StringBuilder sb = new StringBuilder();
+                        while ((idx < tokens.length) && !tokens[idx].equals("moves")) {
+                            sb.append(tokens[idx++]);
+                            sb.append(' ');
+                        }
+                        fen = sb.toString().trim();
+                    }
+                    if (fen != null) {
+                        pos = TextIO.readFEN(fen);
+                        moves.clear();
+                        if ((idx < tokens.length) && tokens[idx++].equals("moves")) {
+                            for (int i = idx; i < tokens.length; i++) {
+                                Optional<Move> m = TextIO.uciStringToMove(tokens[i]);
+                                if (m.isPresent()) {
+                                    moves.add(m.get());
+                                } else {
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-            } else if (cmd.equals("go")) {
-                if (pos == null) {
-                    try {
-                        pos = TextIO.readFEN(TextIO.startPosFEN);
-                    } catch (ChessParseError ex) {
-                        throw new RuntimeException();
-                    }
-                }
-                initEngine(os);
-                int idx = 1;
-                SearchParams sPar = new SearchParams();
-                boolean ponder = false;
-                while (idx < tokens.length) {
-                    String subCmd = tokens[idx++];
-                    if (subCmd.equals("searchmoves")) {
-                        while (idx < tokens.length) {
-                            Move m = TextIO.uciStringToMove(tokens[idx]);
-                            if (m != null) {
-                                sPar.searchMoves.add(m);
-                                idx++;
-                            } else {
-                                break;
-                            }
+                case "go" -> {
+                    if (pos == null) {
+                        try {
+                            pos = TextIO.readFEN(TextIO.START_POS_FEN);
+                        } catch (ChessParseError ex) {
+                            throw new RuntimeException();
                         }
-                    } else if (subCmd.equals("ponder")) {
-                        ponder = true;
-                    } else if (subCmd.equals("wtime")) {
-                        sPar.wTime = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("btime")) {
-                        sPar.bTime = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("winc")) {
-                        sPar.wInc = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("binc")) {
-                        sPar.bInc = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("movestogo")) {
-                        sPar.movesToGo = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("depth")) {
-                        sPar.depth = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("nodes")) {
-                        sPar.nodes = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("mate")) {
-                        sPar.mate = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("movetime")) {
-                        sPar.moveTime = Integer.parseInt(tokens[idx++]);
-                    } else if (subCmd.equals("infinite")) {
-                        sPar.infinite = true;
+                    }
+                    initEngine(os);
+                    int idx = 1;
+                    SearchParams sPar = new SearchParams();
+                    boolean ponder = false;
+                    while (idx < tokens.length) {
+                        String subCmd = tokens[idx++];
+                        switch (subCmd) {
+                            case "searchmoves" -> {
+                                while (idx < tokens.length) {
+                                    Optional<Move> m = TextIO.uciStringToMove(tokens[idx]);
+                                    if (m.isPresent()) {
+                                        sPar.searchMoves.add(m.get());
+                                        idx++;
+                                    } else {
+                                        break;
+                                    }
+                                }
+                            }
+                            case "ponder" -> ponder = true;
+                            case "wtime" -> sPar.wTime = Integer.parseInt(tokens[idx++]);
+                            case "btime" -> sPar.bTime = Integer.parseInt(tokens[idx++]);
+                            case "winc" -> sPar.wInc = Integer.parseInt(tokens[idx++]);
+                            case "binc" -> sPar.bInc = Integer.parseInt(tokens[idx++]);
+                            case "movestogo" -> sPar.movesToGo = Integer.parseInt(tokens[idx++]);
+                            case "depth" -> sPar.depth = Integer.parseInt(tokens[idx++]);
+                            case "nodes" -> sPar.nodes = Integer.parseInt(tokens[idx++]);
+                            case "mate" -> sPar.mate = Integer.parseInt(tokens[idx++]);
+                            case "movetime" -> sPar.moveTime = Integer.parseInt(tokens[idx++]);
+                        }
+                    }
+                    if (ponder) {
+                        engine.startPonder(pos, moves, sPar);
+                    } else {
+                        engine.startSearch(pos, moves, sPar);
                     }
                 }
-                if (ponder) {
-                    engine.startPonder(pos, moves, sPar);
-                } else {
-                    engine.startSearch(pos, moves, sPar);
+                case "stop" -> engine.stopSearch();
+                case "ponderhit" -> engine.ponderHit();
+                case "quit" -> {
+                    if (engine != null) {
+                        engine.stopSearch();
+                    }
+                    quit = true;
                 }
-            } else if (cmd.equals("stop")) {
-                engine.stopSearch();
-            } else if (cmd.equals("ponderhit")) {
-                engine.ponderHit();
-            } else if (cmd.equals("quit")) {
-                if (engine != null) {
-                    engine.stopSearch();
-                }
-                quit = true;
             }
-        } catch (ChessParseError ex) {
-        } catch (ArrayIndexOutOfBoundsException e) {
-        } catch (NumberFormatException nfe) {
+        } catch (ChessParseError | ArrayIndexOutOfBoundsException | NumberFormatException ignored) {
         }
     }
 
-    final private void initEngine(PrintStream os) {
+    private void initEngine(PrintStream os) {
         if (engine == null) {
             engine = new EngineControl(os);
         }

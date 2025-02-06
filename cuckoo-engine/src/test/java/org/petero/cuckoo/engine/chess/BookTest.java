@@ -18,10 +18,11 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import java.util.Optional;
 
 /**
  *
@@ -29,24 +30,12 @@ import static org.junit.Assert.*;
  */
 public class BookTest {
 
-    public BookTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     /**
      * Test of getBookMove method, of class Book.
      */
     @Test
     public void testGetBookMove() throws ChessParseError {
-        System.out.println("getBookMove");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Book book = new Book(true);
         Move move = book.getBookMove(pos);
         checkValid(pos, move);
@@ -57,21 +46,21 @@ public class BookTest {
      */
     @Test
     public void testGetAllBookMoves() throws ChessParseError {
-        System.out.println("getAllBookMoves");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         Book book = new Book(true);
         String moveListString = book.getAllBookMoves(pos);
         String[] strMoves = moveListString.split("\\([0-9]*\\) ");
         assertTrue(strMoves.length > 1);
         for (String strMove : strMoves) {
-            Move m = TextIO.stringToMove(pos, strMove);
-            checkValid(pos, m);
+            Optional<Move> m = TextIO.stringToMove(pos, strMove);
+            assertTrue(m.isPresent());
+            checkValid(pos, m.get());
         }
     }
 
     /** Check that move is a legal move in position pos. */
     private void checkValid(Position pos, Move move) {
-        assertTrue(move != null);
+        assertNotNull(move);
         MoveGen.MoveList moveList = new MoveGen().pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, moveList);
         boolean contains = false;

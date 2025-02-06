@@ -20,6 +20,7 @@ package org.petero.cuckoo.engine.chess;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -27,17 +28,17 @@ import java.util.Random;
  * @author petero
  */
 public class ComputerPlayer implements Player {
-    public static String engineName = "CuckooChess 1.12";
+    public static final String engineName = "CuckooChess 1.12";
 
     int minTimeMillis;
     int maxTimeMillis;
     int maxDepth;
-    int maxNodes;
+    final int maxNodes;
     public boolean verbose;
     TranspositionTable tt;
-    Book book;
+    final Book book;
     boolean bookEnabled;
-    boolean randomMode;
+    boolean randomMode; // TODO remove this field
     Search currentSearch;
 
     public ComputerPlayer() {
@@ -62,7 +63,7 @@ public class ComputerPlayer implements Player {
     }
 
     @Override
-    public String getCommand(Position pos, boolean drawOffer, List<Position> history) {
+    public String getCommand(Position pos, List<Position> history) {
         // Create a search object
         long[] posHashList = new long[200 + history.size()];
         int posHashListSize = 0;
@@ -95,7 +96,7 @@ public class ComputerPlayer implements Player {
         currentSearch = sc;
         sc.setListener(listener);
         Move bestM;
-        if ((moves.size == 1) && (canClaimDraw(pos, posHashList, posHashListSize, moves.m[0]) == "")) {
+        if ((moves.size == 1) && (Objects.equals(canClaimDraw(pos, posHashList, posHashListSize, moves.m[0]), ""))) {
             bestM = moves.m[0];
             bestM.score = 0;
         } else if (randomMode) {
@@ -105,13 +106,13 @@ public class ComputerPlayer implements Player {
             bestM = sc.iterativeDeepening(moves, maxDepth, maxNodes, verbose);
         }
         currentSearch = null;
-//        tt.printStats();
         String strMove = TextIO.moveToString(pos, bestM, false);
 
         // Claim draw if appropriate
+        assert bestM != null;
         if (bestM.score <= 0) {
             String drawClaim = canClaimDraw(pos, posHashList, posHashListSize, bestM);
-            if (drawClaim != "")
+            if (!Objects.equals(drawClaim, ""))
                 strMove = drawClaim;
         }
         return strMove;
@@ -190,19 +191,19 @@ public class ComputerPlayer implements Player {
         // Extract PV
         String PV = TextIO.moveToString(pos, bestM, false) + " ";
         UndoInfo ui = new UndoInfo();
+        assert bestM != null;
         pos.makeMove(bestM, ui);
         PV += tt.extractPV(pos);
         pos.unMakeMove(bestM, ui);
 
-//        tt.printStats();
-
         // Return best move and PV
-        return new TwoReturnValues<Move, String>(bestM, PV);
+        return new TwoReturnValues<>(bestM, PV);
     }
 
     private Move findSemiRandomMove(Search sc, MoveGen.MoveList moves) {
         sc.timeLimit(minTimeMillis, maxTimeMillis);
         Move bestM = sc.iterativeDeepening(moves, 1, maxNodes, verbose);
+        assert bestM != null;
         int bestScore = bestM.score;
 
         Random rndGen = new SecureRandom();
@@ -224,7 +225,7 @@ public class ComputerPlayer implements Player {
         return null;
     }
 
-    private final static int moveProbWeight(int moveScore, int bestScore) {
+    private static int moveProbWeight(int moveScore, int bestScore) {
         double d = (bestScore - moveScore) / 100.0;
         double w = 100*Math.exp(-d*d/2);
         return (int)Math.ceil(w);

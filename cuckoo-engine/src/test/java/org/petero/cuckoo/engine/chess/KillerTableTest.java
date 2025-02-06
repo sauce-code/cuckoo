@@ -18,10 +18,9 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  *
@@ -29,23 +28,11 @@ import static org.junit.Assert.*;
  */
 public class KillerTableTest {
 
-    public KillerTableTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     /**
      * Test of addKiller method, of class KillerTable.
      */
     @Test
     public void testAddKiller() {
-        System.out.println("addKiller");
         KillerTable kt = new KillerTable();
         Move m = new Move(TextIO.getSquare("b1"), TextIO.getSquare("b5"), Piece.EMPTY);
         kt.addKiller(3, m);
@@ -59,7 +46,6 @@ public class KillerTableTest {
      */
     @Test
     public void testGetKillerScore() {
-        System.out.println("getKillerScore");
         KillerTable kt = new KillerTable();
         Move m1 = new Move(TextIO.getSquare("b1"), TextIO.getSquare("b5"), Piece.EMPTY);
         Move m2 = new Move(TextIO.getSquare("c1"), TextIO.getSquare("d2"), Piece.EMPTY);

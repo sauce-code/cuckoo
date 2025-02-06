@@ -25,11 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Implements an opening book.
@@ -37,7 +33,7 @@ import java.util.Random;
  */
 public class Book {
     public static class BookEntry {
-        Move move;
+        final Move move;
         int count;
         BookEntry(Move move) {
             this.move = move;
@@ -47,32 +43,33 @@ public class Book {
     private static Map<Long, List<BookEntry>> bookMap;
     private static Random rndGen;
     private static int numBookMoves = -1;
-    private boolean verbose;
+    private final boolean verbose;
 
     public Book(boolean verbose) {
         this.verbose = verbose;
     }
 
-    private final void initBook() {
+    private void initBook() {
         if (numBookMoves >= 0)
             return;
         long t0 = System.currentTimeMillis();
-        bookMap = new HashMap<Long, List<BookEntry>>();
+        bookMap = new HashMap<>();
         rndGen = new SecureRandom();
         rndGen.setSeed(System.currentTimeMillis());
         numBookMoves = 0;
         try {
             InputStream inStream = getClass().getResourceAsStream("/book.bin");
-            List<Byte> buf = new ArrayList<Byte>(8192);
+            List<Byte> buf = new ArrayList<>(8192);
             byte[] tmpBuf = new byte[1024];
             while (true) {
+                assert inStream != null;
                 int len = inStream.read(tmpBuf);
                 if (len <= 0) break;
                 for (int i = 0; i < len; i++)
                     buf.add(tmpBuf[i]);
             }
             inStream.close();
-            Position startPos = TextIO.readFEN(TextIO.startPosFEN);
+            Position startPos = TextIO.readFEN(TextIO.START_POS_FEN);
             Position pos = new Position(startPos);
             UndoInfo ui = new UndoInfo();
             int len = buf.size();
@@ -106,14 +103,9 @@ public class Book {
     }
 
     /** Add a move to a position in the opening book. */
-    private final void addToBook(Position pos, Move moveToAdd) {
-        List<BookEntry> ent = bookMap.get(pos.zobristHash());
-        if (ent == null) {
-            ent = new ArrayList<BookEntry>();
-            bookMap.put(pos.zobristHash(), ent);
-        }
-        for (int i = 0; i < ent.size(); i++) {
-            BookEntry be = ent.get(i);
+    private void addToBook(Position pos, Move moveToAdd) {
+        List<BookEntry> ent = bookMap.computeIfAbsent(pos.zobristHash(), k -> new ArrayList<>());
+        for (BookEntry be : ent) {
             if (be.move.equals(moveToAdd)) {
                 be.count++;
                 return;
@@ -135,36 +127,35 @@ public class Book {
         MoveGen.MoveList legalMoves = new MoveGen().pseudoLegalMoves(pos);
         MoveGen.removeIllegal(pos, legalMoves);
         int sum = 0;
-        for (int i = 0; i < bookMoves.size(); i++) {
-            BookEntry be = bookMoves.get(i);
+        for (BookEntry be : bookMoves) {
             boolean contains = false;
             for (int mi = 0; mi < legalMoves.size; mi++)
                 if (legalMoves.m[mi].equals(be.move)) {
                     contains = true;
                     break;
                 }
-            if  (!contains) {
+            if (!contains) {
                 // If an illegal move was found, it means there was a hash collision.
                 return null;
             }
-            sum += getWeight(bookMoves.get(i).count);
+            sum += getWeight(be.count);
         }
         if (sum <= 0) {
             return null;
         }
         int rnd = rndGen.nextInt(sum);
         sum = 0;
-        for (int i = 0; i < bookMoves.size(); i++) {
-            sum += getWeight(bookMoves.get(i).count);
+        for (BookEntry bookMove : bookMoves) {
+            sum += getWeight(bookMove.count);
             if (rnd < sum) {
-                return bookMoves.get(i).move;
+                return bookMove.move;
             }
         }
         // Should never get here
         throw new RuntimeException();
     }
 
-    final private int getWeight(int count) {
+    private int getWeight(int count) {
         double tmp = Math.sqrt(count);
         return (int)(tmp * Math.sqrt(tmp) * 100 + 1);
     }
@@ -199,22 +190,22 @@ public class Book {
     }
     
     public static List<Byte> createBinBook() {
-        List<Byte> binBook = new ArrayList<Byte>(0);
+        List<Byte> binBook = new ArrayList<>(0);
         try {
-            InputStream inStream = new Object().getClass().getResourceAsStream("/book.txt");
+            InputStream inStream = Object.class.getResourceAsStream("/book.txt");
+            assert inStream != null;
             InputStreamReader inFile = new InputStreamReader(inStream);
             BufferedReader inBuf = new BufferedReader(inFile);
             LineNumberReader lnr = new LineNumberReader(inBuf);
             String line;
             while ((line = lnr.readLine()) != null) {
-                if (line.startsWith("#") || (line.length() == 0)) {
+            if (line.startsWith("#") || (line.isEmpty())) {
                     continue;
                 }
                 if (!addBookLine(line, binBook)) {
                     System.out.printf("Book parse error, line:%d\n", lnr.getLineNumber());
                     throw new RuntimeException();
                 }
-//              System.out.printf("no:%d line:%s%n", lnr.getLineNumber(), line);
             }
             lnr.close();
         } catch (ChessParseError ex) {
@@ -228,25 +219,24 @@ public class Book {
 
     /** Add a sequence of moves, starting from the initial position, to the binary opening book. */
     private static boolean addBookLine(String line, List<Byte> binBook) throws ChessParseError {
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         UndoInfo ui = new UndoInfo();
         String[] strMoves = line.split(" ");
         for (String strMove : strMoves) {
-//            System.out.printf("Adding move:%s\n", strMove);
             int bad = 0;
             if (strMove.endsWith("?")) {
                 strMove = strMove.substring(0, strMove.length() - 1);
                 bad = 1;
             }
-            Move m = TextIO.stringToMove(pos, strMove);
-            if (m == null) {
+            Optional<Move> m = TextIO.stringToMove(pos, strMove);
+            if (m.isEmpty()) {
                 return false;
             }
-            int prom = pieceToProm(m.promoteTo);
-            int val = m.from + (m.to << 6) + (prom << 12) + (bad << 15);
+            int prom = pieceToProm(m.get().promoteTo);
+            int val = m.get().from + (m.get().to << 6) + (prom << 12) + (bad << 15);
             binBook.add((byte)(val >> 8));
             binBook.add((byte)(val & 255));
-            pos.makeMove(m, ui);
+            pos.makeMove(m.get(), ui);
         }
         binBook.add((byte)0);
         binBook.add((byte)0);
@@ -254,27 +244,22 @@ public class Book {
     }
 
     private static int pieceToProm(int p) {
-        switch (p) {
-        case Piece.WQUEEN: case Piece.BQUEEN:
-            return 1;
-        case Piece.WROOK: case Piece.BROOK:
-            return 2;
-        case Piece.WBISHOP: case Piece.BBISHOP:
-            return 3;
-        case Piece.WKNIGHT: case Piece.BKNIGHT:
-            return 4;
-        default:
-            return 0;
-        }
+        return switch (p) {
+            case Piece.WQUEEN, Piece.BQUEEN -> 1;
+            case Piece.WROOK, Piece.BROOK -> 2;
+            case Piece.WBISHOP, Piece.BBISHOP -> 3;
+            case Piece.WKNIGHT, Piece.BKNIGHT -> 4;
+            default -> 0;
+        };
     }
     
     private static int promToPiece(int prom, boolean whiteMove) {
-        switch (prom) {
-        case 1: return whiteMove ? Piece.WQUEEN : Piece.BQUEEN;
-        case 2: return whiteMove ? Piece.WROOK  : Piece.BROOK;
-        case 3: return whiteMove ? Piece.WBISHOP : Piece.BBISHOP;
-        case 4: return whiteMove ? Piece.WKNIGHT : Piece.BKNIGHT;
-        default: return Piece.EMPTY;
-        }
+        return switch (prom) {
+            case 1 -> whiteMove ? Piece.WQUEEN : Piece.BQUEEN;
+            case 2 -> whiteMove ? Piece.WROOK : Piece.BROOK;
+            case 3 -> whiteMove ? Piece.WBISHOP : Piece.BBISHOP;
+            case 4 -> whiteMove ? Piece.WKNIGHT : Piece.BKNIGHT;
+            default -> Piece.EMPTY;
+        };
     }
 }

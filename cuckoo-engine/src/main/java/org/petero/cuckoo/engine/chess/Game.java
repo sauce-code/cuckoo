@@ -21,6 +21,7 @@ package org.petero.cuckoo.engine.chess;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -58,20 +59,20 @@ public class Game {
             return false;
         }
 
-        Move m = TextIO.stringToMove(pos, str);
-        if (m == null) {
+        Optional<Move> m = TextIO.stringToMove(pos, str);
+        if (m.isEmpty()) {
             return false;
         }
 
         UndoInfo ui = new UndoInfo();
-        pos.makeMove(m, ui);
+        pos.makeMove(m.get(), ui);
         TextIO.fixupEPSquare(pos);
         while (currentMove < moveList.size()) {
             moveList.remove(currentMove);
             uiInfoList.remove(currentMove);
             drawOfferList.remove(currentMove);
         }
-        moveList.add(m);
+        moveList.add(m.get());
         uiInfoList.add(ui);
         drawOfferList.add(pendingDrawOffer);
         pendingDrawOffer = false;
@@ -93,7 +94,7 @@ public class Game {
             case DRAW_REP:
             {
                 String ret = "Game over, draw by repetition!";
-                if ((drawStateMoveStr != null) && (drawStateMoveStr.length() > 0)) {
+                if ((drawStateMoveStr != null) && (!drawStateMoveStr.isEmpty())) {
                     ret = ret + " [" + drawStateMoveStr + "]";
                 }
                 return ret;
@@ -101,7 +102,7 @@ public class Game {
             case DRAW_50:
             {
                 String ret = "Game over, draw by 50 move rule!";
-                if ((drawStateMoveStr != null) && (drawStateMoveStr.length() > 0)) {
+                if ((drawStateMoveStr != null) && (!drawStateMoveStr.isEmpty())) {
                     ret = ret + " [" + drawStateMoveStr + "]";  
                 }
                 return ret;
@@ -185,15 +186,15 @@ public class Game {
      */
     protected boolean handleCommand(String moveStr) {
         if (moveStr.equals("new")) {
-            moveList = new ArrayList<Move>();
-            uiInfoList = new ArrayList<UndoInfo>();
-            drawOfferList = new ArrayList<Boolean>();
+            moveList = new ArrayList<>();
+            uiInfoList = new ArrayList<>();
+            drawOfferList = new ArrayList<>();
             currentMove = 0;
             pendingDrawOffer = false;
             drawState = GameState.ALIVE;
             resignState = GameState.ALIVE;
             try {
-                pos = TextIO.readFEN(TextIO.startPosFEN);
+                pos = TextIO.readFEN(TextIO.START_POS_FEN);
             } catch (ChessParseError ex) {
                 throw new RuntimeException();
             }
@@ -308,7 +309,7 @@ public class Game {
     }
 
     public List<String> getPosHistory() {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         
         Position pos = new Position(this.pos);
         for (int i = currentMove; i > 0; i--) {
@@ -317,8 +318,7 @@ public class Game {
         ret.add(TextIO.toFEN(pos)); // Store initial FEN
 
         StringBuilder moves = new StringBuilder();
-        for (int i = 0; i < moveList.size(); i++) {
-            Move move = moveList.get(i);
+        for (Move move : moveList) {
             String strMove = TextIO.moveToString(pos, move, false);
             moves.append(String.format(" %s", strMove));
             UndoInfo ui = new UndoInfo();
@@ -338,7 +338,7 @@ public class Game {
         System.out.printf("%s", movesStr);
     }
 
-    final public String getMoveListString(boolean compressed) {
+    public final String getMoveListString(boolean compressed) {
         StringBuilder ret = new StringBuilder();
 
         // Undo all moves in move history.
@@ -360,7 +360,7 @@ public class Game {
                 whiteMove = strMove;
             } else {
                 blackMove = strMove;
-                if (whiteMove.length() == 0) {
+                if (whiteMove.isEmpty()) {
                     whiteMove = "...";
                 }
                 if (compressed) {
@@ -376,10 +376,7 @@ public class Game {
             UndoInfo ui = new UndoInfo();
             pos.makeMove(move, ui);
         }
-        if ((whiteMove.length() > 0) || (blackMove.length() > 0)) {
-            if (whiteMove.length() == 0) {
-                whiteMove = "...";
-            }
+        if (!whiteMove.isEmpty()) {
             if (compressed) {
                 ret.append(String.format("%d. %s %s ",
                         pos.fullMoveCounter, whiteMove, blackMove));
@@ -426,7 +423,7 @@ public class Game {
 
     /** Return a list of previous positions in this game, back to the last "zeroing" move. */
     public ArrayList<Position> getHistory() {
-        ArrayList<Position> posList = new ArrayList<Position>();
+        ArrayList<Position> posList = new ArrayList<>();
         Position pos = new Position(this.pos);
         for (int i = currentMove; i > 0; i--) {
             if (pos.halfMoveClock == 0)
@@ -441,19 +438,19 @@ public class Game {
     private boolean handleDrawCmd(String drawCmd) {
         if (drawCmd.startsWith("rep") || drawCmd.startsWith("50")) {
             boolean rep = drawCmd.startsWith("rep");
-            Move m = null;
+            Optional<Move> m = Optional.empty();
             String ms = drawCmd.substring(drawCmd.indexOf(" ") + 1);
-            if (ms.length() > 0) {
+            if (!ms.isEmpty()) {
                 m = TextIO.stringToMove(pos, ms);
             }
             boolean valid;
             if (rep) {
                 valid = false;
-                List<Position> oldPositions = new ArrayList<Position>();
-                if (m != null) {
+                List<Position> oldPositions = new ArrayList<>();
+                if (m.isPresent()) {
                     UndoInfo ui = new UndoInfo();
                     Position tmpPos = new Position(pos);
-                    tmpPos.makeMove(m, ui);
+                    tmpPos.makeMove(m.get(), ui);
                     oldPositions.add(tmpPos);
                 }
                 oldPositions.add(pos);
@@ -464,7 +461,7 @@ public class Game {
                     oldPositions.add(tmpPos);
                 }
                 int repetitions = 0;
-                Position firstPos = oldPositions.get(0);
+                Position firstPos = oldPositions.getFirst();
                 for (Position p : oldPositions) {
                     if (p.drawRuleEquals(firstPos))
                         repetitions++;
@@ -474,21 +471,19 @@ public class Game {
                 }
             } else {
                 Position tmpPos = new Position(pos);
-                if (m != null) {
+                if (m.isPresent()) {
                     UndoInfo ui = new UndoInfo();
-                    tmpPos.makeMove(m, ui);
+                    tmpPos.makeMove(m.get(), ui);
                 }
                 valid = tmpPos.halfMoveClock >= 100;
             }
             if (valid) {
                 drawState = rep ? GameState.DRAW_REP : GameState.DRAW_50;
                 drawStateMoveStr = null;
-                if (m != null) {
-                    drawStateMoveStr = TextIO.moveToString(pos, m, false);
-                }
+                m.ifPresent(move -> drawStateMoveStr = TextIO.moveToString(pos, move, false));
             } else {
                 pendingDrawOffer = true;
-                if (m != null) {
+                if (m.isPresent()) {
                     processString(ms);
                 }
             }
@@ -496,7 +491,7 @@ public class Game {
         } else if (drawCmd.startsWith("offer ")) {
             pendingDrawOffer = true;
             String ms = drawCmd.substring(drawCmd.indexOf(" ") + 1);
-            if (TextIO.stringToMove(pos, ms) != null) {
+            if (TextIO.stringToMove(pos, ms).isPresent()) {
                 processString(ms);
             }
             return true;
@@ -540,15 +535,14 @@ public class Game {
         if (wn + bn == 0) {
             // Only bishops. If they are all on the same color, the position is a draw.
             long bMask = pos.pieceTypeBB[Piece.WBISHOP] | pos.pieceTypeBB[Piece.BBISHOP];
-            if (((bMask & BitBoard.maskDarkSq) == 0) ||
-                ((bMask & BitBoard.maskLightSq) == 0))
-                return true;
+            return ((bMask & BitBoard.MASK_DARK_SQ) == 0) ||
+                    ((bMask & BitBoard.MASK_LIGHT_SQ) == 0);
         }
 
         return false;
     }
 
-    final static long perfT(MoveGen moveGen, Position pos, int depth) {
+    static long perfT(MoveGen moveGen, Position pos, int depth) {
         if (depth == 0)
             return 1;
         long nodes = 0;

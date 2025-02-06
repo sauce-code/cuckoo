@@ -18,7 +18,6 @@ package org.petero.cuckoo.app;
 */
 
 import java.io.IOException;
-
 import org.petero.cuckoo.engine.chess.TreeLogger;
 import org.petero.cuckoo.gui.AppletGUI;
 import org.petero.cuckoo.tui.TUIGame;

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Parameters {
-    public static enum Type {
+    public enum Type {
         CHECK,
         SPIN,
         COMBO,
@@ -14,69 +14,63 @@ public class Parameters {
     }
 
     public static class ParamBase {
-        public String name;
-        public Type type;
-        public boolean visible;
+        protected String name;
+        protected Type type;
+        protected boolean visible;
+
+        public String getName() {
+            return name;
+        }
+
+        public Type getType() {
+            return type;
+        }
     }
 
     public static final class CheckParam extends ParamBase {
-        public boolean value;
-        public boolean defaultValue;
+        public final boolean defaultValue;
         CheckParam(String name, boolean visible, boolean def) {
             this.name = name;
             this.type = Type.CHECK;
             this.visible = visible;
-            this.value = def;
             this.defaultValue = def;
         }
     }
 
     public static final class SpinParam extends ParamBase {
-        public int minValue;
-        public int maxValue;
-        public int value;
-        public int defaultValue;
-        SpinParam(String name, boolean visible, int minV, int maxV, int def) {
+        public final int minValue;
+        public final int maxValue;
+        private int value;
+        public final int defaultValue;
+        SpinParam(String name) {
             this.name = name;
             this.type = Type.SPIN;
-            this.visible = visible;
-            this.minValue = minV;
-            this.maxValue = maxV;
-            this.value = def;
-            this.defaultValue = def;
+            this.visible = false;
+            this.minValue = -200;
+            this.maxValue = 200;
+            this.value = 0;
+            this.defaultValue = 0;
         }
     }
 
     public static final class ComboParam extends ParamBase {
-        public String[] allowedValues;
-        public String value;
-        public String defaultValue;
+        public final String[] allowedValues;
+        public final String defaultValue;
         ComboParam(String name, boolean visible, String[] allowed, String def) {
             this.name = name;
             this.type = Type.COMBO;
             this.visible = visible;
             this.allowedValues = allowed;
-            this.value = def;
             this.defaultValue = def;
         }
     }
 
-    public static final class ButtonParam extends ParamBase {
-        ButtonParam(String name, boolean visible) {
-            this.name = name;
-            this.type = Type.BUTTON;
-            this.visible = visible;
-        }
-    }
-
     public static final class StringParam extends ParamBase {
-        public String value;
-        public String defaultValue;
+        public final String defaultValue;
         StringParam(String name, boolean visible, String def) {
             this.name = name;
             this.type = Type.STRING;
             this.visible = visible;
-            this.value = def;
             this.defaultValue = def;
         }
     }
@@ -85,11 +79,11 @@ public class Parameters {
         return inst;
     }
     public final String[] getParamNames() {
-        ArrayList<String> parNames = new ArrayList<String>();
+        ArrayList<String> parNames = new ArrayList<>();
         for (Map.Entry<String, ParamBase> e : params.entrySet())
             if (e.getValue().visible)
                 parNames.add(e.getKey());
-        return parNames.toArray(new String[parNames.size()]);
+        return parNames.toArray(new String[0]);
     }
 
     public final ParamBase getParam(String name) {
@@ -97,29 +91,22 @@ public class Parameters {
     }
 
     private static final Parameters inst = new Parameters();
-    private Map<String, ParamBase> params = new TreeMap<String, ParamBase>();
+    private final Map<String, ParamBase> params = new TreeMap<>();
 
     private Parameters() {
-        addPar(new SpinParam("qV", false, -200, 200, 0));
-        addPar(new SpinParam("rV", false, -200, 200, 0));
-        addPar(new SpinParam("bV", false, -200, 200, 0));
-        addPar(new SpinParam("nV", false, -200, 200, 0));
-        addPar(new SpinParam("pV", false, -200, 200, 0));
+        addPar(new SpinParam("qV"));
+        addPar(new SpinParam("rV"));
+        addPar(new SpinParam("bV"));
+        addPar(new SpinParam("nV"));
+        addPar(new SpinParam("pV"));
     }
 
-    private final void addPar(ParamBase p) {
+    private void addPar(ParamBase p) {
         params.put(p.name.toLowerCase(), p);
     }
 
-    final boolean getBooleanPar(String name) {
-        return ((CheckParam)params.get(name.toLowerCase())).value;
-    }
     final int getIntPar(String name) {
-        int ret = ((SpinParam)params.get(name.toLowerCase())).value;
-        return ret;
-    }
-    final String getStringPar(String name) {
-        return ((StringParam)params.get(name.toLowerCase())).value;
+        return ((SpinParam)params.get(name.toLowerCase())).value;
     }
 
     public final void set(String name, String value) {
@@ -127,38 +114,24 @@ public class Parameters {
         if (p == null)
             return;
         switch (p.type) {
-        case CHECK: {
-            CheckParam cp = (CheckParam)p;
-            if (value.toLowerCase().equals("true"))
-                cp.value = true;
-            else if (value.toLowerCase().equals("false"))
-                cp.value = false;
+        case CHECK, BUTTON, STRING:
             break;
-        }
         case SPIN: {
             SpinParam sp = (SpinParam)p;
             try {
                 int val = Integer.parseInt(value);
                 if ((val >= sp.minValue) && (val <= sp.maxValue))
                     sp.value = val;
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException ignored) {
             }
             break;
         }
         case COMBO: {
             ComboParam cp = (ComboParam)p;
             for (String allowed : cp.allowedValues)
-                if (allowed.toLowerCase().equals(value.toLowerCase())) {
-                    cp.value = allowed;
+                if (allowed.equalsIgnoreCase(value)) {
                     break;
                 }
-            break;
-        }
-        case BUTTON:
-            break;
-        case STRING: {
-            StringParam sp = (StringParam)p;
-            sp.value = value;
             break;
         }
         }

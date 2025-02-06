@@ -18,12 +18,11 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import java.util.Optional;
 
 /**
  *
@@ -31,23 +30,10 @@ import static org.junit.Assert.*;
  */
 public class HistoryTest {
 
-    public HistoryTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
     }
 
     /**
@@ -55,19 +41,18 @@ public class HistoryTest {
      */
     @Test
     public void testGetHistScore() throws ChessParseError {
-        System.out.println("getHistScore");
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         History hs = new History();
-        Move m1 = TextIO.stringToMove(pos, "e4");
-        Move m2 = TextIO.stringToMove(pos, "d4");
+        Move m1 = move(pos, "e4");
+        Move m2 = move(pos, "d4");
         assertEquals(0, hs.getHistScore(pos, m1));
 
         hs.addSuccess(pos, m1, 1);
-        assertEquals(1 * 49 / 1, hs.getHistScore(pos, m1));
+        assertEquals(49, hs.getHistScore(pos, m1));
         assertEquals(0, hs.getHistScore(pos, m2));
 
         hs.addSuccess(pos, m1, 1);
-        assertEquals(1 * 49 / 1, hs.getHistScore(pos, m1));
+        assertEquals(49, hs.getHistScore(pos, m1));
         assertEquals(0, hs.getHistScore(pos, m2));
 
         hs.addFail(pos, m1, 1);
@@ -80,6 +65,6 @@ public class HistoryTest {
 
         hs.addSuccess(pos, m2, 1);
         assertEquals(2 * 49 / 4, hs.getHistScore(pos, m1));
-        assertEquals(1 * 49 / 1, hs.getHistScore(pos, m2));
+        assertEquals(49, hs.getHistScore(pos, m2));
     }
 }

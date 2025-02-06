@@ -18,12 +18,12 @@
 
 package org.petero.cuckoo.engine.chess;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.petero.cuckoo.engine.chess.TranspositionTable.TTEntry;
 
-import static org.junit.Assert.*;
+import java.util.Optional;
 
 /**
  *
@@ -31,15 +31,10 @@ import static org.junit.Assert.*;
  */
 public class TranspositionTableTest {
 
-    public TranspositionTableTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
+    private Move move(Position pos, String strMove) {
+        Optional<Move> optionalMove = TextIO.stringToMove(pos, strMove);
+        assertTrue(optionalMove.isPresent());
+        return optionalMove.get();
     }
 
     /**
@@ -47,10 +42,9 @@ public class TranspositionTableTest {
      */
     @Test
     public void testTTEntry() throws ChessParseError {
-        System.out.println("TTEntry");
         final int mate0 = Search.MATE0;
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
-        Move move = TextIO.stringToMove(pos, "e4");
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
+        Move move = move(pos, "e4");
 
         // Test "normal" (non-mate) score
         int score = 17;
@@ -72,7 +66,6 @@ public class TranspositionTableTest {
         // Test positive mate score
         TTEntry ent2 = new TTEntry();
         score = mate0 - 6;
-        ply = 3;
         ent2.key = 3;
         move = new Move(8, 0, Piece.BQUEEN);
         ent2.setMove(move);
@@ -87,11 +80,11 @@ public class TranspositionTableTest {
         assertEquals(score + 2, ent2.getScore(ply - 2));
         
         // Compare ent1 and ent2
-        assertTrue(!ent1.betterThan(ent2, 0));  // More depth is good
+        assertFalse(ent1.betterThan(ent2, 0));  // More depth is good
         assertTrue(ent2.betterThan(ent1, 0));
 
         ent2.generation = 1;
-        assertTrue(!ent2.betterThan(ent1, 0));  // ent2 has wrong generation
+        assertFalse(ent2.betterThan(ent1, 0));  // ent2 has wrong generation
         assertTrue(ent2.betterThan(ent1, 1));  // ent1 has wrong generation
 
         ent2.generation = 0;
@@ -99,13 +92,12 @@ public class TranspositionTableTest {
         ent1.type = TranspositionTable.TTEntry.T_GE;
         assertTrue(ent2.betterThan(ent1, 0));
         ent2.type = TranspositionTable.TTEntry.T_LE;
-        assertTrue(!ent2.betterThan(ent1, 0));  // T_GE is equally good as T_LE
-        assertTrue(!ent1.betterThan(ent2, 0));
+        assertFalse(ent2.betterThan(ent1, 0));  // T_GE is equally good as T_LE
+        assertFalse(ent1.betterThan(ent2, 0));
         
         // Test negative mate score
         TTEntry ent3 = new TTEntry();
         score = -mate0 + 5;
-        ply = 3;
         ent3.key = 3;
         move = new Move(8, 0, Piece.BQUEEN);
         ent3.setMove(move);
@@ -125,15 +117,14 @@ public class TranspositionTableTest {
      */
     @Test
     public void testInsert() throws ChessParseError {
-        System.out.println("insert");
         TranspositionTable tt = new TranspositionTable(16);
-        Position pos = TextIO.readFEN(TextIO.startPosFEN);
+        Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
         String[] moves = {
             "e4", "e5", "Nf3", "Nc6", "Bb5", "a6", "Ba4", "b5", "Bb3", "Nf6", "O-O", "Be7", "Re1"
         };
         UndoInfo ui = new UndoInfo();
         for (int i = 0; i < moves.length; i++) {
-            Move m = TextIO.stringToMove(pos, moves[i]);
+            Move m = move(pos, moves[i]);
             pos.makeMove(m, ui);
             int score = i * 17 + 3;
             m.score = score;
@@ -143,9 +134,9 @@ public class TranspositionTableTest {
             tt.insert(pos.historyHash(), m, type, ply, depth, score * 2 + 3);
         }
 
-        pos = TextIO.readFEN(TextIO.startPosFEN);
+        pos = TextIO.readFEN(TextIO.START_POS_FEN);
         for (int i = 0; i < moves.length; i++) {
-            Move m = TextIO.stringToMove(pos, moves[i]);
+            Move m = move(pos, moves[i]);
             pos.makeMove(m, ui);
             TranspositionTable.TTEntry ent = tt.probe(pos.historyHash());
             assertEquals(TranspositionTable.TTEntry.T_EXACT, ent.type);

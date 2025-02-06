@@ -20,26 +20,13 @@ package org.petero.cuckoo.engine.chess;
 
 import static org.junit.Assert.*;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class BitBoardTest {
-    public BitBoardTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     /** Test of kingAttacks, of class BitBoard. */
     @Test
-    public void testKingAttacks() throws ChessParseError {
-        System.out.println("kingAttacks");
+    public void testKingAttacks() {
         assertEquals(5, Long.bitCount(BitBoard.kingAttacks[TextIO.getSquare("g1")]));
         assertEquals(3, Long.bitCount(BitBoard.kingAttacks[TextIO.getSquare("h1")]));
         assertEquals(3, Long.bitCount(BitBoard.kingAttacks[TextIO.getSquare("a1")]));
@@ -51,8 +38,7 @@ public class BitBoardTest {
 
     /** Test of knightAttacks, of class BitBoard. */
     @Test
-    public void testKnightAttacks() throws ChessParseError {
-        System.out.println("knightAttacks");
+    public void testKnightAttacks() {
         assertEquals(3, Long.bitCount(BitBoard.knightAttacks[TextIO.getSquare("g1")]));
         assertEquals(2, Long.bitCount(BitBoard.knightAttacks[TextIO.getSquare("a1")]));
         assertEquals(2, Long.bitCount(BitBoard.knightAttacks[TextIO.getSquare("h1")]));
@@ -67,8 +53,7 @@ public class BitBoardTest {
     
     /** Test of squaresBetween[][], of class BitBoard. */
     @Test
-    public void testSquaresBetween() throws ChessParseError {
-        System.out.println("squaresBetween");
+    public void testSquaresBetween() {
         // Tests that the set of nonzero elements is correct
         for (int sq1 = 0; sq1 < 64; sq1++) {
             for (int sq2 = 0; sq2 < 64; sq2++) {
@@ -82,7 +67,7 @@ public class BitBoardTest {
                         assertEquals(0, BitBoard.squaresBetween[sq1][sq2]);
                     } else {
                         if ((Math.abs(dx) > 1) || (Math.abs(dy) > 1)) {
-                            assertTrue(BitBoard.squaresBetween[sq1][sq2] != 0);
+                            assertNotEquals(0, BitBoard.squaresBetween[sq1][sq2]);
                         } else {
                             assertEquals(0, BitBoard.squaresBetween[sq1][sq2]);
                         }
@@ -99,7 +84,7 @@ public class BitBoardTest {
      * If there is a piece type that can move from "from" to "to", return the
      * corresponding direction, 8*dy+dx.
      */
-    private static final int computeDirection(int from, int to) {
+    private static int computeDirection(int from, int to) {
         int dx = Position.getX(to) - Position.getX(from);
         int dy = Position.getY(to) - Position.getY(from);
         if (dx == 0) {                   // Vertical rook direction
@@ -117,7 +102,6 @@ public class BitBoardTest {
 
     @Test
     public void testGetDirection() {
-        System.out.println("getDirection");
         for (int from = 0; from < 64; from++) {
             for (int to = 0; to < 64; to++) {
                 assertEquals(computeDirection(from, to), BitBoard.getDirection(from, to));
@@ -127,7 +111,6 @@ public class BitBoardTest {
 
     @Test
     public void testTrailingZeros() {
-        System.out.println("trailingZeros");
         for (int i = 0; i < 64; i++) {
             long mask = 1L << i;
             assertEquals(i, BitBoard.numberOfTrailingZeros(mask));

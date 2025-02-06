@@ -22,8 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.Optional;
 
-import org.petero.cuckoo.uci.UCIProtocol;
 import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Evaluate;
@@ -34,6 +34,7 @@ import org.petero.cuckoo.engine.chess.Player;
 import org.petero.cuckoo.engine.chess.Position;
 import org.petero.cuckoo.engine.chess.TextIO;
 import org.petero.cuckoo.engine.chess.TwoReturnValues;
+import org.petero.cuckoo.uci.UCIProtocol;
 
 public class TUIGame extends Game {
 
@@ -91,28 +92,27 @@ public class TUIGame extends Game {
         try {
             int idx = cmd.indexOf(" ");
             String filename = cmd.substring(0, idx);
-            String timeStr = cmd.substring(idx + 1, cmd.length());
+            String timeStr = cmd.substring(idx + 1);
             int timeLimit = Integer.parseInt(timeStr);
             //            System.out.printf("file:%s time:%s (%d)\n", filename, timeStr, timeLimit);
             fr = new LineNumberReader(new FileReader(filename));
             String line;
             Player pl = whitePlayer.isHumanPlayer() ? blackPlayer : whitePlayer;
             if (pl.isHumanPlayer()) {
-                System.out.printf("No computer player available");
+                System.out.print("No computer player available");
                 return false;
             }
             ComputerPlayer cp = (ComputerPlayer)pl;
             int numRight = 0;
             int numTotal = 0;
             while ((line = fr.readLine()) != null) {
-                if (line.startsWith("#") || (line.length() == 0)) {
+                if (line.startsWith("#") || (line.isEmpty())) {
                     continue;
                 }
                 int idx1 = line.indexOf(" bm ");
                 String fen = line.substring(0, idx1);
                 int idx2 = line.indexOf(";", idx1);
                 String bm = line.substring(idx1 + 4, idx2);
-                //                System.out.printf("Line %3d: fen:%s bm:%s\n", fr.getLineNumber(), fen, bm);
                 Position testPos = TextIO.readFEN(fen);
                 cp.clearTT();
                 TwoReturnValues<Move, String> ret = cp.searchPosition(testPos, timeLimit);
@@ -122,11 +122,11 @@ public class TUIGame extends Game {
                 String[] answers = bm.split(" ");
                 boolean correct = false;
                 for (String a : answers) {
-                    Move am = TextIO.stringToMove(testPos, a);
-                    if (am == null) {
+                    Optional<Move> am = TextIO.stringToMove(testPos, a);
+                    if (am.isEmpty()) {
                         throw new ChessParseError("Invalid move " + a);
                     }
-                    if (am.equals(m)) {
+                    if (am.get().equals(m)) {
                         correct = true;
                         break;
                     }
@@ -148,12 +148,9 @@ public class TUIGame extends Game {
             return false;
         } catch (IOException ex) {
             System.out.printf("IO error: %s\n", ex.getMessage());
-        } catch (ChessParseError cpe) {
+        } catch (ChessParseError | StringIndexOutOfBoundsException cpe) {
             int lineNo = (fr == null) ? -1 : fr.getLineNumber();
             System.out.printf("Parse error, line %d: %s\n", lineNo, cpe.getMessage());
-        } catch (StringIndexOutOfBoundsException e) {
-            int lineNo = (fr == null) ? -1 : fr.getLineNumber();
-            System.out.printf("Parse error, line %d: %s\n", lineNo, e.getMessage());
         } finally {
             if (fr != null) {
                 try {
@@ -169,7 +166,7 @@ public class TUIGame extends Game {
     /**
      * Administrate a game between two players, human or computer.
      */
-    public void play() throws IOException {
+    public void play() {
         handleCommand("new");
         while (true) {
             // Print last move
@@ -185,7 +182,6 @@ public class TUIGame extends Game {
                                 moveStr);
                 System.out.println(msg);
             }
-//            System.out.printf("Hash: %016x\n", pos.zobristHash());
             {
                 Evaluate eval = new Evaluate();
                 int evScore = eval.evalPos(pos) * (pos.whiteMove ? 1 : -1);
@@ -195,7 +191,7 @@ public class TUIGame extends Game {
             // Check game state
             System.out.print(TextIO.asciiBoard(pos));
             String stateStr = getGameStateString();
-            if (stateStr.length() > 0) {
+            if (!stateStr.isEmpty()) {
                 System.out.printf("%s%n", stateStr);
             }
             if (getGameState() != GameState.ALIVE) {
@@ -204,7 +200,7 @@ public class TUIGame extends Game {
 
             // Get command from current player and act on it
             Player pl = pos.whiteMove ? whitePlayer : blackPlayer;
-            String moveStr = pl.getCommand(new Position(pos), haveDrawOffer(), getHistory());
+            String moveStr = pl.getCommand(new Position(pos), getHistory());
             if (moveStr.equals("quit")) {
                 return;
             } else {
@@ -216,7 +212,7 @@ public class TUIGame extends Game {
         }
     }
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Player whitePlayer = new HumanPlayer();
         ComputerPlayer blackPlayer = new ComputerPlayer();
         blackPlayer.setTTLogSize(21);

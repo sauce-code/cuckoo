@@ -18,12 +18,9 @@
 
 package org.petero.cuckoo.uci;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  *
@@ -31,31 +28,11 @@ import static org.junit.Assert.*;
  */
 public class UCIProtocolTest {
 
-    public UCIProtocolTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of tokenize method, of class UCIProtocol.
      */
     @Test
     public void testTokenize() {
-        System.out.println("tokenize");
         UCIProtocol uci = new UCIProtocol();
         String[] result = uci.tokenize("  a b   c de \t \t fgh");
         assertEquals(5, result.length);

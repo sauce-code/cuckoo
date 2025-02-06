@@ -18,22 +18,29 @@
 
 package org.petero.cuckoo.engine.chess;
 
+import java.util.Arrays;
+
 public class BitBoard {
 
+    private BitBoard() {
+    }
+
     /** Squares attacked by a king on a given square. */
-    public static final long[] kingAttacks;
-    public static final long[] knightAttacks;
-    public static final long[] wPawnAttacks, bPawnAttacks;
+    protected static final long[] kingAttacks;
+    protected static final long[] knightAttacks;
+    protected static final long[] wPawnAttacks;
+    protected static final long[] bPawnAttacks;
 
     // Squares preventing a pawn from being a passed pawn, if occupied by enemy pawn
-    static final long[] wPawnBlockerMask, bPawnBlockerMask;
+    static final long[] wPawnBlockerMask;
+    static final long[] bPawnBlockerMask;
 
-    public static final long maskAToGFiles = 0x7F7F7F7F7F7F7F7FL;
-    public static final long maskBToHFiles = 0xFEFEFEFEFEFEFEFEL;
-    public static final long maskAToFFiles = 0x3F3F3F3F3F3F3F3FL;
-    public static final long maskCToHFiles = 0xFCFCFCFCFCFCFCFCL;
+    public static final long MASK_A_TO_G_FILES = 0x7F7F7F7F7F7F7F7FL;
+    public static final long MASK_B_TO_H_FILES = 0xFEFEFEFEFEFEFEFEL;
+    public static final long MASK_A_TO_F_FILES = 0x3F3F3F3F3F3F3F3FL;
+    public static final long MASK_C_TO_H_FILES = 0xFCFCFCFCFCFCFCFCL;
 
-    public static final long[] maskFile = {
+    protected static final long[] MASK_FILE = {
         0x0101010101010101L,
         0x0202020202020202L,
         0x0404040404040404L,
@@ -44,20 +51,18 @@ public class BitBoard {
         0x8080808080808080L
     };
 
-    public static final long maskRow1      = 0x00000000000000FFL;
-    public static final long maskRow2      = 0x000000000000FF00L;
-    public static final long maskRow3      = 0x0000000000FF0000L;
-    public static final long maskRow4      = 0x00000000FF000000L;
-    public static final long maskRow5      = 0x000000FF00000000L;
-    public static final long maskRow6      = 0x0000FF0000000000L;
-    public static final long maskRow7      = 0x00FF000000000000L;
-    public static final long maskRow8      = 0xFF00000000000000L;
-    public static final long maskRow1Row8  = 0xFF000000000000FFL;
+    public static final long MASK_ROW_1 = 0x00000000000000FFL;
+    public static final long MASK_ROW_2 = 0x000000000000FF00L;
+    public static final long MASK_ROW_3 = 0x0000000000FF0000L;
+    public static final long MASK_ROW_6 = 0x0000FF0000000000L;
+    public static final long MASK_ROW_7 = 0x00FF000000000000L;
+    public static final long MASK_ROW_8 = 0xFF00000000000000L;
+    public static final long MASK_ROW_1_ROW_8 = 0xFF000000000000FFL;
 
-    public static final long maskDarkSq    = 0xAA55AA55AA55AA55L;
-    public static final long maskLightSq   = 0x55AA55AA55AA55AAL;
+    public static final long MASK_DARK_SQ = 0xAA55AA55AA55AA55L;
+    public static final long MASK_LIGHT_SQ = 0x55AA55AA55AA55AAL;
 
-    public static final long maskCorners   = 0x8100000000000081L;
+    public static final long MASK_CORNERS = 0x8100000000000081L;
 
     static {
         // Compute king attacks
@@ -65,8 +70,8 @@ public class BitBoard {
 
         for (int sq = 0; sq < 64; sq++) {
             long m = 1L << sq;
-            long mask = (((m >>> 1) | (m << 7) | (m >>> 9)) & maskAToGFiles) |
-                        (((m <<  1) | (m << 9) | (m >>> 7)) & maskBToHFiles) |
+            long mask = (((m >>> 1) | (m << 7) | (m >>> 9)) & MASK_A_TO_G_FILES) |
+                        (((m <<  1) | (m << 9) | (m >>> 7)) & MASK_B_TO_H_FILES) |
                         (m << 8) | (m >>> 8);
             kingAttacks[sq] = mask;
         }
@@ -75,10 +80,10 @@ public class BitBoard {
         knightAttacks = new long[64];
         for (int sq = 0; sq < 64; sq++) {
             long m = 1L << sq;
-            long mask = (((m <<  6) | (m >>> 10)) & maskAToFFiles) |
-                        (((m << 15) | (m >>> 17)) & maskAToGFiles) |
-                        (((m << 17) | (m >>> 15)) & maskBToHFiles) |
-                        (((m << 10) | (m >>>  6)) & maskCToHFiles);
+            long mask = (((m <<  6) | (m >>> 10)) & MASK_A_TO_F_FILES) |
+                        (((m << 15) | (m >>> 17)) & MASK_A_TO_G_FILES) |
+                        (((m << 17) | (m >>> 15)) & MASK_B_TO_H_FILES) |
+                        (((m << 10) | (m >>>  6)) & MASK_C_TO_H_FILES);
             knightAttacks[sq] = mask;
         }
 
@@ -89,9 +94,9 @@ public class BitBoard {
         bPawnBlockerMask = new long[64];
         for (int sq = 0; sq < 64; sq++) {
             long m = 1L << sq;
-            long mask = ((m << 7) & maskAToGFiles) | ((m << 9) & maskBToHFiles);
+            long mask = ((m << 7) & MASK_A_TO_G_FILES) | ((m << 9) & MASK_B_TO_H_FILES);
             wPawnAttacks[sq] = mask;
-            mask = ((m >>> 9) & maskAToGFiles) | ((m >>> 7) & maskBToHFiles);
+            mask = ((m >>> 9) & MASK_A_TO_G_FILES) | ((m >>> 7) & MASK_B_TO_H_FILES);
             bPawnAttacks[sq] = mask;
             
             int x = Position.getX(sq);
@@ -99,23 +104,23 @@ public class BitBoard {
             m = 0;
             for (int y2 = y+1; y2 < 8; y2++) {
                 if (x > 0) m |= 1L << Position.getSquare(x-1, y2);
-                           m |= 1L << Position.getSquare(x  , y2);
+                m |= 1L << Position.getSquare(x  , y2);
                 if (x < 7) m |= 1L << Position.getSquare(x+1, y2);
             }
             wPawnBlockerMask[sq] = m;
             m = 0;
             for (int y2 = y-1; y2 >= 0; y2--) {
                 if (x > 0) m |= 1L << Position.getSquare(x-1, y2);
-                           m |= 1L << Position.getSquare(x  , y2);
+                m |= 1L << Position.getSquare(x  , y2);
                 if (x < 7) m |= 1L << Position.getSquare(x+1, y2);
             }
             bPawnBlockerMask[sq] = m;
         }
     }
 
-    private final static long[][] rTables;
-    private final static long[] rMasks;
-    private final static int[] rBits = { 12, 11, 11, 11, 11, 11, 11, 12,
+    private static final long[][] rTables;
+    private static final long[] rMasks;
+    private static final int[] rBits = { 12, 11, 11, 11, 11, 11, 11, 12,
                                          11, 10, 10, 10, 10, 10, 10, 11,
                                          11, 10, 10, 10, 10, 10, 10, 11,
                                          11, 10, 10, 10, 10, 10, 10, 11,
@@ -123,7 +128,7 @@ public class BitBoard {
                                          11, 10, 10, 10, 10, 10, 10, 11,
                                          10,  9,  9,  9,  9,  9, 10, 10,
                                          11, 10, 10, 10, 10, 11, 11, 11 };
-    private final static long[] rMagics = {
+    private static final long[] rMagics = {
         0x0080011084624000L, 0x1440031000200141L, 0x2080082004801000L, 0x0100040900100020L,
         0x0200020010200408L, 0x0300010008040002L, 0x040024081000a102L, 0x0080003100054680L,
         0x1100800040008024L, 0x8440401000200040L, 0x0432001022008044L, 0x0402002200100840L,
@@ -141,9 +146,9 @@ public class BitBoard {
         0xebffffb9ff9fc526L, 0x61fffeddfeedaeaeL, 0x53bfffedffdeb1a2L, 0x127fffb9ffdfb5f6L,
         0x411fffddffdbf4d6L, 0x0005000208040001L, 0x264038060100d004L, 0x7645fffecbfea79eL,
     };
-    private final static long[][] bTables;
-    private final static long[] bMasks;
-    private final static int[] bBits = { 5, 4, 5, 5, 5, 5, 4, 5,
+    private static final long[][] bTables;
+    private static final long[] bMasks;
+    private static final int[] bBits = { 5, 4, 5, 5, 5, 5, 4, 5,
                                          4, 4, 5, 5, 5, 5, 4, 4,
                                          4, 4, 7, 7, 7, 7, 4, 4,
                                          5, 5, 7, 9, 9, 7, 5, 5,
@@ -151,7 +156,7 @@ public class BitBoard {
                                          4, 4, 7, 7, 7, 7, 4, 4,
                                          4, 4, 5, 5, 5, 5, 4, 4,
                                          5, 4, 5, 5, 5, 5, 4, 5 };
-    private final static long[] bMagics = {
+    private static final long[] bMagics = {
         0xffedf9fd7cfcffffL, 0xfc0962854a77f576L, 0x9010210041047000L, 0x52242420800c0000L,
         0x884404220480004aL, 0x0002080248000802L, 0xfc0a66c64a7ef576L, 0x7ffdfdfcbd79ffffL,
         0xfc0846a64a34fff6L, 0xfc087a874a3cf7f6L, 0x02000888010a2211L, 0x0040044040801808L,
@@ -170,7 +175,7 @@ public class BitBoard {
         0x9080000412220a00L, 0x0000002020010a42L, 0xfc087e8e4bb2f736L, 0x43ff9e4ef4ca2c89L,
     };
 
-    private static final long createPattern(int i, long mask) {
+    private static long createPattern(int i, long mask) {
         long ret = 0L;
         for (int j = 0; ; j++) {
             long nextMask = mask & (mask - 1);
@@ -184,7 +189,7 @@ public class BitBoard {
         return ret;
     }
     
-    private static final long addRookRays(int x, int y, long occupied, boolean inner) {
+    private static long addRookRays(int x, int y, long occupied, boolean inner) {
         long mask = 0;
         mask = addRay(mask, x, y,  1,  0, occupied, inner);
         mask = addRay(mask, x, y, -1,  0, occupied, inner);
@@ -192,7 +197,7 @@ public class BitBoard {
         mask = addRay(mask, x, y,  0, -1, occupied, inner);
         return mask;
     }
-    private static final long addBishopRays(int x, int y, long occupied, boolean inner) {
+    private static long addBishopRays(int x, int y, long occupied, boolean inner) {
         long mask = 0;
         mask = addRay(mask, x, y,  1,  1, occupied, inner);
         mask = addRay(mask, x, y, -1, -1, occupied, inner);
@@ -201,21 +206,24 @@ public class BitBoard {
         return mask;
     }
 
-    private static final long addRay(long mask, int x, int y, int dx, int dy, 
-                                     long occupied, boolean inner) {
+    private static long addRay(long mask, int x, int y, int dx, int dy,
+                               long occupied, boolean inner) {
         int lo = inner ? 1 : 0;
         int hi = inner ? 6 : 7;
         while (true) {
             if (dx != 0) {
-                x += dx; if ((x < lo) || (x > hi)) break;
+                x += dx;
+                if ((x < lo) || (x > hi)) break;
             }
             if (dy != 0) {
-                y += dy; if ((y < lo) || (y > hi)) break;
+                y += dy;
+                if ((y < lo) || (y > hi)) break;
             }
             int sq = Position.getSquare(x, y);
             mask |= 1L << sq;
-            if ((occupied & (1L << sq)) != 0)
+            if ((occupied & (1L << sq)) != 0) {
                 break;
+            }
         }
         return mask;
     }
@@ -229,7 +237,7 @@ public class BitBoard {
             rMasks[sq] = addRookRays(x, y, 0L, true);
             int tableSize = 1 << rBits[sq];
             long[] table = new long[tableSize];
-            for (int i = 0; i < tableSize; i++) table[i] = -1;
+            Arrays.fill(table, -1);
             int nPatterns = 1 << Long.bitCount(rMasks[sq]);
             for (int i = 0; i < nPatterns; i++) {
                 long p = createPattern(i, rMasks[sq]);
@@ -238,7 +246,7 @@ public class BitBoard {
                 if (table[entry] == -1) {
                     table[entry] = atks;
                 } else if (table[entry] != atks) {
-                    throw new RuntimeException();
+                    throw new InitializationException();
                 }
             }
             rTables[sq] = table;
@@ -254,7 +262,7 @@ public class BitBoard {
             bMasks[sq] = addBishopRays(x, y, 0L, true);
             int tableSize = 1 << bBits[sq];
             long[] table = new long[tableSize];
-            for (int i = 0; i < tableSize; i++) table[i] = -1;
+            Arrays.fill(table, -1);
             int nPatterns = 1 << Long.bitCount(bMasks[sq]);
             for (int i = 0; i < nPatterns; i++) {
                 long p = createPattern(i, bMasks[sq]);
@@ -263,22 +271,23 @@ public class BitBoard {
                 if (table[entry] == -1) {
                     table[entry] = atks;
                 } else if (table[entry] != atks) {
-                    throw new RuntimeException();
+                    throw new InitializationException();
                 }
             }
             bTables[sq] = table;
         }
     }
 
-    public static final long bishopAttacks(int sq, long occupied) {
+    public static long bishopAttacks(int sq, long occupied) {
         return bTables[sq][(int)(((occupied & bMasks[sq]) * bMagics[sq]) >>> (64 - bBits[sq]))];
     }
 
-    public static final long rookAttacks(int sq, long occupied) {
+    public static long rookAttacks(int sq, long occupied) {
         return rTables[sq][(int)(((occupied & rMasks[sq]) * rMagics[sq]) >>> (64 - rBits[sq]))];
     }
-    
-    static public final long[][] squaresBetween;
+
+  protected static final long[][] squaresBetween;
+
     static {
         squaresBetween = new long[64][];
         for (int sq1 = 0; sq1 < 64; sq1++) {
@@ -305,7 +314,7 @@ public class BitBoard {
         }
     }
 
-    private static final byte dirTable[] = {
+    private static final byte[] dirTable = {
             -9,   0,   0,   0,   0,   0,   0,  -8,   0,   0,   0,   0,   0,   0,  -7,
         0,   0,  -9,   0,   0,   0,   0,   0,  -8,   0,   0,   0,   0,   0,  -7,   0,
         0,   0,   0,  -9,   0,   0,   0,   0,  -8,   0,   0,   0,   0,  -7,   0,   0,
@@ -323,37 +332,37 @@ public class BitBoard {
         0,   7,   0,   0,   0,   0,   0,   0,   8,   0,   0,   0,   0,   0,   0,   9
     };
 
-    static public final int getDirection(int from, int to) {
+  public static int getDirection(int from, int to) {
         int offs = to + (to|7) - from - (from|7) + 0x77;
         return dirTable[offs];
     }
 
-    public static final long southFill(long mask) {
+    public static long southFill(long mask) {
         mask |= (mask >>> 8);
         mask |= (mask >>> 16);
         mask |= (mask >>> 32);
         return mask;
     }
     
-    public static final long northFill(long mask) {
+    public static long northFill(long mask) {
         mask |= (mask << 8);
         mask |= (mask << 16);
         mask |= (mask << 32);
         return mask;
     }
 
-    private static final int trailingZ[] = {
-        63,  0, 58,  1, 59, 47, 53,  2,
-        60, 39, 48, 27, 54, 33, 42,  3,
-        61, 51, 37, 40, 49, 18, 28, 20,
-        55, 30, 34, 11, 43, 14, 22,  4,
-        62, 57, 46, 52, 38, 26, 32, 41,
-        50, 36, 17, 19, 29, 10, 13, 21,
-        56, 45, 25, 31, 35, 16,  9, 12,
-        44, 24, 15,  8, 23,  7,  6,  5
-    };
+  private static final int[] trailingZ = {
+    63, 0, 58, 1, 59, 47, 53, 2,
+    60, 39, 48, 27, 54, 33, 42, 3,
+    61, 51, 37, 40, 49, 18, 28, 20,
+    55, 30, 34, 11, 43, 14, 22, 4,
+    62, 57, 46, 52, 38, 26, 32, 41,
+    50, 36, 17, 19, 29, 10, 13, 21,
+    56, 45, 25, 31, 35, 16, 9, 12,
+    44, 24, 15, 8, 23, 7, 6, 5
+  };
 
-    static public final int numberOfTrailingZeros(long mask) {
+  public static int numberOfTrailingZeros(long mask) {
         return trailingZ[(int)(((mask & -mask) * 0x07EDD5E59A4E28C2L) >>> 58)];
     }
 }
