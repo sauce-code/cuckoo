@@ -872,70 +872,74 @@ public class Evaluate {
             int score = 0;
             long wPawns = pos.pieceTypeBB[Piece.WPAWN];
             long bPawns = pos.pieceTypeBB[Piece.BPAWN];
-            {
-                int safety = 0;
-                int halfOpenFiles = 0;
-                if (Position.getY(pos.wKingSq) < 2) {
-                    long shelter = 1L << Position.getX(pos.wKingSq);
-                    shelter |= ((shelter & BitBoard.MASK_B_TO_H_FILES) >>> 1) |
-                               ((shelter & BitBoard.MASK_A_TO_G_FILES) << 1);
-                    shelter <<= 8;
-                    safety += 3 * Long.bitCount(wPawns & shelter);
-                    safety -= 2 * Long.bitCount(bPawns & (shelter | (shelter << 8)));
-                    shelter <<= 8;
-                    safety += 2 * Long.bitCount(wPawns & shelter);
-                    shelter <<= 8;
-                    safety -= Long.bitCount(bPawns & shelter);
-                    
-                    long wOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(wPawns)) & 0xff;
-                    if (wOpen != 0) {
-                        halfOpenFiles += 25 * Long.bitCount(wOpen & 0xe7);
-                        halfOpenFiles += 10 * Long.bitCount(wOpen & 0x18);
-                    }
-                    long bOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(bPawns)) & 0xff;
-                    if (bOpen != 0) {
-                        halfOpenFiles += 25 * Long.bitCount(bOpen & 0xe7);
-                        halfOpenFiles += 10 * Long.bitCount(bOpen & 0x18);
-                    }
-                    safety = Math.min(safety, 8);
-                }
-                final int kSafety = (safety - 9) * 15 - halfOpenFiles;
-                score += kSafety;
-            }
-            {
-                int safety = 0;
-                int halfOpenFiles = 0;
-                if (Position.getY(pos.bKingSq) >= 6) {
-                    long shelter = 1L << (56 + Position.getX(pos.bKingSq));
-                    shelter |= ((shelter & BitBoard.MASK_B_TO_H_FILES) >>> 1) |
-                               ((shelter & BitBoard.MASK_A_TO_G_FILES) << 1);
-                    shelter >>>= 8;
-                    safety += 3 * Long.bitCount(bPawns & shelter);
-                    safety -= 2 * Long.bitCount(wPawns & (shelter | (shelter >>> 8)));
-                    shelter >>>= 8;
-                    safety += 2 * Long.bitCount(bPawns & shelter);
-                    shelter >>>= 8;
-                    safety -= Long.bitCount(wPawns & shelter);
 
-                    long wOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(wPawns)) & 0xff;
-                    if (wOpen != 0) {
-                        halfOpenFiles += 25 * Long.bitCount(wOpen & 0xe7);
-                        halfOpenFiles += 10 * Long.bitCount(wOpen & 0x18);
-                    }
-                    long bOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(bPawns)) & 0xff;
-                    if (bOpen != 0) {
-                        halfOpenFiles += 25 * Long.bitCount(bOpen & 0xe7);
-                        halfOpenFiles += 10 * Long.bitCount(bOpen & 0x18);
-                    }
-                    safety = Math.min(safety, 8);
-                }
-                final int kSafety = (safety - 9) * 15 - halfOpenFiles;
-                score -= kSafety;
-            }
+            score += getKSafetyWhite(pos, wPawns, bPawns);
+            score -= getKSafetyBlack(pos, wPawns, bPawns);
+
             ksh.key = key;
             ksh.score = score;
         }
         return ksh.score;
+    }
+
+    private static int getKSafetyWhite(Position pos, long wPawns, long bPawns) {
+        int safety = 0;
+        int halfOpenFiles = 0;
+        if (Position.getY(pos.wKingSq) < 2) {
+            long shelter = 1L << Position.getX(pos.wKingSq);
+            shelter |= ((shelter & BitBoard.MASK_B_TO_H_FILES) >>> 1) |
+                    ((shelter & BitBoard.MASK_A_TO_G_FILES) << 1);
+            shelter <<= 8;
+            safety += 3 * Long.bitCount(wPawns & shelter);
+            safety -= 2 * Long.bitCount(bPawns & (shelter | (shelter << 8)));
+            shelter <<= 8;
+            safety += 2 * Long.bitCount(wPawns & shelter);
+            shelter <<= 8;
+            safety -= Long.bitCount(bPawns & shelter);
+
+            long wOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(wPawns)) & 0xff;
+            if (wOpen != 0) {
+                halfOpenFiles += 25 * Long.bitCount(wOpen & 0xe7);
+                halfOpenFiles += 10 * Long.bitCount(wOpen & 0x18);
+            }
+            long bOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(bPawns)) & 0xff;
+            if (bOpen != 0) {
+                halfOpenFiles += 25 * Long.bitCount(bOpen & 0xe7);
+                halfOpenFiles += 10 * Long.bitCount(bOpen & 0x18);
+            }
+            safety = Math.min(safety, 8);
+        }
+        return (safety - 9) * 15 - halfOpenFiles;
+    }
+
+    private static int getKSafetyBlack(Position pos, long wPawns, long bPawns) {
+        int safety = 0;
+        int halfOpenFiles = 0;
+        if (Position.getY(pos.bKingSq) >= 6) {
+            long shelter = 1L << (56 + Position.getX(pos.bKingSq));
+            shelter |= ((shelter & BitBoard.MASK_B_TO_H_FILES) >>> 1) |
+                    ((shelter & BitBoard.MASK_A_TO_G_FILES) << 1);
+            shelter >>>= 8;
+            safety += 3 * Long.bitCount(bPawns & shelter);
+            safety -= 2 * Long.bitCount(wPawns & (shelter | (shelter >>> 8)));
+            shelter >>>= 8;
+            safety += 2 * Long.bitCount(bPawns & shelter);
+            shelter >>>= 8;
+            safety -= Long.bitCount(wPawns & shelter);
+
+            long wOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(wPawns)) & 0xff;
+            if (wOpen != 0) {
+                halfOpenFiles += 25 * Long.bitCount(wOpen & 0xe7);
+                halfOpenFiles += 10 * Long.bitCount(wOpen & 0x18);
+            }
+            long bOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(bPawns)) & 0xff;
+            if (bOpen != 0) {
+                halfOpenFiles += 25 * Long.bitCount(bOpen & 0xe7);
+                halfOpenFiles += 10 * Long.bitCount(bOpen & 0x18);
+            }
+            safety = Math.min(safety, 8);
+        }
+        return (safety - 9) * 15 - halfOpenFiles;
     }
 
     /** Implements special knowledge for some endgame situations. */
