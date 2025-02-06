@@ -372,26 +372,21 @@ public class TextIO {
         return ret.toString();
     }
 
+    public static String getPromotionString(Move m) {
+        return switch (m.promoteTo) {
+            case Piece.WQUEEN, Piece.BQUEEN -> "q";
+            case Piece.WROOK, Piece.BROOK -> "r";
+            case Piece.WBISHOP, Piece.BBISHOP -> "b";
+            case Piece.WKNIGHT, Piece.BKNIGHT -> "n";
+            default -> "";
+        };
+    }
+
     /** Convert a move object to UCI string format. */
     public static String moveToUCIString(Move m) {
         String ret = squareToString(m.from);
         ret += squareToString(m.to);
-        switch (m.promoteTo) {
-            case Piece.WQUEEN, Piece.BQUEEN:
-                ret += "q";
-                break;
-            case Piece.WROOK, Piece.BROOK:
-                ret += "r";
-                break;
-            case Piece.WBISHOP, Piece.BBISHOP:
-                ret += "b";
-                break;
-            case Piece.WKNIGHT, Piece.BKNIGHT:
-                ret += "n";
-                break;
-            default:
-                break;
-        }
+        ret += getPromotionString(m);
         return ret;
     }
 

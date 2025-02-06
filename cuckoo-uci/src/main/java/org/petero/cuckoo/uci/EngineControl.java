@@ -335,22 +335,7 @@ public class EngineControl {
 			return "0000";
 		String ret = TextIO.squareToString(m.from);
 		ret += TextIO.squareToString(m.to);
-		switch (m.promoteTo) {
-		case Piece.WQUEEN, Piece.BQUEEN:
-			ret += "q";
-			break;
-		case Piece.WROOK, Piece.BROOK:
-			ret += "r";
-			break;
-		case Piece.WBISHOP, Piece.BBISHOP:
-			ret += "b";
-			break;
-		case Piece.WKNIGHT, Piece.BKNIGHT:
-			ret += "n";
-			break;
-		default:
-			break;
-		}
+		ret += TextIO.getPromotionString(m);
 		return ret;
 	}
 
