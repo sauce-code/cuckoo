@@ -321,14 +321,10 @@ public class EngineControl {
 			ent.getMove(ret);
 			MoveGen.MoveList moves = moveGen.pseudoLegalMoves(pos);
 			MoveGen.removeIllegal(pos, moves);
-			boolean contains = false;
-			for (int mi = 0; mi < moves.size; mi++)
-				if (moves.m[mi].equals(ret)) {
-					contains = true;
-					break;
-				}
-			if (!contains)
-				ret = null;
+			boolean contains = TranspositionTable.contains(ret, ent, moveGen, pos);
+      		if (!contains) {
+        		ret = null;
+	  		}
 		}
 		pos.unMakeMove(m, ui);
 		return ret;

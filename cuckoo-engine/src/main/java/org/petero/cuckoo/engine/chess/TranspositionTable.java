@@ -238,20 +238,26 @@ public class TranspositionTable {
             if (ent.type == TTEntry.T_EMPTY) {
                 break;
             }
-            m = new Move(0,0,0);
-            ent.getMove(m);
-            MoveGen.MoveList moves = moveGen.pseudoLegalMoves(pos);
-            MoveGen.removeIllegal(pos, moves);
-            boolean contains = false;
-            for (int mi = 0; mi < moves.size; mi++)
-                if (moves.m[mi].equals(m)) {
-                    contains = true;
-                    break;
-                }
+            m = new Move(0, 0, 0);
+            boolean contains = contains(m, ent, moveGen, pos);
             if  (!contains)
                 break;
         }
         return ret;
+    }
+
+    public static boolean contains(Move m, TTEntry ent, MoveGen moveGen, Position pos) {
+        ent.getMove(m);
+        MoveGen.MoveList moves = moveGen.pseudoLegalMoves(pos);
+        MoveGen.removeIllegal(pos, moves);
+        boolean contains = false;
+        for (int mi = 0; mi < moves.size; mi++) {
+            if (moves.m[mi].equals(m)) {
+                contains = true;
+                break;
+            }
+        }
+        return contains;
     }
 
     /** Extract the PV starting from pos, using hash entries, both exact scores and bounds. */
@@ -272,15 +278,7 @@ public class TranspositionTable {
                 type = ">";
             }
             Move m = new Move(0,0,0);
-            ent.getMove(m);
-            MoveGen.MoveList moves = moveGen.pseudoLegalMoves(pos);
-            MoveGen.removeIllegal(pos, moves);
-            boolean contains = false;
-            for (int mi = 0; mi < moves.size; mi++)
-                if (moves.m[mi].equals(m)) {
-                    contains = true;
-                    break;
-                }
+            boolean contains = contains(m, ent, moveGen, pos);
             if  (!contains)
                 break;
             String moveStr = TextIO.moveToString(pos, m, false);
