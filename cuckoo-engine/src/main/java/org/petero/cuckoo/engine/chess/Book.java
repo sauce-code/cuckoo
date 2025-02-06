@@ -178,18 +178,19 @@ public class Book {
     }
 
     /** Creates the book.bin file. */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         List<Byte> binBook = createBinBook();
-        FileOutputStream out = new FileOutputStream("../src/book.bin");
-        int bookLen = binBook.size();
-        byte[] binBookA = new byte[bookLen];
-        for (int i = 0; i < bookLen; i++)
-            binBookA[i] = binBook.get(i);
-        out.write(binBookA);
-        out.close();
+    try (FileOutputStream out = new FileOutputStream("../src/book.bin")) {
+      int bookLen = binBook.size();
+      byte[] binBookA = new byte[bookLen];
+      for (int i = 0; i < bookLen; i++) binBookA[i] = binBook.get(i);
+      out.write(binBookA);
+    } catch (IOException e) {
+        e.printStackTrace();
     }
-    
-    public static List<Byte> createBinBook() {
+  }
+
+  public static List<Byte> createBinBook() {
         List<Byte> binBook = new ArrayList<>(0);
         try {
             InputStream inStream = Object.class.getResourceAsStream("/book.txt");

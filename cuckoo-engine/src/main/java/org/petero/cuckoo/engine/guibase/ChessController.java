@@ -183,62 +183,60 @@ public class ChessController {
 
         // Parse tag section
         Position pos = TextIO.readFEN(TextIO.START_POS_FEN);
-        Scanner sc = new Scanner(pgn);
-        sc.useDelimiter("\\s+");
-        while (sc.hasNext("\\[.*")) {
+        try (Scanner sc = new Scanner(pgn)) {
+          sc.useDelimiter("\\s+");
+          while (sc.hasNext("\\[.*")) {
             String tagName = sc.next();
             if (tagName.length() > 1) {
-                tagName = tagName.substring(1);
+              tagName = tagName.substring(1);
             } else {
-                tagName = sc.next();
+              tagName = sc.next();
             }
             String tagValue = sc.findWithinHorizon(".*\\]", 0);
             tagValue = tagValue.trim();
-            if (tagValue.charAt(0) == '"')
-                tagValue = tagValue.substring(1);
-            if (tagValue.charAt(tagValue.length()-1) == ']')
-                tagValue = tagValue.substring(0, tagValue.length() - 1);
-            if (tagValue.charAt(tagValue.length()-1) == '"')
-                tagValue = tagValue.substring(0, tagValue.length() - 1);
+            if (tagValue.charAt(0) == '"') tagValue = tagValue.substring(1);
+            if (tagValue.charAt(tagValue.length() - 1) == ']')
+              tagValue = tagValue.substring(0, tagValue.length() - 1);
+            if (tagValue.charAt(tagValue.length() - 1) == '"')
+              tagValue = tagValue.substring(0, tagValue.length() - 1);
             if (tagName.equals("FEN")) {
-                pos = TextIO.readFEN(tagValue);
+              pos = TextIO.readFEN(tagValue);
             }
-        }
-        game.processString("new");
-        game.pos = pos;
+          }
+          game.processString("new");
+          game.pos = pos;
 
-        // Handle (ignore) recursive annotation variations
-        {
+          // Handle (ignore) recursive annotation variations
+          {
             StringBuilder out = new StringBuilder();
             sc.useDelimiter("");
             int level = 0;
             while (sc.hasNext()) {
-                String c = sc.next();
-                if (c.equals("(")) {
-                    level++;
-                } else if (c.equals(")")) {
-                    level--;
-                } else if (level == 0) {
-                    out.append(c);
-                }
+              String c = sc.next();
+              if (c.equals("(")) {
+                level++;
+              } else if (c.equals(")")) {
+                level--;
+              } else if (level == 0) {
+                out.append(c);
+              }
             }
             pgn = out.toString();
+          }
         }
-        sc.close();
 
         // Parse move text section
-        sc = new Scanner(pgn);
-        sc.useDelimiter("\\s+");
-        while (sc.hasNext()) {
+        try (Scanner sc = new Scanner(pgn)) {
+          sc.useDelimiter("\\s+");
+          while (sc.hasNext()) {
             String strMove = sc.next();
             strMove = strMove.replaceFirst("\\$?[0-9]*\\.*([^?!]*)[?!]*", "$1");
             if (strMove.isEmpty()) continue;
             Optional<Move> m = TextIO.stringToMove(game.pos, strMove);
-            if (m.isEmpty())
-                break;
+            if (m.isEmpty()) break;
             game.processString(strMove);
+          }
         }
-        sc.close();
     }
 
     public final boolean humansTurn() {
@@ -404,6 +402,7 @@ public class ChessController {
                 computerThread.join();
             } catch (InterruptedException ex) {
                 System.out.printf("Could not stop thread%n");
+                computerThread.interrupt();
             }
             computerThread = null;
             updateGUI();

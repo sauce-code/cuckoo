@@ -213,7 +213,7 @@ public class ComputerPlayer implements Player {
         for (int mi = 0; mi < moves.size; mi++) {
             sum += moveProbWeight(moves.m[mi].score, bestScore);
         }
-        int rnd = rndGen.nextInt(sum);
+        int rnd = sum == 0 ? 0 : rndGen.nextInt(sum);
         for (int mi = 0; mi < moves.size; mi++) {
             int weight = moveProbWeight(moves.m[mi].score, bestScore);
             if (rnd < weight) {

@@ -28,6 +28,7 @@ import org.petero.cuckoo.engine.guibase.GUIInterface;
 
 import java.awt.*;
 import java.io.Serial;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * The main class for the chess GUI.
@@ -42,7 +43,7 @@ public class AppletGUI extends JFrame implements GUIInterface {
     String moveListStr = "";
     String thinkingStr = "";
 
-    public AppletGUI(String title) throws HeadlessException {
+    public AppletGUI(String title) {
         super(title);
         ctrl = new ChessController(this);
         try {
@@ -52,8 +53,11 @@ public class AppletGUI extends JFrame implements GUIInterface {
                 ctrl.newGame(playerWhite.isSelected(), TT_LOG_SIZE, true);
                 ctrl.startGame();
             });
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
         }
     }
 
