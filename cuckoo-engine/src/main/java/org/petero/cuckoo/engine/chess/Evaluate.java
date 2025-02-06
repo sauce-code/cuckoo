@@ -882,6 +882,23 @@ public class Evaluate {
         return ksh.score;
     }
 
+    private static int getHalfOpenFiles(long shelter, long wPawns, long bPawns) {
+        int halfOpenFiles = 0;
+        halfOpenFiles += getHalfOpenFiles(shelter, wPawns);
+        halfOpenFiles += getHalfOpenFiles(shelter, bPawns);
+        return halfOpenFiles;
+    }
+
+    private static int getHalfOpenFiles(long shelter, long pawns) {
+        int halfOpenFiles = 0;
+        long wOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(pawns)) & 0xff;
+        if (wOpen != 0) {
+            halfOpenFiles += 25 * Long.bitCount(wOpen & 0xe7);
+            halfOpenFiles += 10 * Long.bitCount(wOpen & 0x18);
+        }
+        return halfOpenFiles;
+    }
+
     private static int getKSafetyWhite(Position pos, long wPawns, long bPawns) {
         int safety = 0;
         int halfOpenFiles = 0;
@@ -896,17 +913,7 @@ public class Evaluate {
             safety += 2 * Long.bitCount(wPawns & shelter);
             shelter <<= 8;
             safety -= Long.bitCount(bPawns & shelter);
-
-            long wOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(wPawns)) & 0xff;
-            if (wOpen != 0) {
-                halfOpenFiles += 25 * Long.bitCount(wOpen & 0xe7);
-                halfOpenFiles += 10 * Long.bitCount(wOpen & 0x18);
-            }
-            long bOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(bPawns)) & 0xff;
-            if (bOpen != 0) {
-                halfOpenFiles += 25 * Long.bitCount(bOpen & 0xe7);
-                halfOpenFiles += 10 * Long.bitCount(bOpen & 0x18);
-            }
+            halfOpenFiles += getHalfOpenFiles(shelter, wPawns, bPawns);
             safety = Math.min(safety, 8);
         }
         return (safety - 9) * 15 - halfOpenFiles;
@@ -926,17 +933,7 @@ public class Evaluate {
             safety += 2 * Long.bitCount(bPawns & shelter);
             shelter >>>= 8;
             safety -= Long.bitCount(wPawns & shelter);
-
-            long wOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(wPawns)) & 0xff;
-            if (wOpen != 0) {
-                halfOpenFiles += 25 * Long.bitCount(wOpen & 0xe7);
-                halfOpenFiles += 10 * Long.bitCount(wOpen & 0x18);
-            }
-            long bOpen = BitBoard.southFill(shelter) & (~BitBoard.southFill(bPawns)) & 0xff;
-            if (bOpen != 0) {
-                halfOpenFiles += 25 * Long.bitCount(bOpen & 0xe7);
-                halfOpenFiles += 10 * Long.bitCount(bOpen & 0x18);
-            }
+            halfOpenFiles += getHalfOpenFiles(shelter, wPawns, bPawns);
             safety = Math.min(safety, 8);
         }
         return (safety - 9) * 15 - halfOpenFiles;
