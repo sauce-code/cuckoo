@@ -21,6 +21,7 @@ package org.petero.cuckoo.engine.chess;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -442,7 +443,7 @@ public class MoveGenTest {
         assertTrue(strMoves.containsAll(capList2));
 
         List<String> evList = getCheckEvasions(pos, onlyLegal);
-        if (evList != null)
+        if (!evList.isEmpty())
             assertTrue(strMoves.containsAll(evList));
         UndoInfo ui = new UndoInfo();
         for (String sm : strMoves) {
@@ -486,7 +487,7 @@ public class MoveGenTest {
                     assertTrue(capList2.contains(sm));
                 }
             }
-            if (evList != null) {
+            if (!evList.isEmpty()) {
                 assertTrue(evList.contains(sm));
             }
         }
@@ -514,7 +515,7 @@ public class MoveGenTest {
 
     private List<String> getCheckEvasions(Position pos, boolean onlyLegal) {
         if (!MoveGen.inCheck(pos))
-            return null;
+            return Collections.emptyList();
         MoveGen.MoveList moves = new MoveGen().checkEvasions(pos);
         if (onlyLegal)
             MoveGen.removeIllegal(pos, moves);
