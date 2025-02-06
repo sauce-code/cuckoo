@@ -1131,7 +1131,7 @@ public class Evaluate {
 
         int bytePos = index / 8;
         int bitPos = index % 8;
-        boolean draw = ((kpkTable[bytePos]) & (1 << bitPos)) == 0;
+        boolean draw = ((kpkTable[bytePos] & 0xff) & (1 << bitPos)) == 0;
         if (draw)
             return 0;
         return qV - pV / 4 * (7-Position.getY(wPawn));
@@ -1148,7 +1148,7 @@ public class Evaluate {
         index = index * 48 + bPawn - 8;
         index = index * 8 + Position.getY(wKing);
         byte mask = krkpTable[index];
-        boolean canWin = (mask & (1 << Position.getX(wKing))) != 0;
+        boolean canWin = (mask & 0xff & (1 << Position.getX(wKing))) != 0;
 
         int score = rV - pV + Position.getY(bPawn) * pV / 4;
         if (canWin)

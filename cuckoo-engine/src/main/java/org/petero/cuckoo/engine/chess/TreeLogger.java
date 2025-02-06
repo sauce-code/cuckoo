@@ -29,6 +29,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
+
 import org.petero.cuckoo.engine.chess.TranspositionTable.TTEntry;
 
 public final class TreeLogger {
@@ -161,7 +163,7 @@ public final class TreeLogger {
     
     /** Compute endIndex for all StartNode entries. */
     private void computeForwardPointers() {
-        if ((mapBuf.get(127) & (1<<7)) != 0)
+        if ((mapBuf.get(127) & 0xff & (1<<7)) != 0)
             return;
         System.out.print("Computing forward pointers...\n");
         StartEntry se = new StartEntry();
@@ -213,6 +215,7 @@ public final class TreeLogger {
         int otherIndex = bb.getInt(0);
         boolean isStartEntry = (otherIndex == -1) || (otherIndex > index);
         if (isStartEntry) {
+            Objects.requireNonNull(se);
             se.endIndex = otherIndex;
             se.parentIndex = bb.getInt(4);
             int m = bb.getShort(8);
@@ -222,6 +225,7 @@ public final class TreeLogger {
             se.ply = bb.get(14);
             se.depth = bb.get(15);
         } else {
+            Objects.requireNonNull(ee);
             ee.startIndex = otherIndex;
             ee.score = bb.getShort(4);
             ee.scoreType = bb.getShort(6);

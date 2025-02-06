@@ -46,6 +46,9 @@ import org.petero.cuckoo.engine.chess.UndoInfo;
  * @author petero
  */
 public class EngineControl {
+
+	private static final Random random = new Random();
+
 	final PrintStream os;
 
 	Thread engineThread;
@@ -163,7 +166,7 @@ public class EngineControl {
 	}
 
 	public final void newGame() {
-		randomSeed = new Random().nextLong();
+		randomSeed = random.nextLong();
 		tt.clear();
 	}
 
@@ -200,7 +203,7 @@ public class EngineControl {
 			final int margin = Math.min(1000, time * 9 / 10);
 			int timeLimit = (time + inc * (moves - 1) - margin) / moves;
 			minTimeLimit = (int) (timeLimit * 0.85);
-			maxTimeLimit = (int) (minTimeLimit * (Math.max(2.5, Math.min(4.0, moves / 2))));
+			maxTimeLimit = (int) (minTimeLimit * (Math.max(2.5, Math.min(4.0, moves / 2.0))));
 
 			// Leave at least 1s on the clock, but can't use negative time
 			minTimeLimit = clamp(minTimeLimit, time - margin);
@@ -236,7 +239,7 @@ public class EngineControl {
 		}
 		tt.nextGeneration();
 		final int srchmaxDepth = maxDepth;
-		engineThread = new Thread(() -> {
+		engineThread = Thread.ofVirtual().start(() -> {
 			Move m = null;
 			if (ownBook && !analyseMode) {
 				Book book = new Book(false);
@@ -283,7 +286,7 @@ public class EngineControl {
 			try {
 				myThread.join();
 			} catch (InterruptedException ex) {
-				throw new RuntimeException();
+				myThread.interrupt();
 			}
 		}
 	}
