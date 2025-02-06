@@ -356,9 +356,6 @@ public class ChessController {
     public final boolean humansTurn() {
         return game.pos.whiteMove == humanIsWhite;
     }
-    public final boolean computerThinking() {
-        return computerThread != null;
-    }
 
     public final void takeBackMove() {
         if (humansTurn()) {

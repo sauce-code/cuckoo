@@ -127,7 +127,7 @@ public class Search {
     private static final class MoveInfo {
         final Move move;
         int nodes;
-        MoveInfo(Move m, int n) { move = m;  nodes = n; }
+        MoveInfo(Move m) { move = m;  nodes = 0; }
         public static final class SortByScore implements Comparator<MoveInfo> {
             @Override
 			public int compare(MoveInfo mi1, MoveInfo mi2) {
@@ -176,7 +176,7 @@ public class Search {
         MoveInfo[] scMoves = new MoveInfo[scMovesIn.size];
         for (int mi = 0, len = 0; mi < scMovesIn.size; mi++) {
             Move m = scMovesIn.m[mi];
-            scMoves[len++] = new MoveInfo(m, 0);
+            scMoves[len++] = new MoveInfo(m);
         }
         maxNodes = initialMaxNodes;
         nodesToGo = 0;

@@ -308,12 +308,12 @@ public final class TreeLogger {
                     currIndex = found.getFirst();
                 }
             } else if (cmdStr.startsWith("u")) {
-                int n = getArg(cmdStr, 1);
+                int n = getArg(cmdStr);
                 for (int i = 0; i < n; i++)
                     currIndex = findParent(currIndex);
             } else if (cmdStr.startsWith("l")) {
                 ArrayList<Integer> children = findChildren(currIndex);
-                String m = getArgStr(cmdStr, "");
+                String m = getArgStr(cmdStr);
                 for (Integer c : children)
                     printNodeInfo(c, m);
                 doPrint = false;
@@ -323,7 +323,7 @@ public final class TreeLogger {
                     printNodeInfo(node);
                 doPrint = false;
             } else if (cmdStr.startsWith("d")) {
-                ArrayList<Integer> nVec = getArgs(cmdStr, 0);
+                ArrayList<Integer> nVec = getArgs(cmdStr);
                 for (int n : nVec) {
                     ArrayList<Integer> children = findChildren(currIndex);
                     if ((n >= 0) && (n < children.size())) {
@@ -409,7 +409,7 @@ public final class TreeLogger {
     }
 
     /** Get integer parameter from an input string. */
-    private static int getArg(String s, int defVal) {
+    private static int getArg(String s) {
         try {
             int idx = s.indexOf(' ');
             if (idx > 0) {
@@ -417,11 +417,11 @@ public final class TreeLogger {
             }
         } catch (NumberFormatException ignored) {
         }
-        return defVal;
+        return 1;
     }
 
     /** Get a list of integer parameters from an input string. */
-    ArrayList<Integer> getArgs(String s, int defVal) {
+    ArrayList<Integer> getArgs(String s) {
         ArrayList<Integer> ret = new ArrayList<>();
         String[] split = s.split(" ");
         try {
@@ -430,16 +430,16 @@ public final class TreeLogger {
         } catch (NumberFormatException e) {
             ret.clear();
         }
-        if (ret.isEmpty()) ret.add(defVal);
+        if (ret.isEmpty()) ret.add(0);
         return ret;
     }
 
     /** Get a string parameter from an input string. */
-    private static String getArgStr(String s, String defVal) {
+    private static String getArgStr(String s) {
         int idx = s.indexOf(' ');
         if (idx > 0)
             return s.substring(idx+1);
-        return defVal;
+        return "";
     }
 
     private void printHelp() {

@@ -233,12 +233,12 @@ public class Evaluate {
     /** Constructor. */
     public Evaluate() {
         if (kpkTable == null)
-            kpkTable = readTable("/kpk.bitbase", 2*32*64*48/8);
+            kpkTable = readTable("/kpk.bitbase");
         if (krkpTable == null)
-            krkpTable = readTable("/krkp.winmasks", 2*32*48*8);
+            krkpTable = readTable("/krkp.winmasks");
     }
 
-    private byte[] readTable(String resource, int length) {
+    private byte[] readTable(String resource) {
         byte[] table = new byte[2*32*64*48/8];
         InputStream inStream = getClass().getResourceAsStream(resource);
         try {

@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.Optional;
+
 import org.petero.cuckoo.engine.chess.ChessParseError;
 import org.petero.cuckoo.engine.chess.ComputerPlayer;
 import org.petero.cuckoo.engine.chess.Evaluate;
@@ -120,11 +122,11 @@ public class TUIGame extends Game {
                 String[] answers = bm.split(" ");
                 boolean correct = false;
                 for (String a : answers) {
-                    Move am = TextIO.stringToMove(testPos, a);
-                    if (am == null) {
+                    Optional<Move> am = TextIO.stringToMove(testPos, a);
+                    if (am.isEmpty()) {
                         throw new ChessParseError("Invalid move " + a);
                     }
-                    if (am.equals(m)) {
+                    if (am.get().equals(m)) {
                         correct = true;
                         break;
                     }
@@ -210,7 +212,7 @@ public class TUIGame extends Game {
         }
     }
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Player whitePlayer = new HumanPlayer();
         ComputerPlayer blackPlayer = new ComputerPlayer();
         blackPlayer.setTTLogSize(21);

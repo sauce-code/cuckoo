@@ -36,14 +36,14 @@ public class Parameters {
         public final int maxValue;
         public int value;
         public final int defaultValue;
-        SpinParam(String name, boolean visible, int minV, int maxV, int def) {
+        SpinParam(String name) {
             this.name = name;
             this.type = Type.SPIN;
-            this.visible = visible;
-            this.minValue = minV;
-            this.maxValue = maxV;
-            this.value = def;
-            this.defaultValue = def;
+            this.visible = false;
+            this.minValue = -200;
+            this.maxValue = 200;
+            this.value = 0;
+            this.defaultValue = 0;
         }
     }
 
@@ -92,11 +92,11 @@ public class Parameters {
     private final Map<String, ParamBase> params = new TreeMap<>();
 
     private Parameters() {
-        addPar(new SpinParam("qV", false, -200, 200, 0));
-        addPar(new SpinParam("rV", false, -200, 200, 0));
-        addPar(new SpinParam("bV", false, -200, 200, 0));
-        addPar(new SpinParam("nV", false, -200, 200, 0));
-        addPar(new SpinParam("pV", false, -200, 200, 0));
+        addPar(new SpinParam("qV"));
+        addPar(new SpinParam("rV"));
+        addPar(new SpinParam("bV"));
+        addPar(new SpinParam("nV"));
+        addPar(new SpinParam("pV"));
     }
 
     private void addPar(ParamBase p) {
