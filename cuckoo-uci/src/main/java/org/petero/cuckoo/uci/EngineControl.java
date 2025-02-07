@@ -242,7 +242,7 @@ public class EngineControl {
 		}
 		tt.nextGeneration();
 		final int srchmaxDepth = maxDepth;
-		engineThread = Thread.ofVirtual().start(() -> {
+		engineThread = new Thread(() -> {
 			Move m = null;
 			if (ownBook && !analyseMode) {
 				Book book = new Book(false);
