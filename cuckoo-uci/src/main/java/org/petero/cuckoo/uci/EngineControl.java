@@ -159,6 +159,9 @@ public class EngineControl {
 		}
 		infinite = (maxTimeLimit < 0) && (maxDepth < 0) && (maxNodes < 0);
 		ponder = false;
+		synchronized (threadMutex) {
+			threadMutex.notifyAll();
+		}
 	}
 
 	public final void stopSearch() {
@@ -248,14 +251,17 @@ public class EngineControl {
 			if (m == null) {
 				m = sc.iterativeDeepening(srchMoves, srchmaxDepth, maxNodes, false);
 			}
-			while (ponder || infinite) {
+
 				// We should not respond until told to do so. Just wait
 				// until
 				// we are allowed to respond.
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException ex) {
-					break;
+			synchronized (threadMutex) {
+				while (ponder || infinite) {
+					try {
+						threadMutex.wait();
+					} catch (InterruptedException ex) {
+						Thread.currentThread().interrupt();
+					}
 				}
 			}
 			Move ponderMove = getPonderMove(pos, m);
