@@ -210,8 +210,6 @@ public class Game {
                 drawState = GameState.ALIVE;
                 resignState = GameState.ALIVE;
                 return handleCommand("swap");
-            } else {
-                System.out.println("Nothing to undo");
             }
             return true;
         } else if (moveStr.equals("redo")) {
@@ -220,8 +218,6 @@ public class Game {
                 currentMove++;
                 pendingDrawOffer = false;
                 return handleCommand("swap");
-            } else {
-                System.out.println("Nothing to redo");
             }
             return true;
         } else if (moveStr.equals("swap") || moveStr.equals("go")) {

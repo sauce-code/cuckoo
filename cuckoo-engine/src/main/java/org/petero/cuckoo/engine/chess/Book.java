@@ -95,11 +95,6 @@ public class Book {
             System.out.println("Can't read opening book resource");
             throw new RuntimeException();
         }
-        if (verbose) {
-            long t1 = System.currentTimeMillis();
-            System.out.printf("Book moves:%d (parse time:%.3f)%n", numBookMoves,
-                    (t1 - t0) / 1000.0);
-        }
     }
 
     /** Add a move to a position in the opening book. */

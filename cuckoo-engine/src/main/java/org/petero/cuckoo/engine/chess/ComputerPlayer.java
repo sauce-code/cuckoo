@@ -87,7 +87,6 @@ public class ComputerPlayer implements Player {
         if (bookEnabled) {
             Move bookMove = book.getBookMove(pos);
             if (bookMove != null) {
-                System.out.printf("Book moves: %s\n", book.getAllBookMoves(pos));
                 return TextIO.moveToString(pos, bookMove, false);
             }
         }
